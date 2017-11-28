@@ -1,0 +1,14 @@
+.DS_Store
+*~
+*#
+#*
+public_html
+node_modules
+build
+.sass-cache
+.tmp
+
+.idea
+# Logs
+logs
+*.log
