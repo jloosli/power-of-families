@@ -1,0 +1,50 @@
+@media screen and (max-width: 768px){
+  div .fl-post-feed-post.fl-post-feed-image-beside {
+    max-width: 500px;
+  }
+}
+body .max-900 {
+  max-width: 900px;
+  margin: auto;
+}
+body .max-800 {
+  max-width: 800px;
+  margin: auto;
+}
+@media screen and (min-width: 960px) {
+  .fl-builder-max-900 .entry {
+    padding-left: 160px;
+    padding-right: 160px;
+  }
+  .fl-builder-max-900 .fl-row > div {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .fl-builder-max-900 .fl-row .fl-module-content {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+/* Full Width Page (Beaver Builder)
+-------------------------------------------- */
+body .content .fl-post-feed-post {
+  padding-bottom: 40px;
+  margin-bottom: 40px;
+}
+.fl-builder-full .site-inner {
+  max-width: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+.fl-builder-full .entry,
+.fl-builder-content .entry {
+  padding: 0;
+}
+
+@media only screen and (max-width: 800px) {
+  .fl-builder-full .site-inner {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}

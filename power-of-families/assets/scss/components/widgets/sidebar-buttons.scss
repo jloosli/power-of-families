@@ -1,0 +1,51 @@
+.sidebar-button a {
+  color:$color_2;
+  font-size:18px;
+  font-weight:bold;
+  padding:12px 20px;
+  display:block;
+  float:none;
+  transition:background-color .25s ease-in-out;
+  -moz-transition:background-color .25s ease-in-out;
+  -webkit-transition:background-color .25s ease-in-out;
+  -o-transition:background-color .25s ease-in-out;
+}
+
+.sidebar .widget.sidebar-button {
+  margin:40px 0 0 0;
+}
+
+.sidebar-button + .sidebar-button {
+  margin-top:7px!important;
+}
+
+.sidebar-button + .widget:not(.sidebar-button){
+  margin-top:40px;
+}
+
+.sidebar-button a:hover {
+  text-decoration:none;
+}
+
+.widget.orange-button a {
+  background-color:$background_color_5;
+  border-bottom:3px solid $background_color_13;
+}
+
+.widget.orange-button a:hover {
+  background-color:$background_color_13;
+}
+
+.widget.blue-button a {
+  background-color:$background_color_14;
+  border-bottom:3px solid #167da1;
+}
+
+.widget.blue-button a:hover {
+  background-color:$background_color_15;
+}
+
+.widget.green-button a {
+  background-color:$color_7;
+  border-bottom:3px solid $color_9;
+}

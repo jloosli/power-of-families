@@ -5,3 +5,4 @@ $Autoloader = new \POF\Autoloader();
 $ThemeSetup = new \Avanti\ThemeSetup();
 
 new \Avanti\WooCommerce();
+new \Avanti\Readme();

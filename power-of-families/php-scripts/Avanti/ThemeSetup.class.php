@@ -44,6 +44,11 @@ class ThemeSetup
         wp_enqueue_style('fontello', get_stylesheet_directory_uri() . '/css/fontello.css', array(), CHILD_THEME_VERSION);
 
         wp_enqueue_style('custom-google-fonts', 'https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,600,700|Playfair+Display:400,700', false);
+        wp_enqueue_style('power_of_families_styles', 'http://localhost:8010/assets/main.css');
+    }
+
+    function custom_load_custom_scripts() {
+        wp_enqueue_script('power_of_families_scripts','http://localhost:8010/assets/scripts.js', ['jquery'], CHILD_THEME_VERSION, true);
     }
 
     function genesis_init()
@@ -146,6 +151,7 @@ class ThemeSetup
         // Add Javascript and stylesheets
         add_action('genesis_after_footer', [$this, 'after_body_js']);
         add_action('wp_enqueue_scripts', [$this, 'custom_load_custom_style_sheet'], 0);
+        add_action('wp_enqueue_scripts', [$this, 'custom_load_custom_scripts'], 0);
 
     }
 

@@ -4,7 +4,8 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var WebpackNotifierPlugin = require('webpack-notifier');
 
 const extractSass = new ExtractTextPlugin({
-  filename: "[name].[contenthash].css",
+  filename: "[name].css",
+  // filename: "[name].[contenthash].css",
   disable: process.env.NODE_ENV === "development"
 });
 
@@ -15,6 +16,7 @@ module.exports = {
       // 'babel-polyfill',
       'webpack-dev-server/client?http://localhost:8010',
       './power-of-families/src/main.ts',
+      './power-of-families/assets/scss/main.scss'
     ]
   },
   output: {

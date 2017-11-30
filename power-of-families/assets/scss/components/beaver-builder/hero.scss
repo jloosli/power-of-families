@@ -1,0 +1,38 @@
+#hero .fl-content-slider-wrapper .fl-slide-content {
+  background-color: $background_color_8 !important;
+}
+.fl-node-59fcd97827984 .fl-heading {
+  color: $color_1;
+}
+#hero .fl-slide:before  {
+  position: absolute;
+  content: "";
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: $background_color_9;
+  z-index: 2;
+}
+#hero .fl-slide-content {
+  position: absolute;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  bottom: 0px;
+  right: 0;
+  left: 0;
+}
+@media screen and (min-width: 769px) {
+  #hero .fl-slide-content {
+    bottom: 140px;
+  }
+}
+#hero .fl-slide-title {
+  margin-bottom: 0 !important;
+  font-weight: normal;
+  font-family: $font_family_3;
+  letter-spacing: 1px;
+}
+.fl-node-59fce7e97a1ce {
+  border-bottom: 3px solid $color_6;
+}

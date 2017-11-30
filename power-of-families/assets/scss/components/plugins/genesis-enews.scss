@@ -1,0 +1,34 @@
+.enews-widget,
+.enews-widget .widget-title {
+  color: $color_2;
+}
+
+.sidebar .widget.enews-widget {
+  background-color: $color_4;
+}
+
+.enews-widget input,
+.enews-widget input:focus {
+  border: 1px solid $color_4;
+}
+
+.enews-widget input {
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+.enews-widget input[type="submit"] {
+  background-color: $color_3;
+  color: $color_2;
+  margin: 0;
+  width: 100%;
+}
+
+.enews-widget input:hover[type="submit"] {
+  background-color: $color_2;
+  color: $color_4;
+}
+
+.enews form + p {
+  margin-top: 24px;
+}

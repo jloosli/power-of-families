@@ -1,3 +1,40 @@
-.reddish {
-  color: red;
-}
+/*
+- Media Queries
+	- Retina Display
+	- Max-width: 1200px
+	- Max-width: 960px
+	- Max-width: 800px
+*/
+@import 'components/fonts';
+@import 'components/normalize.css';
+@import 'components/custom-reset.scss';
+@import 'components/variables.scss';
+@import 'components/typography.scss';
+@import 'components/objects';
+@import 'components/gallery';
+@import 'components/forms';
+@import 'components/tables';
+@import 'components/layout/index';
+@import 'components/beaver-builder/index';
+@import 'components/avatar';
+@import 'components/genesis';
+@import 'components/search-form';
+@import 'components/titles';
+@import 'components/common';
+@import 'components/wordpress';
+@import 'components/featured-content';
+@import 'components/plugins/index';
+@import 'components/site-header/index';
+@import 'components/site-nav';
+@import 'components/nav/index';
+@import 'components/entries';
+@import 'components/pagination';
+@import 'components/comments';
+@import 'components/widgets/index';
+@import 'components/archive';
+@import 'components/widgets/index';
+@import 'components/site-footer.scss';
+@import 'components/footer-menu.scss';
+@import 'components/header-opt-in.scss';
+@import 'components/media-queries';
+

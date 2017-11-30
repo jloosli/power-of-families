@@ -1,0 +1,35 @@
+.header-opt-in {
+  text-align:left;
+  margin-top:14px;
+}
+
+.header-opt-in img {
+  float:left;
+  width:105px;
+  display:block;
+}
+
+.header-opt-in-right {
+  float:right;
+  width:225px;
+}
+
+.header-opt-in button {
+  padding:5px 26px;
+  font-size:14px;
+  margin:0;
+}
+
+.header-opt-in p {
+  margin-bottom:6px;
+  line-height:1.3;
+  color:$color_14;
+}
+
+.header-opt-in h3 {
+  margin-bottom:4px;
+  margin-top: -7px;
+  line-height:1.3;
+  font-size:24px;
+  color:$color_3;
+}
