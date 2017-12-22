@@ -2,9 +2,9 @@
 *~
 *#
 #*
-public_html
 node_modules
 build
+dist
 .sass-cache
 .tmp
 

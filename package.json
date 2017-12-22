@@ -7,17 +7,17 @@
   "license": "UNLICENSED",
   "scripts": {
     "dev": "npm run webpack-dev",
-    "build": "npm run clean-build && npm run copy && npm run build:scripts && npm run replaceAssetUrls && npm run reversion",
+    "build": "npm run copy && npm run build:scripts && npm run replaceAssetUrls && npm run reversion",
     "build:scripts": "npm run pack-js",
-    "clean-build": "rimraf build",
-    "copy": "cpx \"./power-of-families/assets/images/**/*.{png,gif,jpg,ico,svg}\" ./build/power-of-families/assets/images && cpx \"./power-of-families-theme/**/*.php\" ./build/power-of-families/ && cpx \"./power-of-families-theme/style.css\" ./build/power-of-families && cpx \"./power-of-families-theme/screenshot.png\" ./build/power-of-families && cpx \"./power-of-families-theme/assets/ie9.css\" ./build/power-of-families/assets",
-    "pack-js": "webpack --config ./webpack.prod.config.js",
+    "copy": "cpx \"./power-of-families/assets/images/**/*.{png,gif,jpg,ico,svg}\" ./build/power-of-families/assets/images && cpx \"./power-of-families-theme/**/*.php\" ./build/power-of-families/ && cpx \"./power-of-families-theme/screenshot.png\" ./build/power-of-families && cpx \"./power-of-families-theme/assets/ie9.css\" ./build/power-of-families/assets",
+    "pack-js": "webpack --config ./webpack.prod.js",
     "replaceAssetUrls": "replace \"'http://localhost:8010\" \"get_template_directory_uri() . '\" ./build/power-of-families/php-scripts/Bpm/ThemeSetup.class.php",
     "reversion": "node ./bin/reversion",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "webpack-dev": "webpack-dev-server --port 8010 --progress --colors --inline --content-base power-of-families-theme/assets/js/ --history-api-fallback"
+    "webpack-dev": "webpack-dev-server --config webpack.dev.js"
   },
   "devDependencies": {
+    "clean-webpack-plugin": "^0.1.17",
     "cpx": "^1.5.0",
     "css-loader": "^0.28.7",
     "extract-text-webpack-plugin": "^3.0.2",
@@ -30,9 +30,12 @@
     "style-loader": "^0.19.0",
     "ts-loader": "^3.1.1",
     "typescript": "^2.6.2",
+    "uglifyjs-webpack-plugin": "^1.1.4",
     "webpack": "^3.8.1",
     "webpack-dev-server": "^2.9.5",
     "webpack-notifier": "^1.5.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "webpack-merge": "^4.1.1"
+  }
 }

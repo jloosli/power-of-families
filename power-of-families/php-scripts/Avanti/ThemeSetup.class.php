@@ -31,7 +31,7 @@ class ThemeSetup
     {
         wp_enqueue_script('bootstrap', get_stylesheet_directory_uri() . '/bootstrap/js/bootstrap.min.js', array('jquery'), '', true);
         wp_enqueue_script('z-responsive-menu', get_stylesheet_directory_uri() . '/lib/js/responsive-menu.js', array('jquery'), '', true);
-        wp_enqueue_script('scripts', get_stylesheet_directory_uri() . '/js/scripts.js', array('jquery'), CHILD_THEME_VERSION, true);
+        wp_enqueue_script('scripts', get_stylesheet_directory_uri() . '/js/main.js', array('jquery'), CHILD_THEME_VERSION, true);
 
     }
 
@@ -46,7 +46,7 @@ class ThemeSetup
 
     function custom_load_custom_scripts()
     {
-        wp_enqueue_script('power_of_families_scripts', 'http://localhost:8010/assets/scripts.js', ['jquery'], CHILD_THEME_VERSION, true);
+        wp_enqueue_script('power_of_families_scripts', 'http://localhost:8010/assets/main.js', ['jquery'], CHILD_THEME_VERSION, true);
     }
 
     function genesis_init()
