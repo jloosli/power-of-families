@@ -14,8 +14,6 @@ class ThemeSetup
     function __construct()
     {
         $this->init();
-
-
     }
 
     /**
@@ -37,7 +35,6 @@ class ThemeSetup
 
     }
 
-
     function custom_load_custom_style_sheet()
     {
         wp_enqueue_style('bootstrap', get_stylesheet_directory_uri() . '/bootstrap/css/bootstrap.min.css', array(), CHILD_THEME_VERSION);
@@ -47,8 +44,9 @@ class ThemeSetup
         wp_enqueue_style('power_of_families_styles', 'http://localhost:8010/assets/main.css');
     }
 
-    function custom_load_custom_scripts() {
-        wp_enqueue_script('power_of_families_scripts','http://localhost:8010/assets/scripts.js', ['jquery'], CHILD_THEME_VERSION, true);
+    function custom_load_custom_scripts()
+    {
+        wp_enqueue_script('power_of_families_scripts', 'http://localhost:8010/assets/scripts.js', ['jquery'], CHILD_THEME_VERSION, true);
     }
 
     function genesis_init()
@@ -61,8 +59,8 @@ class ThemeSetup
     {
         //* Child theme (do not remove)
         define('CHILD_THEME_NAME', 'Power of Families');
-        define('CHILD_THEME_URL', 'http://zachswinehart.com/');
-        define('CHILD_THEME_VERSION', '1.0.2');
+        define('CHILD_THEME_URL', 'http://avantidevelopment.com/');
+        define('CHILD_THEME_VERSION', '2.0.0');
 
         //* Add HTML5 markup structure
         add_theme_support('html5', ['search-form', 'comment-form', 'comment-list']);
@@ -179,7 +177,7 @@ class ThemeSetup
     function newgravatar($avatar_defaults)
     {
         $myavatar = get_stylesheet_directory_uri() . '/images/default_avatar.jpg';
-        $avatar_defaults[$myavatar] = "Power of Moms Avatar";
+        $avatar_defaults[$myavatar] = "Power of Families Avatar";
 
         return $avatar_defaults;
     }

@@ -49,12 +49,14 @@ module.exports = {
           use: [
             // {
             // loader: "style-loader" // creates style nodes from JS strings
-          // },
+            // },
             {
-            loader: "css-loader" // translates CSS into CommonJS
-          }, {
-            loader: "sass-loader" // compiles Sass to CSS
-          }],
+              loader: "css-loader" // translates CSS into CommonJS
+            },
+            {
+              loader: "sass-loader" // compiles Sass to CSS
+            }
+          ],
           fallback: "style-loader"
         })
         // loader: ExtractTextPlugin.extract(

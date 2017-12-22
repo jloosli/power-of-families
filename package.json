@@ -10,12 +10,12 @@
     "build": "npm run clean-build && npm run copy && npm run build:scripts && npm run replaceAssetUrls && npm run reversion",
     "build:scripts": "npm run pack-js",
     "clean-build": "rimraf build",
-    "copy": "cpx \"./theme_vivial2016/assets/images/**/*.{png,gif,jpg,ico,svg}\" ./build/vivial2016/assets/images && cpx \"./theme_vivial2016/**/*.php\" ./build/vivial2016/ && cpx \"./theme_vivial2016/style.css\" ./build/vivial2016 && cpx \"./theme_vivial2016/screenshot.png\" ./build/vivial2016 && cpx \"./theme_vivial2016/assets/ie9.css\" ./build/vivial2016/assets",
+    "copy": "cpx \"./power-of-families/assets/images/**/*.{png,gif,jpg,ico,svg}\" ./build/power-of-families/assets/images && cpx \"./power-of-families-theme/**/*.php\" ./build/power-of-families/ && cpx \"./power-of-families-theme/style.css\" ./build/power-of-families && cpx \"./power-of-families-theme/screenshot.png\" ./build/power-of-families && cpx \"./power-of-families-theme/assets/ie9.css\" ./build/power-of-families/assets",
     "pack-js": "webpack --config ./webpack.prod.config.js",
-    "replaceAssetUrls": "replace \"'http://localhost:8010\" \"get_template_directory_uri() . '\" ./build/vivial2016/php-scripts/Bpm/ThemeSetup.class.php",
+    "replaceAssetUrls": "replace \"'http://localhost:8010\" \"get_template_directory_uri() . '\" ./build/power-of-families/php-scripts/Bpm/ThemeSetup.class.php",
     "reversion": "node ./bin/reversion",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "webpack-dev": "webpack-dev-server --port 8010 --progress --colors --inline --content-base theme_vivial2016/assets/js/ --history-api-fallback"
+    "webpack-dev": "webpack-dev-server --port 8010 --progress --colors --inline --content-base power-of-families-theme/assets/js/ --history-api-fallback"
   },
   "devDependencies": {
     "cpx": "^1.5.0",
@@ -25,6 +25,7 @@
     "json-loader": "^0.5.7",
     "node-sass": "^4.7.2",
     "node-version-assets": "^1.2.2",
+    "normalize.css": "^7.0.0",
     "sass-loader": "^6.0.6",
     "style-loader": "^0.19.0",
     "ts-loader": "^3.1.1",

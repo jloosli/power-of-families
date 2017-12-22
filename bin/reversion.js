@@ -1,4 +1,3 @@
-/* ~/www/project-x/version.js */
 var Version = require("node-version-assets");
 var versionInstance = new Version({
     assets: ['build/vivial2016/assets/main.css', 'build/vivial2016/assets/scripts.js'],

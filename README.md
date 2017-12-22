@@ -26,3 +26,7 @@ For working with visual composer and our custom shortcodes, see: https://wpbaker
 ### Building ###
 
 Run `npm run build` to package up the theme into the `build` directory, ready for ftp upload.
+
+
+#### Notes
+https://alexjoverm.github.io/2017/03/06/Tree-shaking-with-Webpack-2-TypeScript-and-Babel/

@@ -14,19 +14,35 @@ class WooCommerce
 
     function __construct()
     {
-        add_action('woocommerce_after_shop_loop_item_title', [$this, 'woocommerce_after_shop_loop_item_title_short_description'], 5);
+        add_action('woocommerce_after_shop_loop_item_title',
+            [$this, 'woocommerce_after_shop_loop_item_title_short_description'], 5);
+
+        // Replace add to card button with learn more in the store page
+        add_action('init', [$this, 'remove_loop_button']);
+        add_action('woocommerce_after_shop_loop_item', [$this, 'replace_add_to_cart']);
     }
 
     function woocommerce_after_shop_loop_item_title_short_description()
     {
         global $product;
-        if (!$product->post->post_excerpt) return;
+        $excerpt=$product->get_short_description();
+        if (!$excerpt) return;
         ?>
         <div itemprop="description">
-            <?php echo apply_filters('woocommerce_short_description', $product->post->post_excerpt) ?>
+            <?php echo apply_filters('woocommerce_short_description', $excerpt); ?>
         </div>
         <?php
     }
 
+    function remove_loop_button()
+    {
+        remove_action('woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10);
+    }
 
+    function replace_add_to_cart()
+    {
+        global $product;
+        $link = $product->get_permalink();
+        echo do_shortcode('<br><a class="button" href="' . esc_attr($link) . '">Learn More</a>');
+    }
 }

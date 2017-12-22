@@ -1,23 +1,26 @@
 var path = require('path');
 var webpack = require('webpack');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
-
+const extractSass = new ExtractTextPlugin({
+  filename: "[name].css",
+  // filename: "[name].[contenthash].css",
+  disable: process.env.NODE_ENV === "development"
+});
 module.exports = {
   entry: {
     main: [
       'babel-polyfill',
-      './theme_vivial2016/assets/js/main',
+      './power-of-families/src/main.ts',
+      './power-of-families/assets/scss/main.scss'
     ]
   },
   output: {
     filename: 'scripts.js',
-    path: __dirname + '/build/vivial2016/assets/',
+    path: __dirname + '/build/power-of-families/assets/',
     publicPath: './'
   },
   resolve: {
-    modulesDirectories: ['node_modules'],
-    root: path.resolve('./theme_vivial2016/assets/js'),
-    extensions:         ['', '.js', '.jsx', '.scss']
+    extensions: ['.ts', '.js', '.tsx', '.scss']
   },
   loader: {
     appSettings: {
@@ -27,19 +30,9 @@ module.exports = {
   module: {
     loaders: [
       {
-        test: /\.jsx?$/,
+        test: /\.tsx?$/,
         exclude: /(node_modules|build)/,
-        loader: 'babel',
-        babelrc: false,
-        query: {
-          presets: ['es2015', 'react', 'stage-1'],
-          plugins: []
-        }
-      },
-      {
-        test: /\.jsx?$/,
-        loader: "eslint-loader",
-        exclude: /(node_modules|build)/
+        loader: 'ts-loader'
       },
       {
         "test": /\.json$/,
@@ -47,18 +40,26 @@ module.exports = {
       },
       {
         test: /\.scss$/,
-        loader: ExtractTextPlugin.extract(
-          'css?sourceMap!sass?outputStyle=compressed' // loaders to preprocess CSS
-        )
+        use: extractSass.extract({
+          use: [
+            // {
+            // loader: "style-loader" // creates style nodes from JS strings
+            // },
+            {
+              loader: "css-loader" // translates CSS into CommonJS
+            },
+            {
+              loader: "sass-loader" // compiles Sass to CSS
+            }
+          ],
+          fallback: "style-loader"
+        })
       },
       {
         test: /\.(png|gif|jpg|ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
         loader: 'file-loader'
       }
-    ],
-    eslint: {
-      configFile: '.eslintrc.js'
-    }
+    ]
   },
   plugins: [
     new webpack.DefinePlugin({
