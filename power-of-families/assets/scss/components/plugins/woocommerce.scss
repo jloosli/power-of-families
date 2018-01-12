@@ -6,6 +6,15 @@ div .woocommerce input.button {
   color: $color_2;
 }
 
+.woocommerce-page .checkout .col2-set .col-1 {
+  width: 100%;
+}
+
+.woocommerce div.product .woocommerce-tabs ul.tabs {
+  display: none;
+}
+
+
 @media screen and (min-width: 768px) {
   .fl-module-woocommerce .woocommerce ul.products li.product {
     background-color: $background_color_1;
