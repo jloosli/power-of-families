@@ -11,9 +11,21 @@ namespace Avanti;
 
 class ThemeSetup
 {
+    CONST RUNNING_PROD = 2 ** 1;
+    CONST RUNNING_DEV = 2 ** 2;
+    public $run_location;
+    public $asset_directory;
+
     function __construct()
     {
         $this->init();
+        $this->run_location = strpos($_SERVER['SERVER_NAME'], '.com') ? self::RUNNING_PROD : self::RUNNING_DEV;
+        $this->setAssetDirectory();
+    }
+
+    function setAssetDirectory() {
+        $this->asset_directory = self::RUNNING_DEV ? 'http://localhost:8010' : get_stylesheet_directory_uri();
+        $this->asset_directory .= '/assets';
     }
 
     /**
@@ -29,19 +41,21 @@ class ThemeSetup
 
     function after_body_js()
     {
+        $js_loc = $this->asset_directory . '/main.js';
         wp_enqueue_script('bootstrap', get_stylesheet_directory_uri() . '/bootstrap/js/bootstrap.min.js', array('jquery'), '', true);
         wp_enqueue_script('z-responsive-menu', get_stylesheet_directory_uri() . '/lib/js/responsive-menu.js', array('jquery'), '', true);
-        wp_enqueue_script('scripts', get_stylesheet_directory_uri() . '/js/main.js', array('jquery'), CHILD_THEME_VERSION, true);
+        wp_enqueue_script('scripts', $js_loc, array('jquery'), CHILD_THEME_VERSION, true);
 
     }
 
     function custom_load_custom_style_sheet()
     {
+        $stylesheet_loc = $this->asset_directory . '/main.css';
         wp_enqueue_style('bootstrap', get_stylesheet_directory_uri() . '/bootstrap/css/bootstrap.min.css', array(), CHILD_THEME_VERSION);
-        wp_enqueue_style('fontello', get_stylesheet_directory_uri() . '/css/fontello.css', array(), CHILD_THEME_VERSION);
+//        wp_enqueue_style('fontello', get_stylesheet_directory_uri() . '/css/fontello.css', array(), CHILD_THEME_VERSION);
 
         wp_enqueue_style('custom-google-fonts', 'https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,600,700|Playfair+Display:400,700', false);
-        wp_enqueue_style('power_of_families_styles', 'http://localhost:8010/assets/main.css');
+        wp_enqueue_style('power_of_families_styles', $stylesheet_loc);
     }
 
     function custom_load_custom_scripts()
@@ -55,12 +69,17 @@ class ThemeSetup
         include_once(get_template_directory() . '/lib/init.php');
     }
 
+    function getVersion() {
+        return trim(file_get_contents(__DIR__. '/../../version.txt'));
+    }
+
     function child_theme_setup()
     {
+        $version = $this->getVersion();
         //* Child theme (do not remove)
         define('CHILD_THEME_NAME', 'Power of Families');
         define('CHILD_THEME_URL', 'http://avantidevelopment.com/');
-        define('CHILD_THEME_VERSION', '2.0.0');
+        define('CHILD_THEME_VERSION', $version);
 
         //* Add HTML5 markup structure
         add_theme_support('html5', ['search-form', 'comment-form', 'comment-list']);

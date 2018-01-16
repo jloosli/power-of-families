@@ -21,7 +21,8 @@ class WooCommerce
         add_action('init', [$this, 'remove_loop_button']);
         add_action('woocommerce_after_shop_loop_item', [$this, 'replace_add_to_cart']);
 
-        add_filter('gettext', [$this, 'change_billing_details_to_your_details']);
+        add_filter('gettext', [$this, 'change_billing_details_to_your_details'], 20, 3);
+        add_filter('woocommerce_checkout_login_message',[$this, 'returning_customer_to_returning_member']);
     }
 
     function woocommerce_after_shop_loop_item_title_short_description()
@@ -48,13 +49,18 @@ class WooCommerce
         echo do_shortcode('<br><a class="button" href="' . esc_attr($link) . '">Learn More</a>');
     }
 
-    function change_billing_details_to_your_details($translated_text, $text, $domain)
+    function change_billing_details_to_your_details($translated_text, $text='', $domain='')
     {
-        switch (strtolower('Billing Details')) {
+        remove_filter(current_filter(), __FUNCTION__);
+        switch (strtolower($translated_text)) {
             case 'billing details':
                 $translated_text = __('Your details', 'woocommerce');
                 break;
         }
         return $translated_text;
+    }
+
+    function returning_customer_to_returning_member(){
+        return 'Returning Member?';
     }
 }

@@ -7,14 +7,14 @@
   "license": "UNLICENSED",
   "scripts": {
     "dev": "npm run webpack-dev",
-    "build": "npm run copy && npm run build:scripts && npm run replaceAssetUrls && npm run reversion",
+    "build": "npm run version-bump && npm run build:scripts && npm run copy",
     "build:scripts": "npm run pack-js",
-    "copy": "cpx \"./power-of-families/assets/images/**/*.{png,gif,jpg,ico,svg}\" ./build/power-of-families/assets/images && cpx \"./power-of-families-theme/**/*.php\" ./build/power-of-families/ && cpx \"./power-of-families-theme/screenshot.png\" ./build/power-of-families && cpx \"./power-of-families-theme/assets/ie9.css\" ./build/power-of-families/assets",
+    "copy": "cpx \"./power-of-families/assets/images/**/*.{png,gif,jpg,ico,svg}\" ./build/power-of-families/assets/images && cpx \"./power-of-families/**/*.php\" ./build/power-of-families/ && cpx \"./power-of-families/*.{png,css,txt}\" ./build/power-of-families && cpx \"./power-of-families/assets/ie9.css\" ./build/power-of-families/assets",
     "pack-js": "webpack --config ./webpack.prod.js",
-    "replaceAssetUrls": "replace \"'http://localhost:8010\" \"get_template_directory_uri() . '\" ./build/power-of-families/php-scripts/Bpm/ThemeSetup.class.php",
-    "reversion": "node ./bin/reversion",
+    "version-bump": "node ./bin/bump-version",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "webpack-dev": "webpack-dev-server --config webpack.dev.js"
+    "webpack-dev": "webpack-dev-server --config webpack.dev.js",
+    "deploy": "yarn run build && rsync --dry-run -avzhe ssh ./build/ pof:html/wp-content/themes/"
   },
   "devDependencies": {
     "clean-webpack-plugin": "^0.1.17",
@@ -27,6 +27,7 @@
     "node-version-assets": "^1.2.2",
     "normalize.css": "^7.0.0",
     "sass-loader": "^6.0.6",
+    "semver": "^5.4.1",
     "style-loader": "^0.19.0",
     "ts-loader": "^3.1.1",
     "typescript": "^2.6.2",

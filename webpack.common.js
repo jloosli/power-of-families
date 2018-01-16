@@ -19,7 +19,7 @@ module.exports = {
   },
   output: {
     filename: '[name].js',
-    path: __dirname + '/dist/',
+    path: __dirname + '/build/power-of-families/assets/',
     publicPath: '/assets/'
   },
   resolve: {
