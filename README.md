@@ -3,8 +3,8 @@ Power of Families Wordpress Theme
 
 This repo only stores the theme files. In dev environment, it's recommended you install wordpress in a `public_html` directory. Then setup a symlink to the theme folder.
 
-`cd public_html/wp-content/themes` (the bluon theme directory shouldn't exist yet)
-`sudo ln -s ../../../theme_vivial2016 vivial2016` To create the symlink
+`cd www/wp-content/themes` (the bluon theme directory shouldn't exist yet)
+`sudo ln -s ../../../power-of-families-theme/power-of-families pof-symlink` To create the symlink
 
 ### Developing ###
 

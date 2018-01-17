@@ -14,9 +14,10 @@
     "version-bump": "node ./bin/bump-version",
     "test": "echo \"Error: no test specified\" && exit 1",
     "webpack-dev": "webpack-dev-server --config webpack.dev.js",
-    "deploy": "yarn run build && rsync --dry-run -avzhe ssh ./build/ pof:html/wp-content/themes/"
+    "deploy": "yarn run build && rsync -avzhe ssh ./build/ pof:html/wp-content/themes/"
   },
   "devDependencies": {
+    "@types/jquery": "^3.2.18",
     "clean-webpack-plugin": "^0.1.17",
     "cpx": "^1.5.0",
     "css-loader": "^0.28.7",
@@ -37,6 +38,7 @@
     "webpack-notifier": "^1.5.0"
   },
   "dependencies": {
+    "bootstrap": "^3.3.7",
     "webpack-merge": "^4.1.1"
   }
 }

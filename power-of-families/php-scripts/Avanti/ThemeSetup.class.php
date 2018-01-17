@@ -11,20 +11,20 @@ namespace Avanti;
 
 class ThemeSetup
 {
-    CONST RUNNING_PROD = 2 ** 1;
-    CONST RUNNING_DEV = 2 ** 2;
+    CONST RUNNING_PROD = 2 ** 0;
+    CONST RUNNING_DEV = 2 ** 1;
     public $run_location;
     public $asset_directory;
 
     function __construct()
     {
         $this->init();
-        $this->run_location = strpos($_SERVER['SERVER_NAME'], '.com') ? self::RUNNING_PROD : self::RUNNING_DEV;
+        $this->run_location = strpos($_SERVER['SERVER_NAME'], '.com') !== false ? self::RUNNING_PROD : self::RUNNING_DEV;
         $this->setAssetDirectory();
     }
 
     function setAssetDirectory() {
-        $this->asset_directory = self::RUNNING_DEV ? 'http://localhost:8010' : get_stylesheet_directory_uri();
+        $this->asset_directory = $this->run_location === self::RUNNING_DEV ? 'http://localhost:8010' : get_stylesheet_directory_uri();
         $this->asset_directory .= '/assets';
     }
 
@@ -42,8 +42,8 @@ class ThemeSetup
     function after_body_js()
     {
         $js_loc = $this->asset_directory . '/main.js';
-        wp_enqueue_script('bootstrap', get_stylesheet_directory_uri() . '/bootstrap/js/bootstrap.min.js', array('jquery'), '', true);
-        wp_enqueue_script('z-responsive-menu', get_stylesheet_directory_uri() . '/lib/js/responsive-menu.js', array('jquery'), '', true);
+        wp_enqueue_script('bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', array('jquery'), '3.3.7', true);
+//        wp_enqueue_script('z-responsive-menu', get_stylesheet_directory_uri() . '/lib/js/responsive-menu.js', array('jquery'), '', true);
         wp_enqueue_script('scripts', $js_loc, array('jquery'), CHILD_THEME_VERSION, true);
 
     }
@@ -51,16 +51,11 @@ class ThemeSetup
     function custom_load_custom_style_sheet()
     {
         $stylesheet_loc = $this->asset_directory . '/main.css';
-        wp_enqueue_style('bootstrap', get_stylesheet_directory_uri() . '/bootstrap/css/bootstrap.min.css', array(), CHILD_THEME_VERSION);
+        wp_enqueue_style('bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css', array(), '3.3.7');
 //        wp_enqueue_style('fontello', get_stylesheet_directory_uri() . '/css/fontello.css', array(), CHILD_THEME_VERSION);
 
         wp_enqueue_style('custom-google-fonts', 'https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,600,700|Playfair+Display:400,700', false);
         wp_enqueue_style('power_of_families_styles', $stylesheet_loc);
-    }
-
-    function custom_load_custom_scripts()
-    {
-        wp_enqueue_script('power_of_families_scripts', 'http://localhost:8010/assets/main.js', ['jquery'], CHILD_THEME_VERSION, true);
     }
 
     function genesis_init()
@@ -168,7 +163,6 @@ class ThemeSetup
         // Add Javascript and stylesheets
         add_action('genesis_after_footer', [$this, 'after_body_js']);
         add_action('wp_enqueue_scripts', [$this, 'custom_load_custom_style_sheet'], 0);
-        add_action('wp_enqueue_scripts', [$this, 'custom_load_custom_scripts'], 0);
 
     }
 
