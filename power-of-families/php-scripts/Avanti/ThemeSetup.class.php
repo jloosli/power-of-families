@@ -242,7 +242,7 @@ class ThemeSetup
 
     function pre_load_favicon()
     {
-        $favicon_directory = get_stylesheet_directory_uri() . '/images/favicon/';
+        $favicon_directory = get_stylesheet_directory_uri() . '/assets/images/favicon/';
 
         echo '<link rel="shortcut icon" href="' . $favicon_directory . 'favicon.ico">' . PHP_EOL
             . '<link rel="apple-touch-icon-precomposed" sizes="57x57"   href="' . $favicon_directory . 'apple-touch-icon-57x57.png" />' . PHP_EOL
