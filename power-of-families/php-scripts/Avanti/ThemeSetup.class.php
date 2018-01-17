@@ -23,7 +23,8 @@ class ThemeSetup
         $this->setAssetDirectory();
     }
 
-    function setAssetDirectory() {
+    function setAssetDirectory()
+    {
         $this->asset_directory = $this->run_location === self::RUNNING_DEV ? 'http://localhost:8010' : get_stylesheet_directory_uri();
         $this->asset_directory .= '/assets';
     }
@@ -55,7 +56,7 @@ class ThemeSetup
 //        wp_enqueue_style('fontello', get_stylesheet_directory_uri() . '/css/fontello.css', array(), CHILD_THEME_VERSION);
 
         wp_enqueue_style('custom-google-fonts', 'https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,600,700|Playfair+Display:400,700', false);
-        wp_enqueue_style('power_of_families_styles', $stylesheet_loc);
+        wp_enqueue_style('power_of_families_styles', $stylesheet_loc, [], CHILD_THEME_VERSION);
     }
 
     function genesis_init()
@@ -64,8 +65,9 @@ class ThemeSetup
         include_once(get_template_directory() . '/lib/init.php');
     }
 
-    function getVersion() {
-        return trim(file_get_contents(__DIR__. '/../../version.txt'));
+    function getVersion()
+    {
+        return trim(file_get_contents(__DIR__ . '/../../version.txt'));
     }
 
     function child_theme_setup()

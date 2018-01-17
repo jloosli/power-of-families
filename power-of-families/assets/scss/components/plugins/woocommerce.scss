@@ -14,6 +14,10 @@ div .woocommerce input.button {
   display: none;
 }
 
+.entry-content li.wc_payment_method {
+  list-style-type: none;
+}
+
 
 @media screen and (min-width: 768px) {
   .fl-module-woocommerce .woocommerce ul.products li.product {
