@@ -18,6 +18,12 @@ div .woocommerce input.button {
   list-style-type: none;
 }
 
+.woocommerce-order-details .my-programs-after-order-message {
+  padding: 1rem;
+  border: 2px solid $color_9;
+  box-shadow: 1rem 1rem 1rem $color_9;
+}
+
 
 @media screen and (min-width: 768px) {
   .fl-module-woocommerce .woocommerce ul.products li.product {

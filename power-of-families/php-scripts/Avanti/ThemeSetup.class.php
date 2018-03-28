@@ -225,7 +225,7 @@ class ThemeSetup
             return $menu;
         }
         if (is_user_logged_in()) {
-            $follow = '<li class="menu-item menu-item-has-children" ><a href="/#" title="My Account">My Account</a>';
+            $follow = '<li class="menu-item menu-item-has-children" ><a href="/my-programs" title="My Account">My Account</a>';
             //$follow .= '<div class="sub-menu-toggle-container"><button class="sub-menu-toggle" role="button" aria-pressed="false"><span class="hide-activated">Open Navigation</span><span class="hide-deactivated">Close Navigation</span></button></div>';
             $follow .= '<ul class="sub-menu">';
             $follow .= '<li class="menu-item menu-login-link"><a href="/my-programs" title="Go to My Programs">My Programs</a></li>';

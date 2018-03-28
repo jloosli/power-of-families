@@ -33,15 +33,17 @@ class WooCommerce
 
         add_action('woocommerce_checkout_after_customer_details', [$this, 'add_text_to_checkout']);
 
+        add_action('woocommerce_order_details_before_order_table', [$this, 'add_my_programs_message']);
+
         /**
          * Auto Complete all WooCommerce orders.
          */
-        add_action( 'woocommerce_thankyou', [$this, 'custom_woocommerce_auto_complete_order'] );
+        add_action('woocommerce_thankyou', [$this, 'custom_woocommerce_auto_complete_order']);
 
-        add_filter( 'gettext', [$this, 'change_billing_field_strings'], 20, 3 );
+        add_filter('gettext', [$this, 'change_billing_field_strings'], 20, 3);
 
 
-        add_filter( 'woocommerce_checkout_login_message', [$this, 'change_return_customer_message'] );
+        add_filter('woocommerce_checkout_login_message', [$this, 'change_return_customer_message']);
 
 
     }
@@ -75,7 +77,7 @@ class WooCommerce
         remove_filter(current_filter(), __FUNCTION__);
         switch (strtolower($translated_text)) {
             case 'billing details':
-                $translated_text = __('Your details', 'woocommerce');
+                $translated_text = is_user_logged_in() ? '' : __('Your details', 'woocommerce');
                 break;
         }
         return $translated_text;
@@ -88,6 +90,11 @@ class WooCommerce
 
     function remove_unnecessary_billing_fields($fields = [])
     {
+        if (is_user_logged_in()) {
+            unset($fields['billing_first_name']);
+            unset($fields['billing_last_name']);
+            unset($fields['billing_email']);
+        }
         unset($fields['billing_company']);
         unset($fields['billing_address_1']);
         unset($fields['billing_address_2']);
@@ -120,26 +127,40 @@ need to quickly create an account for you. Your email will be your username and 
 and password to log in and access your materials whenever you wish.";
     }
 
-    function custom_woocommerce_auto_complete_order( $order_id ) {
-        if ( ! $order_id ) {
+    function custom_woocommerce_auto_complete_order($order_id)
+    {
+        if (!$order_id) {
             return;
         }
 
-        $order = wc_get_order( $order_id );
-        $order->update_status( 'completed' );
+        $order = wc_get_order($order_id);
+        $order->update_status('completed');
     }
 
-    function change_billing_field_strings( $translated_text, $text, $domain ) {
-        switch ( $translated_text ) {
+    function change_billing_field_strings($translated_text, $text, $domain)
+    {
+        switch ($translated_text) {
             case 'Billing details' :
-                $translated_text = __( 'Your Details', 'woocommerce' );
+                $translated_text = is_user_logged_in() ? '' : __('Your Details', 'woocommerce');
                 break;
         }
         return $translated_text;
     }
 
-    function change_return_customer_message() {
+    function change_return_customer_message()
+    {
         return 'Returning Member?';
+    }
+
+    function add_my_programs_message()
+    {
+        ?>
+        <div class="my-programs-after-order-message">
+            To access your new program now and in the future, be sure you are logged (in upper right corner
+            of the website) then use the dropdown menu for "My Account" to click on "My Programs". You should
+            then see an icon for your new program. Click on that icon to access your materials.
+        </div>
+        <?php
     }
 
 }

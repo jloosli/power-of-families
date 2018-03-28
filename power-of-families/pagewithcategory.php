@@ -24,10 +24,12 @@ add_action( 'genesis_after_entry_content', 'sk_do_loop' );
 function sk_do_loop() {
  	$cat = genesis_get_custom_field('category');
 	$cat = get_cat_ID($cat);
-	$category = get_category($cat); 
-	$cat = $category->slug;
-	//echo '<h1>' . $cat . '</h1>';
-	echo '<div class="clearfix"></div>' . do_shortcode('[wpv-view name="Category post display" category="' . $cat . '"]');
+	$category = get_category($cat);
+	if(!is_a($category, 'WP_Error')) {
+        $cat = $category->slug;
+        //echo '<h1>' . $cat . '</h1>';
+        echo '<div class="clearfix"></div>' . do_shortcode('[wpv-view name="Category post display" category="' . $cat . '"]');
+    }
 }
  
 genesis();
