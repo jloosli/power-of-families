@@ -11,7 +11,7 @@ module.exports = merge(common, {
     publicPath: ASSET_PATH
   },
   plugins: [
-    new CleanWebpackPlugin(['dist','build']),
+    new CleanWebpackPlugin(['dist', 'build']),
     new UglifyJSPlugin({
       sourceMap: true
     }),
