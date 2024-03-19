@@ -8,7 +8,14 @@ dist
 .sass-cache
 .tmp
 
+db-backups/*
+
 .idea
 # Logs
 logs
 *.log
+
+db_data
+wordpress
+site-backup
+docker/ZscalerRootCA.crt
