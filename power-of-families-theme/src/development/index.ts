@@ -6,6 +6,7 @@ class Development {
   useServerImagesIfDevelopingLocally() {
     const ProductionRegex = /\.com$/;
     const BeginningOfStringRegex = /^\//;
+    debugger;
     if (!ProductionRegex.test(window.location.hostname)) {
       const images = document.querySelectorAll('img');
       [].forEach.call(images, (img: HTMLImageElement) => {

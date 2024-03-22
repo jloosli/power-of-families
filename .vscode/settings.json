@@ -1,0 +1,6 @@
+{
+    "php.validate.enable": false,
+    "docker-linter.php.enable": true,
+    "docker-linter.php.container": "pof_wordpress",
+    "docker-linter.php.machine": ""
+}

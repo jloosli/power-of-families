@@ -16,7 +16,7 @@
     ]
   },
   "include": [
-    "./power-of-families/src/**/*.ts"
+    "power-of-families-theme/src/**/*.ts"
   ],
   "exclude": [
     "./node_modules"

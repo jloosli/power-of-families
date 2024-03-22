@@ -370,7 +370,7 @@ class ThemeSetup
 
     }
 
-    function genesis_search_secondary_nav_menu($menu, stdClass $args)
+    function genesis_search_secondary_nav_menu($menu, \stdClass $args)
     {
         if ('secondary' != $args->theme_location) {
             return $menu;
