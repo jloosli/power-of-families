@@ -22,7 +22,7 @@ services:
       WP_SITEURL: http://localhost:8080
     volumes:
       - ./wordpress:/var/www/html
-      # - ./power-of-families:/var/www/html/wp-content/themes/power-of-families
+      - ./power-of-families-theme:/var/www/html/wp-content/themes/power-of-families
   
   wpcli:
     depends_on:

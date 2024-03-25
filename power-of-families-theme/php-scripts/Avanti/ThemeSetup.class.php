@@ -25,7 +25,7 @@ class ThemeSetup
 
     function setAssetDirectory()
     {
-        $this->asset_directory = $this->run_location === self::RUNNING_DEV ? 'http://localhost:8010' : get_stylesheet_directory_uri();
+        $this->asset_directory = $this->run_location === self::RUNNING_DEV ? 'http://localhost:8080' : get_stylesheet_directory_uri();
         $this->asset_directory .= '/assets';
     }
 

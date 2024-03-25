@@ -25,10 +25,6 @@ Use [https://localhost:8180](phpMyAdmin) to upload database
 `rsync -avz --exclude=~/backups-tigertech/current/www/wp-content/themes/power-of-families pof:~/backups-tigertech/current/www/wp-content/themes ./wordpress/wp-content/`
 `rsync -avz pof:~/backups-tigertech/current/www/wp-content/plugins ./wordpress/wp-content/`
 
-#### Set up local theme/plugin
-
-`ln -s wordpress/wp-content/themes/power-of-families ./power-of-families`
-
 ##### Update wp-config
 
 
