@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: jloosli
@@ -11,10 +12,11 @@ namespace Avanti;
 
 class ThemeSetup
 {
-    CONST RUNNING_PROD = 2 ** 0;
-    CONST RUNNING_DEV = 2 ** 1;
+    const RUNNING_PROD = 2 ** 0;
+    const RUNNING_DEV = 2 ** 1;
     public $run_location;
     public $asset_directory;
+    public $build_directory;
 
     function __construct()
     {
@@ -27,6 +29,7 @@ class ThemeSetup
     {
         $this->asset_directory = $this->run_location === self::RUNNING_DEV ? 'http://localhost:8080' : get_stylesheet_directory_uri();
         $this->asset_directory .= '/assets';
+        $this->build_directory = get_stylesheet_directory_uri() . '/build';
     }
 
     /**
@@ -44,16 +47,15 @@ class ThemeSetup
     {
         $js_loc = $this->asset_directory . '/main.js';
         wp_enqueue_script('bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', array('jquery'), '3.3.7', true);
-//        wp_enqueue_script('z-responsive-menu', get_stylesheet_directory_uri() . '/lib/js/responsive-menu.js', array('jquery'), '', true);
+        //        wp_enqueue_script('z-responsive-menu', get_stylesheet_directory_uri() . '/lib/js/responsive-menu.js', array('jquery'), '', true);
         wp_enqueue_script('scripts', $js_loc, array('jquery'), CHILD_THEME_VERSION, true);
-
     }
 
     function custom_load_custom_style_sheet()
     {
-        $stylesheet_loc = $this->asset_directory . '/main.css';
+        $stylesheet_loc = $this->build_directory . '/index.css';
         wp_enqueue_style('bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css', array(), '3.3.7');
-//        wp_enqueue_style('fontello', get_stylesheet_directory_uri() . '/css/fontello.css', array(), CHILD_THEME_VERSION);
+        //        wp_enqueue_style('fontello', get_stylesheet_directory_uri() . '/css/fontello.css', array(), CHILD_THEME_VERSION);
 
         wp_enqueue_style('custom-google-fonts', 'https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,600,700|Playfair+Display:400,700', false);
         wp_enqueue_style('power_of_families_styles', $stylesheet_loc, [], CHILD_THEME_VERSION);
@@ -104,7 +106,7 @@ class ThemeSetup
         //https://wpbeaches.com/switching-primary-menu-genesis-theme-header-right/
         remove_action('genesis_after_header', 'genesis_do_nav');
         add_action('genesis_header_right', 'genesis_do_nav');
-        add_theme_support('genesis-structural-wraps', array('header', 'menu-secondary', 'footer-widgets', 'footer'));//menu-primary is removed
+        add_theme_support('genesis-structural-wraps', array('header', 'menu-secondary', 'footer-widgets', 'footer')); //menu-primary is removed
         unregister_sidebar('header-right');
 
         /* Filter primary menu */
@@ -152,7 +154,7 @@ class ThemeSetup
         if (!is_user_logged_in()) {
             add_action('genesis_before_header', [$this, 'login_bar'], 10);
         }
-//        add_filter( 'wp_nav_menu_items', [$this, 'genesis_search_secondary_nav_menu'], 10, 2 );
+        //        add_filter( 'wp_nav_menu_items', [$this, 'genesis_search_secondary_nav_menu'], 10, 2 );
 
         // Update category header
         add_action('genesis_before_loop', [$this, 'themeprefix_category_header']);
@@ -165,14 +167,13 @@ class ThemeSetup
         // Add Javascript and stylesheets
         add_action('genesis_after_footer', [$this, 'after_body_js']);
         add_action('wp_enqueue_scripts', [$this, 'custom_load_custom_style_sheet'], 0);
-
     }
 
     function power_of_families_footer()
     {
-        ?>
+?>
         <p>&copy; Copyright 2017 - <?php echo date("Y") ?> <a href="https://poweroffamilies.com">Power of Families</a>
-        <?php
+    <?php
     }
 
     function power_of_families_footer_menu()
@@ -214,7 +215,6 @@ class ThemeSetup
                 show_admin_bar(false);
             }
         }
-
     }
 
     function be_follow_icons($menu, $args)
@@ -361,13 +361,13 @@ class ThemeSetup
         echo '<h2>Member Login</h2>';
         echo wp_login_form($args);
         echo '<div class="register"><a href="/register" class="button">Register</a></div>';
-        printf('<div class="lost_password"><a href="%s" title="Lost Password">Lost Password?</a></div>',
+        printf(
+            '<div class="lost_password"><a href="%s" title="Lost Password">Lost Password?</a></div>',
             wp_lostpassword_url(get_permalink())
         );
 
         echo '<button type="button" class="close" data-toggle="collapse" data-target="#login-bar">
 <span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button></div></div>';
-
     }
 
     function genesis_search_secondary_nav_menu($menu, \stdClass $args)
@@ -384,7 +384,6 @@ class ThemeSetup
 
 
         return $menu;
-
     }
 
     function themeprefix_category_header()
