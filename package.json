@@ -6,26 +6,22 @@
   "author": "Jared Loosli",
   "license": "UNLICENSED",
   "scripts": {
-    "start": "wp-scripts start --webpack-src-dir=power-of-families-theme/src --output-path=power-of-families-theme/build",
+    "start": "wp-scripts start",
     "build": "wp-scripts build",
-    "dev": "npm run webpack-dev",
     "build-old": "npm run version-bump && npm run build:scripts && npm run copy",
     "build:scripts": "npm run pack-js",
     "copy": "cpx \"./power-of-families/assets/images/**/*.{png,gif,jpg,ico,svg}\" ./build/power-of-families/assets/images && cpx \"./power-of-families/**/*.php\" ./build/power-of-families/ && cpx \"./power-of-families/*.{png,css,txt}\" ./build/power-of-families && cpx \"./power-of-families/assets/ie9.css\" ./build/power-of-families/assets",
-    "pack-js": "webpack --config ./webpack.prod.js",
     "version-bump": "node ./bin/bump-version",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "webpack-dev": "webpack-dev-server --config webpack.dev.js",
     "deploy": "yarn run build && rsync -avzhe ssh ./build/ pof:html/wp-content/themes/"
   },
   "devDependencies": {
     "@wordpress/babel-preset-default": "^7.38.0",
     "@wordpress/prettier-config": "^3.11.0",
     "@wordpress/scripts": "^27.5.0",
-    "babel-preset-env": "^1.7.0",
-    "prettier": "^3.2.5"
-  },
-  "dependencies": {
-    "normalize.css": "^8.0.1"
+    "normalize.css": "^8.0.1",
+    "prettier": "^3.2.5",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.4.3",
+    "wp-types": "^3.64.0"
   }
 }

@@ -1,15 +1,14 @@
 class Development {
   constructor() {
-    this.useServerImagesIfDevelopingLocally();
+    document.addEventListener('DOMContentLoaded', ()=> setTimeout(()=> this.useServerImagesIfDevelopingLocally(), 500));
   }
 
   useServerImagesIfDevelopingLocally() {
     const ProductionRegex = /\.com$/;
     const BeginningOfStringRegex = /^\//;
-    debugger;
     if (!ProductionRegex.test(window.location.hostname)) {
       const images = document.querySelectorAll('img');
-      [].forEach.call(images, (img: HTMLImageElement) => {
+      images.forEach((img) => {
         if (img.src !== img.currentSrc) {
           img.src = this.createUrlToImage(img.src);
           if (img.srcset) {
@@ -17,18 +16,17 @@ class Development {
             img.srcset = img.srcset.split(',')
               .map(str => str.trim())
               .map(src => BeginningOfStringRegex.test(src) ? 'https://poweroffamilies.com' + src : src)
-              .join(",\n");
+              .join(", ");
           }
         }
       });
     }
   }
 
-  createUrlToImage(location: string): string {
-    const temp = document.createElement('a');
-    temp.href = location;
-    return 'https://poweroffamilies.com' + temp.pathname;
-  }
+  createUrlToImage(location: string) {
+    const url = new URL(location);
+    return 'https://poweroffamilies.com' + url.pathname;
+}
 }
 
 export {Development}

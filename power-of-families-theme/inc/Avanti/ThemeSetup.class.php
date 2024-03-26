@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: jloosli
- * Date: 11/28/17
- * Time: 5:23 PM
- */
-
 namespace Avanti;
 
 
@@ -14,30 +7,19 @@ class ThemeSetup
 {
     const RUNNING_PROD = 2 ** 0;
     const RUNNING_DEV = 2 ** 1;
-    public $run_location;
-    public $asset_directory;
-    public $build_directory;
+    // const RUN_LOCATION = strpos($_SERVER['SERVER_NAME'], '.com') !== false ? self::RUNNING_PROD : self::RUNNING_DEV;
+    // const BUILD_DIRECTORY = get_stylesheet_directory_uri() . '/build';
+    public string $theme_version;
+    public string $build_directory;
+    public int $run_location;
 
     function __construct()
     {
-        $this->init();
+        $this->theme_version =  trim(file_get_contents(__DIR__ . '/../../version.txt'));
         $this->run_location = strpos($_SERVER['SERVER_NAME'], '.com') !== false ? self::RUNNING_PROD : self::RUNNING_DEV;
-        $this->setAssetDirectory();
-    }
-
-    function setAssetDirectory()
-    {
-        $this->asset_directory = $this->run_location === self::RUNNING_DEV ? 'http://localhost:8080' : get_stylesheet_directory_uri();
-        $this->asset_directory .= '/assets';
         $this->build_directory = get_stylesheet_directory_uri() . '/build';
-    }
 
-    /**
-     * Execute this on load. For scripts not attached to any action hooks, etc.
-     */
-    function init()
-    {
-        $this->genesis_init();
+        include_once get_template_directory() . '/lib/init.php';
         $this->child_theme_setup();
         $this->hideAdminBarFromSubscribers();
         $this->display_author_box_on_single_posts();
@@ -45,26 +27,29 @@ class ThemeSetup
 
     function after_body_js()
     {
-        $js_loc = $this->asset_directory . '/main.js';
+
+        //@todo: figure out if I need bootstrap
         wp_enqueue_script('bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', array('jquery'), '3.3.7', true);
-        //        wp_enqueue_script('z-responsive-menu', get_stylesheet_directory_uri() . '/lib/js/responsive-menu.js', array('jquery'), '', true);
-        wp_enqueue_script('scripts', $js_loc, array('jquery'), CHILD_THEME_VERSION, true);
     }
 
     function custom_load_custom_style_sheet()
     {
-        $stylesheet_loc = $this->build_directory . '/index.css';
+        add_action('wp_enqueue_scripts', function (): void {
+            $asset_file = include get_theme_file_path('build/main.asset.php');
+            wp_enqueue_script(
+                'pof_theme_scripts',
+                get_stylesheet_directory_uri() . '/build/main.js',
+                $asset_file['dependencies'],
+                $asset_file['version']
+            );
+        });
+
+        $stylesheet_loc = $this->build_directory . '/main.css';
         wp_enqueue_style('bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css', array(), '3.3.7');
         //        wp_enqueue_style('fontello', get_stylesheet_directory_uri() . '/css/fontello.css', array(), CHILD_THEME_VERSION);
 
         wp_enqueue_style('custom-google-fonts', 'https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,600,700|Playfair+Display:400,700', false);
         wp_enqueue_style('power_of_families_styles', $stylesheet_loc, [], CHILD_THEME_VERSION);
-    }
-
-    function genesis_init()
-    {
-        //* Start the engine
-        include_once(get_template_directory() . '/lib/init.php');
     }
 
     function getVersion()
@@ -78,7 +63,7 @@ class ThemeSetup
         //* Child theme (do not remove)
         define('CHILD_THEME_NAME', 'Power of Families');
         define('CHILD_THEME_URL', 'http://avantidevelopment.com/');
-        define('CHILD_THEME_VERSION', $version);
+        define('CHILD_THEME_VERSION', $this->theme_version);
 
         //* Add HTML5 markup structure
         add_theme_support('html5', ['search-form', 'comment-form', 'comment-list']);
