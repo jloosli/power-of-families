@@ -7,8 +7,6 @@ class ThemeSetup
 {
     const RUNNING_PROD = 2 ** 0;
     const RUNNING_DEV = 2 ** 1;
-    // const RUN_LOCATION = strpos($_SERVER['SERVER_NAME'], '.com') !== false ? self::RUNNING_PROD : self::RUNNING_DEV;
-    // const BUILD_DIRECTORY = get_stylesheet_directory_uri() . '/build';
     public string $theme_version;
     public string $build_directory;
     public int $run_location;
@@ -19,20 +17,14 @@ class ThemeSetup
         $this->run_location = strpos($_SERVER['SERVER_NAME'], '.com') !== false ? self::RUNNING_PROD : self::RUNNING_DEV;
         $this->build_directory = get_stylesheet_directory_uri() . '/build';
 
+        // Start up the theme setup
         include_once get_template_directory() . '/lib/init.php';
         $this->child_theme_setup();
         $this->hideAdminBarFromSubscribers();
         $this->display_author_box_on_single_posts();
     }
 
-    function after_body_js()
-    {
-
-        //@todo: figure out if I need bootstrap
-        wp_enqueue_script('bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', array('jquery'), '3.3.7', true);
-    }
-
-    function custom_load_custom_style_sheet()
+    function custom_load_styles_and_scripts()
     {
         add_action('wp_enqueue_scripts', function (): void {
             $asset_file = include get_theme_file_path('build/main.asset.php');
@@ -45,9 +37,6 @@ class ThemeSetup
         });
 
         $stylesheet_loc = $this->build_directory . '/main.css';
-        wp_enqueue_style('bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css', array(), '3.3.7');
-        //        wp_enqueue_style('fontello', get_stylesheet_directory_uri() . '/css/fontello.css', array(), CHILD_THEME_VERSION);
-
         wp_enqueue_style('custom-google-fonts', 'https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,600,700|Playfair+Display:400,700', false);
         wp_enqueue_style('power_of_families_styles', $stylesheet_loc, [], CHILD_THEME_VERSION);
     }
@@ -65,27 +54,7 @@ class ThemeSetup
         define('CHILD_THEME_URL', 'http://avantidevelopment.com/');
         define('CHILD_THEME_VERSION', $this->theme_version);
 
-        //* Add HTML5 markup structure
-        add_theme_support('html5', ['search-form', 'comment-form', 'comment-list']);
-
-        //* Add viewport meta tag for mobile browsers
-        add_theme_support('genesis-responsive-viewport');
-
-        //* Add support for custom background
-        add_theme_support('custom-background');
-
-        //* Add support for 3-column footer widgets
-        add_theme_support('genesis-footer-widgets', 3);
-
-        add_theme_support('genesis-menus', [
-            'primary' => 'Primary Navigation Menu',
-            'secondary' => 'Secondary Navigation Menu',
-            'tertiary' => 'Footer Navigation Menu'
-        ]);
-
-        //* Add support for WooCommerce
-        add_theme_support('genesis-connect-woocommerce');
-        add_theme_support('woocommerce');
+        $this->register_theme_support();
 
         /* Move primary menu into header */
         //https://wpbeaches.com/switching-primary-menu-genesis-theme-header-right/
@@ -150,8 +119,16 @@ class ThemeSetup
         add_filter('get_page_metadata', [$this, 'hide_on_protected_pages'], 10, 4);
 
         // Add Javascript and stylesheets
-        add_action('genesis_after_footer', [$this, 'after_body_js']);
-        add_action('wp_enqueue_scripts', [$this, 'custom_load_custom_style_sheet'], 0);
+        add_action('wp_enqueue_scripts', [$this, 'custom_load_styles_and_scripts'], 0);
+    }
+
+    function register_theme_support()
+    {
+        $theme_supports = genesis_get_config('theme-supports');
+
+        foreach ($theme_supports as $feature => $args) {
+            add_theme_support($feature, $args);
+        }
     }
 
     function power_of_families_footer()

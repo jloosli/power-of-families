@@ -6,6 +6,15 @@ Helpful Docker tips:
 * https://developer.wordpress.com/2022/11/14/seetup-local-development-environment-for-wordpress/
 * https://aschmelyun.com/blog/build-a-solid-wordpress-dev-environment-with-docker/
 
+This theme is a child theme of the [https://www.studiopress.com/themes/genesis/](Genesis Framework).
+
+* [https://developer.wpengine.com/themes/genesis-framework/](Genesis Framework Documentation)
+* [https://github.com/studiopress/genesis-sample](Sample Gensis Child Theme)
+
+General Wordpress and wp-scripts help:
+
+* https://wordpress.tv/2023/12/19/developer-hours-modern-wordpress-development-with-the-wp-scripts-package/
+
 ### Local Development
 
 `docker compose up wordpress`
@@ -35,25 +44,6 @@ define('WP_HOME', 'http://localhost:8080');
 define('WP_SITEURL', 'http://localhost:8080');
 ```
 
-This project uses node (make sure it is installed).
-
-Install node dependencies with `npm install`
-
-Run `npm run dev` while developing. This will:
-
-* Process and compile sass (scss) files
-* Run JS through a linter
-* Compile JS using webpack
-* Serve css and js bundles at `http://localhost:8010/assets/scripts.js` and `http://localhost:8010/assets/main.css`
-
-Don't forget to set `WP_DEBUG` to `true` in `wp-config`.
+Set `WP_DEBUG` to `true` in `wp-config`.
 
 For working with visual composer and our custom shortcodes, see: https://wpbakery.atlassian.net/wiki/pages/viewpage.action?pageId=524332
-
-### Building ###
-
-Run `npm run build` to package up the theme into the `build` directory, ready for ftp upload.
-
-
-#### Notes
-https://alexjoverm.github.io/2017/03/06/Tree-shaking-with-Webpack-2-TypeScript-and-Babel/

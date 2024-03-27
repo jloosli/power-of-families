@@ -12,7 +12,7 @@
     "build:scripts": "npm run pack-js",
     "copy": "cpx \"./power-of-families/assets/images/**/*.{png,gif,jpg,ico,svg}\" ./build/power-of-families/assets/images && cpx \"./power-of-families/**/*.php\" ./build/power-of-families/ && cpx \"./power-of-families/*.{png,css,txt}\" ./build/power-of-families && cpx \"./power-of-families/assets/ie9.css\" ./build/power-of-families/assets",
     "version-bump": "node ./bin/bump-version",
-    "deploy": "yarn run build && rsync -avzhe ssh ./build/ pof:html/wp-content/themes/"
+    "deploy": "npm run build && rsync -avzhe ssh ./build/ pof:html/wp-content/themes/"
   },
   "devDependencies": {
     "@wordpress/babel-preset-default": "^7.38.0",

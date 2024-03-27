@@ -8,7 +8,7 @@ dist
 .sass-cache
 .tmp
 
-db-backups/*
+db-backups
 
 .idea
 # Logs
