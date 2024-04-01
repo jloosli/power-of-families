@@ -2,47 +2,48 @@
 
 ## Contents
 
-* [Power of Families Theme](power-of-families-theme)
-* [Power of Families Programs](pof-programs-plugin)
-* [Power of Families Bloom](pof-bloom-plugin)
+- [Power of Families Theme](power-of-families-theme)
+- [Power of Families Programs](pof-programs-plugin)
+- [Power of Families Bloom](pof-bloom-plugin)
 
 ## Developing
 
-Helpful Docker tips: 
+Helpful Docker tips:
 
-* https://developer.wordpress.com/2022/11/14/seetup-local-development-environment-for-wordpress/
-* https://aschmelyun.com/blog/build-a-solid-wordpress-dev-environment-with-docker/
+- https://developer.wordpress.com/2022/11/14/seetup-local-development-environment-for-wordpress/
+- https://aschmelyun.com/blog/build-a-solid-wordpress-dev-environment-with-docker/
 
 This theme is a child theme of the [https://www.studiopress.com/themes/genesis/](Genesis Framework).
 
-* [Genesis Framework Documentation](https://developer.wpengine.com/themes/genesis-framework/)
-* [Sample Gensis Child Theme](https://github.com/studiopress/genesis-sample)
+- [Genesis Framework Documentation](https://developer.wpengine.com/themes/genesis-framework/)
+- [Sample Gensis Child Theme](https://github.com/studiopress/genesis-sample)
 
 General Wordpress and wp-scripts help:
 
-* https://wordpress.tv/2023/12/19/developer-hours-modern-wordpress-development-with-the-wp-scripts-package/
+- https://wordpress.tv/2023/12/19/developer-hours-modern-wordpress-development-with-the-wp-scripts-package/
 
 ### Local Development
 
+Copy `ZscalerRootCA.crt` to [docker](docker)
+
 `docker compose up wordpress`
-`sudo chown -R jloosli:staff wordpress`
+`sudo chown -R j-lo:staff wordpress`
 
 #### First Time Setup
 
 ##### Import DB
 
 Copy database backup:
-`scp pof:backups-tigertech/current/mysql/poweroffamilies/poweroffamilies.dump db-backups/`
+`rsync -avz pof:backups-tigertech/current/mysql/poweroffamilies/poweroffamilies.dump db-backups/`
 
-Use [https://localhost:8180](phpMyAdmin) to upload database
+Use [phpMyAdmin](http://localhost:8180) to upload database
 
 ##### Import Themes and Plugins
 
 `rsync -avz --exclude=~/backups-tigertech/current/www/wp-content/themes/power-of-families pof:~/backups-tigertech/current/www/wp-content/themes ./wordpress/wp-content/`
-`rsync -avz pof:~/backups-tigertech/current/www/wp-content/plugins ./wordpress/wp-content/`
+`rsync -avz --exclude=~/backups-tigertech/current/www/wp-content/plugins/pof-programs --exclude=~/backups-tigertech/current/www/wp-content/plugins/pom-bloom pof:~/backups-tigertech/current/www/wp-content/plugins ./wordpress/wp-content/`
 
 ##### Update wp-config
-
 
 Add the following to `wp-config.php`
 
