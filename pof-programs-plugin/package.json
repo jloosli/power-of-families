@@ -1,0 +1,30 @@
+{
+  "name": "power-of-families-programs",
+  "description": "Power of Families Programs",
+  "version": "3.0.0",
+  "homepage": "https://github.com/jloosli/pof-programs",
+  "repository": "https://github.com/jloosli/pof-programs.git",
+  "main": "Gruntfile.js",
+  "scripts": {
+    "watch": "grunt watch"
+  },
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "load-grunt-tasks": "^3.5.2",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-contrib-jshint": "^1.1.0",
+    "grunt-contrib-uglify": "^3.1.0",
+    "grunt-contrib-imagemin": "^2.0.1",
+    "grunt-rsync": "^2.0.1",
+    "grunt-shell": "^2.1.0",
+    "grunt-ts": "^6.0.0-beta.17",
+    "typescript":"^2.6.1",
+    "node-sass": "^4.5.3",
+    "grunt-node-sass": "^1.0.1",
+    "uglify-js": "^3.1.6"
+  },
+  "engines": {
+    "node": ">=0.8.0",
+    "npm": ">=1.1.0"
+  }
+}
