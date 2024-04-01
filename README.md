@@ -1,15 +1,22 @@
-# Power of Families Wordpress Theme
+# Power of Families Wordpress Tools
+
+## Contents
+
+* [Power of Families Theme](power-of-families-theme)
+* [Power of Families Programs](pof-programs-plugin)
+* [Power of Families Bloom](pof-bloom-plugin)
 
 ## Developing
 
 Helpful Docker tips: 
+
 * https://developer.wordpress.com/2022/11/14/seetup-local-development-environment-for-wordpress/
 * https://aschmelyun.com/blog/build-a-solid-wordpress-dev-environment-with-docker/
 
 This theme is a child theme of the [https://www.studiopress.com/themes/genesis/](Genesis Framework).
 
-* [https://developer.wpengine.com/themes/genesis-framework/](Genesis Framework Documentation)
-* [https://github.com/studiopress/genesis-sample](Sample Gensis Child Theme)
+* [Genesis Framework Documentation](https://developer.wpengine.com/themes/genesis-framework/)
+* [Sample Gensis Child Theme](https://github.com/studiopress/genesis-sample)
 
 General Wordpress and wp-scripts help:
 
