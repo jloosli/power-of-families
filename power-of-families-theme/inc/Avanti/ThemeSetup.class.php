@@ -27,16 +27,16 @@ class ThemeSetup
     function custom_load_styles_and_scripts()
     {
         add_action('wp_enqueue_scripts', function (): void {
-            $asset_file = include get_theme_file_path('build/main.asset.php');
+            $asset_file = include get_theme_file_path('build/js/main.asset.php');
             wp_enqueue_script(
                 'pof_theme_scripts',
-                get_stylesheet_directory_uri() . '/build/main.js',
+                get_stylesheet_directory_uri() . '/build/js/main.js',
                 $asset_file['dependencies'],
                 $asset_file['version']
             );
         });
 
-        $stylesheet_loc = $this->build_directory . '/main.css';
+        $stylesheet_loc = $this->build_directory . '/css/main.css';
         wp_enqueue_style('custom-google-fonts', 'https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,600,700|Playfair+Display:400,700', false);
         wp_enqueue_style('power_of_families_styles', $stylesheet_loc, [], CHILD_THEME_VERSION);
     }
