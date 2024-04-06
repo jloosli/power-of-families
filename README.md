@@ -34,14 +34,14 @@ Copy `ZscalerRootCA.crt` to [docker](docker)
 ##### Import DB
 
 Copy database backup:
-`rsync -avz pof:backups-tigertech/current/mysql/poweroffamilies/poweroffamilies.dump db-backups/`
+`rsync -avzh pof:backups-tigertech/current/mysql/poweroffamilies/poweroffamilies.dump db-backups/`
 
 Use [phpMyAdmin](http://localhost:8180) to upload database
 
 ##### Import Themes and Plugins
 
-`rsync -avz --exclude=~/backups-tigertech/current/www/wp-content/themes/power-of-families pof:~/backups-tigertech/current/www/wp-content/themes ./wordpress/wp-content/`
-`rsync -avz --exclude=~/backups-tigertech/current/www/wp-content/plugins/pof-programs --exclude=~/backups-tigertech/current/www/wp-content/plugins/pom-bloom pof:~/backups-tigertech/current/www/wp-content/plugins ./wordpress/wp-content/`
+`rsync -avzh --exclude=~/backups-tigertech/current/www/wp-content/themes/power-of-families pof:~/backups-tigertech/current/www/wp-content/themes ./wordpress/wp-content/`
+`rsync -avzh --exclude=~/backups-tigertech/current/www/wp-content/plugins/pof-programs --exclude=~/backups-tigertech/current/www/wp-content/plugins/pom-bloom pof:~/backups-tigertech/current/www/wp-content/plugins ./wordpress/wp-content/`
 
 ##### Update wp-config
 

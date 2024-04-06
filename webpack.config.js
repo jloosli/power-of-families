@@ -78,7 +78,7 @@ module.exports = {
 						},
 						{
 							source: './dist/pof-theme',
-							destination: './power-of-families-theme/build',
+							destination: './power-of-families-theme/build/theme',
 						},
 					],
 				},
