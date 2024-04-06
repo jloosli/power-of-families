@@ -26,7 +26,7 @@ class ThemeSetup
 
     function custom_load_styles_and_scripts()
     {
-        $js_asset = include get_theme_file_path('theme/build/js/main.asset.php');
+        $js_asset = include get_theme_file_path('build/theme/js/main.asset.php');
         wp_enqueue_script(
             'pof_theme_scripts',
             get_stylesheet_directory_uri() . '/build/theme/js/main.js',
