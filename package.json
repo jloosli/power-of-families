@@ -10,7 +10,7 @@
     "build": "wp-scripts build",
     "version-bump": "node ./bin/bump-version",
     "deploy": "npm run deploy:theme",
-    "deploy:theme": "npm run build && rsync -avzhn --exclude=./power-of-families-theme/assets ./power-of-families-theme/ pof:html/wp-content/themes/power-of-families"
+    "deploy:theme": "npm run build && rsync -avzh --exclude=./power-of-families-theme/assets ./power-of-families-theme/ pof:html/wp-content/themes/power-of-families"
   },
   "devDependencies": {
     "@wordpress/babel-preset-default": "^7.38.0",
