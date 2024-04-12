@@ -55,3 +55,8 @@ define('WP_SITEURL', 'http://localhost:8080');
 Set `WP_DEBUG` to `true` in `wp-config`.
 
 For working with visual composer and our custom shortcodes, see: https://wpbakery.atlassian.net/wiki/pages/viewpage.action?pageId=524332
+
+```
+export BASE_DIR="backups-tigertech/2024-03-23T02:16:39-07:00/www/"; rsync -avzhn --exclude ${BASE_DIR}wp-content/uploads --exclude ${BASE_DIR}wp-content/media pof:${BASE_DIR} ./wordpress
+export BASE_DIR="backups-tigertech/2024-03-23T02:16:39-07:00/"; rsync -avzh pof:${BASE_DIR}mysql/poweroffamilies/poweroffamilies.dump .
+```

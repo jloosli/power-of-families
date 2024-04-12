@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: jloosli
@@ -8,14 +9,20 @@
 
 namespace Avanti;
 
+global $product;
 
 class WooCommerce
 {
 
     function __construct()
     {
-        add_action('woocommerce_after_shop_loop_item_title',
-            [$this, 'woocommerce_after_shop_loop_item_title_short_description'], 5);
+
+        add_action('woocommerce_after_shop_loop_item_title', [$this, 'woocommerce_after_shop_loop_item_title_short_description'], 5);
+        add_action('woocommerce_after_main_content', function () {
+            if(is_product()) {
+                woocommerce_simple_add_to_cart();
+            }
+        });
 
         // Replace add to card button with learn more in the store page
         add_action('init', [$this, 'remove_loop_button']);
@@ -39,13 +46,8 @@ class WooCommerce
          * Auto Complete all WooCommerce orders.
          */
         add_action('woocommerce_thankyou', [$this, 'custom_woocommerce_auto_complete_order']);
-
         add_filter('gettext', [$this, 'change_billing_field_strings'], 20, 3);
-
-
         add_filter('woocommerce_checkout_login_message', [$this, 'change_return_customer_message']);
-
-
     }
 
     function woocommerce_after_shop_loop_item_title_short_description()
@@ -53,11 +55,11 @@ class WooCommerce
         global $product;
         $excerpt = $product->get_short_description();
         if (!$excerpt) return;
-        ?>
+?>
         <div itemprop="description">
             <?php echo apply_filters('woocommerce_short_description', $excerpt); ?>
         </div>
-        <?php
+    <?php
     }
 
     function remove_loop_button()
@@ -140,7 +142,7 @@ and password to log in and access your materials whenever you wish.";
     function change_billing_field_strings($translated_text, $text, $domain)
     {
         switch ($translated_text) {
-            case 'Billing details' :
+            case 'Billing details':
                 $translated_text = is_user_logged_in() ? '' : __('Your Details', 'woocommerce');
                 break;
         }
@@ -154,13 +156,12 @@ and password to log in and access your materials whenever you wish.";
 
     function add_my_programs_message()
     {
-        ?>
+    ?>
         <div class="my-programs-after-order-message">
             To access your new program now and in the future, be sure you are logged (in upper right corner
             of the website) then use the dropdown menu for "My Account" to click on "My Programs". You should
             then see an icon for your new program. Click on that icon to access your materials.
         </div>
-        <?php
+<?php
     }
-
 }
