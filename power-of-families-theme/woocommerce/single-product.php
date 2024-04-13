@@ -37,6 +37,13 @@ get_header( 'shop' ); ?>
 
 
 			<?php wc_get_template_part( 'content', 'single-product' ); ?>
+			<?php 
+			// Added the following since it's not showing up
+			// However, it seems like it should show up with the correct hooks called
+			// @todo: Figure this out and remove this template
+			?>
+			<?php woocommerce_simple_add_to_cart(); ?>
+			<?php  the_content(); ?>
 
 		<?php endwhile; // end of the loop. ?>
 
