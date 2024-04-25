@@ -7,6 +7,8 @@ require_once get_template_directory() . '/lib/init.php';
 // Sets up the Theme.
 require_once get_stylesheet_directory() . '/lib/theme-defaults.php';
 
+define('THEME_BUILD_PATH', get_stylesheet_directory() . '/build/');
+
 
 
 add_action('after_setup_theme', 'pof_localization_setup');
@@ -17,7 +19,6 @@ add_action('after_setup_theme', 'pof_localization_setup');
  */
 function pof_localization_setup()
 {
-
 	load_child_theme_textdomain(genesis_get_theme_handle(), get_stylesheet_directory() . '/languages');
 }
 
@@ -83,6 +84,23 @@ function pof_enqueue_scripts_styles()
 			genesis_get_theme_version()
 		);
 	}
+
+	$scss_file = include(plugin_dir_path(__FILE__) . 'build/css/main.asset.php');
+	$main_js_file = include(plugin_dir_path(__FILE__) . 'build/js/main.asset.php');
+
+	wp_enqueue_style(
+		genesis_get_theme_handle() . '-main',
+		get_stylesheet_directory_uri() . '/build/css/main.css',
+		$scss_file['dependencies'],
+		$scss_file['version']
+	);
+
+	wp_enqueue_script(
+		genesis_get_theme_handle() . '-main',
+		get_stylesheet_directory_uri() . '/build/js/main.js',
+		$main_js_file['dependencies'],
+		$main_js_file['version']
+	);
 }
 
 add_filter('body_class', 'pof_body_classes');
@@ -261,3 +279,4 @@ function pof_comments_gravatar($args)
 	$args['avatar_size'] = 60;
 	return $args;
 }
+	

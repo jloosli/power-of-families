@@ -3,7 +3,7 @@ class Development {
 		const ProductionRegex = /\.com$/;
 		if (!ProductionRegex.test(window.location.hostname)) {
 			document.addEventListener('DOMContentLoaded', () =>
-				setTimeout(() => this.useServerImagesIfDevelopingLocally(), 500)
+				this.useServerImagesIfDevelopingLocally()
 			);
 		}
 	}
