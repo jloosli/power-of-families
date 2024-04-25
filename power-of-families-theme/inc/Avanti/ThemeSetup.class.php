@@ -18,7 +18,7 @@ class ThemeSetup
         $this->build_directory = get_stylesheet_directory_uri() . '/build';
 
         // Start up the theme setup
-        include_once get_template_directory() . '/lib/init.php';
+        require_once get_template_directory() . '/lib/init.php';
         $this->child_theme_setup();
         $this->hideAdminBarFromSubscribers();
         $this->display_author_box_on_single_posts();
