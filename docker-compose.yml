@@ -67,6 +67,13 @@ services:
       MYSQL_ROOT_PASSWORD: password
       UPLOAD_LIMIT: 1024M
 
+  composer:
+    image: composer:latest
+    container_name: pof_composer
+    volumes:
+      - ./pof-theme:/var/www/html/wp-content/themes/pof-theme
+    working_dir: /var/www/html/wp-content/themes/pof-theme
+
 volumes:
   wordpress:
   db_data:

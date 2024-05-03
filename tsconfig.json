@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./power-of-families-theme/build",
+    "outDir": "./pof-theme/build",
     "jsx": "react-jsx",
     "module": "esnext",
     "sourceMap": true,

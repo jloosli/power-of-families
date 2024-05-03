@@ -19,3 +19,4 @@ db_data
 wordpress
 site-backup
 docker/ZscalerRootCA.crt
+vendor
