@@ -1,50 +1,75 @@
-@import "bootstrap/scss/mixins/banner";
-@include bsBanner("");
+/* Table of Contents
+- HTML5 Reset
+	- Baseline Normalize
+	- Box Sizing
+	- Float Clearing
+- Defaults
+	- Typographical Elements
+	- Headings
+	- Objects
+	- Gallery
+	- Forms
+	- Tables
+	- Screen Reader Text
+- Structure and Layout
+	- Site Container
+	- Site Inner
+- Common Classes
+	- Avatar
+	- Genesis
+	- Search Form
+	- Titles
+	- WordPress
+- Widgets
+	- Featured Content
+- Plugins
+	- Genesis eNews Extended
+	- Genesis Simple FAQ
+	- WPForms
+- Skip Links
+- Site Header
+	- Title Area
+- Site Navigation
+	- Responsive Menu
+	- Header Menu
+	- Footer Menu
+- Content Area
+	- Entry Content
+	- Entry Meta
+	- Pagination
+	- Entry Comments
+- Sidebar
+- Footer Widgets
+- Site Footer
+- Media Queries
+	- Min-width: 960px
+		- Site Header
+		- Genesis Menu
+		- Responsive Menu
+		- Header Menu
+		- Site Inner
+		- Content
+		- Sidebar
+		- Author Box
+		- After Entry
+		- Column Classes
+		- Entry Misc.
+		- Footer Widgets
+- Print Styles
+*/
 
-// scss-docs-start import-stack
-// Configuration
-@import "bootstrap/scss/functions";
-@import "bootstrap/scss/variables";
-@import "bootstrap/scss/variables-dark";
-@import "bootstrap/scss/maps";
-@import "bootstrap/scss/mixins";
-@import "bootstrap/scss/utilities";
-
-// Layout & components
-@import "bootstrap/scss/root";
-@import "bootstrap/scss/reboot";
-@import "bootstrap/scss/type";
-@import "bootstrap/scss/images";
-@import "bootstrap/scss/containers";
-@import "bootstrap/scss/grid";
-@import "bootstrap/scss/tables";
-@import "bootstrap/scss/forms";
-@import "bootstrap/scss/buttons";
-@import "bootstrap/scss/transitions";
-@import "bootstrap/scss/dropdown";
-@import "bootstrap/scss/button-group";
-@import "bootstrap/scss/nav";
-@import "bootstrap/scss/navbar";
-@import "bootstrap/scss/card";
-@import "bootstrap/scss/accordion";
-@import "bootstrap/scss/breadcrumb";
-@import "bootstrap/scss/pagination";
-@import "bootstrap/scss/badge";
-@import "bootstrap/scss/alert";
-@import "bootstrap/scss/progress";
-@import "bootstrap/scss/list-group";
-@import "bootstrap/scss/close";
-@import "bootstrap/scss/toasts";
-@import "bootstrap/scss/modal";
-@import "bootstrap/scss/tooltip";
-@import "bootstrap/scss/popover";
-@import "bootstrap/scss/carousel";
-@import "bootstrap/scss/spinners";
-@import "bootstrap/scss/offcanvas";
-@import "bootstrap/scss/placeholders";
-
-// Helpers
-@import "bootstrap/scss/helpers";
-
-// Utilities
-@import "bootstrap/scss/utilities/api";
+@import "components/reset"; /* HTML5 Reset */
+@import "components/defaults"; /* Defaults */
+@import "components/structure"; /* Structure and Layout */
+@import "components/common"; /* Common Classes */
+@import "components/widgets"; /* Widgets */
+@import "components/plugins"; /* Plugins */
+@import "components/skip-links"; /* Skip Links */
+@import "components/site-header"; /* Site Header */
+@import "components/site-navigation"; /* Site Navigation */
+@import "components/content-area"; /* Content Area */
+@import "components/sidebar"; /* Sidebar */
+@import "components/footer-widgets"; /* Footer Widgets */
+@import "components/site-footer"; /* Site Footer */
+@import "components/media-queries"; /* Media Queries */
+@import "components/print-styles"; /* Print Styles */
