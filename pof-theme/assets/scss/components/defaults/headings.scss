@@ -4,26 +4,38 @@ h3,
 h4,
 h5,
 h6 {
-	font-family: "Source Sans Pro", sans-serif;
+	color: $color_5;
+	font-family: $font_family_2;
 	font-weight: 400;
 	line-height: 1.2;
 	margin: 0 0 20px;
+	padding-top: 15px;
 }
 
 h1 {
-	font-size: 30px;
+	font-size: 36px;
+	font-weight: 400;
+	padding-top: 0;
 }
 
 h2 {
-	font-size: 27px;
+	font-size: 32px;
+  color: $color_6;
+  text-transform: uppercase;
+  font-family: $font_family_3;
 }
 
 h3 {
 	font-size: 24px;
+	font-style: normal;
+  color: $color_1;
 }
 
 h4 {
-	font-size: 20px;
+	// font-size: 20px;
+	font-size: 58px;
+  font-family: $font_family_4;
+  letter-spacing: 2px;
 }
 
 .entry-content h3,

@@ -58,6 +58,8 @@
 - Print Styles
 */
 
+@import "components/variables.scss"; /* Variables */
+
 @import "components/reset"; /* HTML5 Reset */
 @import "components/defaults"; /* Defaults */
 @import "components/structure"; /* Structure and Layout */

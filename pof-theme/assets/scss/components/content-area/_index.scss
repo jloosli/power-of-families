@@ -1,8 +1,10 @@
-/* Entry Content
---------------------------------------------- */
+.site-inner {
+	background-color: $color_2;
+}
 
 .entry {
 	margin-bottom: 40px;
+	padding: 50px 60px;
 }
 
 .entry-content ol,
@@ -30,11 +32,11 @@
 }
 
 .entry-content code {
-	background-color: #f5f5f5;
+	background-color: $background_color_1;
 }
 
 .content .sticky {
-	background-color: #f5f5f5;
+	background-color: $background_color_1;
 	padding: 30px;
 }
 
@@ -82,7 +84,7 @@ p.entry-meta {
 }
 
 .archive-pagination li a {
-	background-color: #f5f5f5;
+	background-color: $background_color_1;
 	color: #333;
 	cursor: pointer;
 	display: inline-block;
@@ -97,7 +99,7 @@ p.entry-meta {
 .archive-pagination li a:hover,
 .archive-pagination li.active a {
 	background-color: #333;
-	color: #fff;
+	color: $color_2;
 }
 
 /* Entry Comments
