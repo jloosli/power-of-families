@@ -59,7 +59,7 @@ hr {
 	border-collapse: collapse;
 	border-bottom: 1px solid currentColor;
 	clear: both;
-	color: #eee;
+	color: $color_18;
 	margin: 1.65em auto;
 }
 
@@ -76,8 +76,8 @@ i {
 }
 
 mark {
-	background: #ddd;
-	color: #333;
+	background: $color_11;
+	color: $color_4;
 }
 
 blockquote {

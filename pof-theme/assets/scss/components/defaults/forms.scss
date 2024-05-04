@@ -2,8 +2,8 @@ input,
 select,
 textarea {
 	background-color: $background_color_1;
-	border: 1px solid #ddd;
-	color: #333;
+	border: 1px solid $color_11;
+	color: $color_4;
 	font-size: 18px;
 	font-weight: 400;
 	padding: 15px;
@@ -12,7 +12,7 @@ textarea {
 
 input:focus,
 textarea:focus {
-	border: 1px solid #999;
+	border: 1px solid $color_12;
 	outline: none;
 }
 
@@ -23,12 +23,12 @@ input[type="radio"] {
 }
 
 :-ms-input-placeholder {
-	color: #333;
+	color: $color_4;
 	opacity: 1;
 }
 
 ::placeholder {
-	color: #333;
+	color: $color_4;
 	opacity: 1;
 }
 
@@ -39,7 +39,7 @@ input[type="submit"],
 .site-container div.wpforms-container-full .wpforms-form input[type="submit"],
 .site-container div.wpforms-container-full .wpforms-form button[type="submit"],
 .button {
-	background-color: #333;
+	background-color: $color_4;
 	border: 0;
 	border-radius: 5px;
 	color: $color_2;
@@ -103,7 +103,7 @@ input[type="submit"]:hover,
 .site-container input[type="reset"]:disabled:hover,
 .site-container input[type="submit"]:disabled,
 .site-container input[type="submit"]:disabled:hover {
-	background-color: #eee;
+	background-color: $color_18;
 	border-width: 0;
 	color: #777;
 	cursor: not-allowed;

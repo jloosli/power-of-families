@@ -1,11 +1,10 @@
 @media print {
-
 	*,
 	*::before,
 	*::after {
 		background: transparent !important;
 		box-shadow: none !important;
-		color: #333 !important;
+		color: $color_4 !important;
 		text-shadow: none !important;
 	}
 
@@ -54,7 +53,7 @@
 
 	blockquote,
 	pre {
-		border: 1px solid #999;
+		border: 1px solid $color_12;
 		page-break-inside: avoid;
 	}
 
@@ -118,7 +117,6 @@
 		widows: 3;
 	}
 
-
 	img {
 		page-break-after: avoid;
 		page-break-inside: avoid;
@@ -135,5 +133,4 @@
 	ul {
 		page-break-before: avoid;
 	}
-
 }

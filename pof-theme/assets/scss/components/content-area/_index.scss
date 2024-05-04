@@ -53,7 +53,7 @@ p.entry-meta {
 }
 
 .entry-footer .entry-meta {
-	border-top: 1px solid #eee;
+	border-top: 1px solid $color_18;
 	padding-top: 20px;
 }
 
@@ -85,7 +85,7 @@ p.entry-meta {
 
 .archive-pagination li a {
 	background-color: $background_color_1;
-	color: #333;
+	color: $color_4;
 	cursor: pointer;
 	display: inline-block;
 	font-size: 16px;
@@ -98,7 +98,7 @@ p.entry-meta {
 .archive-pagination li a:focus,
 .archive-pagination li a:hover,
 .archive-pagination li.active a {
-	background-color: #333;
+	background-color: $color_4;
 	color: $color_2;
 }
 

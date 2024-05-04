@@ -38,7 +38,7 @@
 }
 
 .breadcrumb {
-	border-bottom: 1px solid #eee;
+	border-bottom: 1px solid $color_18;
 	font-size: 16px;
 	margin-bottom: 40px;
 	padding-bottom: 10px;
@@ -89,28 +89,34 @@
 	font-size: 20px;
 	font-weight: 600;
 	margin-bottom: 10px;
+	color: $color_7;
 }
 
 .entry-title {
 	font-size: 30px;
 	margin-bottom: 10px;
+	color: $color_7;
 }
 
 .entry-title a,
 .sidebar .widget-title a {
-	color: #333;
+	color: $color_7;
 	text-decoration: none;
 }
 
 .entry-title a:focus,
 .entry-title a:hover {
-	color: #0073e5;
+	color: $color_9;
 }
 
 .widget-title {
 	font-size: 18px;
 	font-weight: 600;
 	margin-bottom: 20px;
+	color: $color_1;
+	font-family: $font_family_5;
+	text-transform: uppercase;
+	letter-spacing: 0;
 }
 
 .genesis-title-hidden .site-inner {

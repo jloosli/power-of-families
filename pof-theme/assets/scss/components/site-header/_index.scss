@@ -1,7 +1,14 @@
 .site-header {
-	background-color: $background_color_1;
-	box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
-	padding: 0 30px;
+	background-color: $color_2;
+	// box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+	// padding: 0 30px;
+	min-height: 108px;
+	
+	.wrap {
+		padding: 0;
+		max-width: $max_site_width;
+		margin: 0 auto;
+	}
 }
 
 /* Title Area
@@ -14,7 +21,7 @@
 }
 
 .wp-custom-logo .title-area {
-	max-width: 350px;
+	max-width: 620px;
 	padding-bottom: 5px;
 	padding-top: 5px;
 	width: 100%;
@@ -38,7 +45,7 @@
 .site-title a,
 .site-title a:focus,
 .site-title a:hover {
-	color: #333;
+	color: $color_4;
 	text-decoration: none;
 }
 

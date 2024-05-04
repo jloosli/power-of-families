@@ -5,23 +5,25 @@
 	clear: both;
 	line-height: 1;
 	width: 100%;
+	// font-size: 14px;
+	// font-weight: 500;
 }
 
 .genesis-nav-menu .menu-item {
-	display: block;
-	float: none;
+	display: inline-block;
+	text-align: left;
 	position: relative;
+	text-transform: uppercase;
 }
 
 .genesis-nav-menu a {
-	color: #333;
+	color: $color_4;
 	display: block;
-	font-size: 15px;
-	font-weight: 400;
-	outline-offset: -1px;
-	padding-bottom: 12px;
-	padding-top: 12px;
-	text-decoration: none;
+	padding: 12px 24px 16px 24px;
+	// outline-offset: -1px;
+	// padding-bottom: 12px;
+	// padding-top: 12px;
+	// text-decoration: none;
 }
 
 .genesis-nav-menu a:focus,
@@ -29,8 +31,9 @@
 .genesis-nav-menu .current-menu-item > a,
 .genesis-nav-menu .sub-menu .current-menu-item > a:focus,
 .genesis-nav-menu .sub-menu .current-menu-item > a:hover {
-	color: #0073e5;
-	text-decoration: none;
+	color: $color_2;
+	background-color: $color_6;
+	
 }
 
 .genesis-nav-menu .sub-menu,
@@ -50,10 +53,13 @@
 }
 
 .genesis-nav-menu .sub-menu a {
-	background-color: $background_color_1;
+	background-color: $color_2;
+	border: 1px solid #eee;
+  border-top: none;
 	font-size: 14px;
 	position: relative;
 	word-wrap: break-word;
+	width: 200px;
 }
 
 .genesis-nav-menu .menu-item:focus,
@@ -93,7 +99,7 @@
 .sub-menu-toggle {
 	background-color: transparent;
 	border-width: 0;
-	color: #333;
+	color: $color_4;
 	display: block;
 	margin: 0 auto;
 	overflow: hidden;
