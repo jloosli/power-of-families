@@ -2,16 +2,14 @@
 ---------------------------------------------------------------------------- */
 
 .genesis-nav-menu {
-	clear: both;
 	line-height: 1;
 	width: 100%;
-	// font-size: 14px;
-	// font-weight: 500;
+	display: flex;
+	flex-flow: row;
 }
 
 .genesis-nav-menu .menu-item {
-	display: inline-block;
-	text-align: left;
+	display: flex;
 	position: relative;
 	text-transform: uppercase;
 }
@@ -19,11 +17,7 @@
 .genesis-nav-menu a {
 	color: $color_4;
 	display: block;
-	padding: 12px 24px 16px 24px;
-	// outline-offset: -1px;
-	// padding-bottom: 12px;
-	// padding-top: 12px;
-	// text-decoration: none;
+	padding: 16px 24px;
 }
 
 .genesis-nav-menu a:focus,
