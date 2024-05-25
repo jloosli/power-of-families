@@ -1,0 +1,47 @@
+.wp-block-jetpack-slideshow
+		.wp-block-jetpack-slideshow_caption.gallery-caption {
+		background-color: transparent;
+		top: 50%;
+		bottom: unset;
+		text-align: center;
+	}
+
+	.homepage-slider {
+		height: 500px;
+		margin: 0;
+		padding: 0;
+
+        figure {
+            margin: 0;
+            padding: 0;
+        }
+
+		figcaption {
+			font-size: 40px;
+            font-weight: 400;
+		}
+
+		.wp-block-jetpack-slideshow_container {
+			height: 500px;
+			// margin: 0;
+		}
+
+		ul.wp-block-jetpack-slideshow__swiper-wrapper.swiper-wrapper {
+			height: 500px;
+		}
+
+		img {
+			height: 500px;
+			object-fit: cover;
+            object-position: center;
+            filter: brightness(0.75);
+            
+		}
+
+		.wp-block-jetpack-slideshow_button-pause,
+		.wp-block-jetpack-slideshow_button-next,
+		.wp-block-jetpack-slideshow_button-prev,
+        .wp-block-jetpack-slideshow_pagination {
+			display: none;
+		}
+	}

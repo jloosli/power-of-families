@@ -1,0 +1,39 @@
+.archive-description .entry-title,
+.archive-title,
+.author-box-title {
+	font-size: 20px;
+	font-weight: 600;
+	margin-bottom: 10px;
+	color: $color_7;
+}
+
+.entry-title {
+	font-size: 30px;
+	margin-bottom: 10px;
+	color: $color_7;
+}
+
+.entry-title a,
+.sidebar .widget-title a {
+	color: $color_7;
+	text-decoration: none;
+}
+
+.entry-title a:focus,
+.entry-title a:hover {
+	color: $color_9;
+}
+
+.widget-title {
+	font-size: 18px;
+	font-weight: 600;
+	margin-bottom: 20px;
+	color: $color_1;
+	font-family: $font_family_5;
+	text-transform: uppercase;
+	letter-spacing: 0;
+}
+
+.genesis-title-hidden .site-inner {
+	padding-top: 0;
+}
