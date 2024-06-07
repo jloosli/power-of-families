@@ -14,7 +14,7 @@
 add_filter('genesis_attr_site-inner', 'pof_attr_site_inner');
 // Use either 'genesis_after_header' or 'genesis_before_content_sidebar_wrap'
 add_action('genesis_after_header', 'pof_home_page_slider');
-add_action('genesis_before_content_sidebar_wrap', 'pof_home_page_showcase');
+add_action('genesis_after_header', 'pof_home_page_showcase');
 add_action('genesis_before_content_sidebar_wrap', 'pof_home_page_cta');
 
 function pof_home_page_slider()
@@ -57,7 +57,58 @@ function pof_home_page_slider()
 }
 function pof_home_page_showcase()
 {
-	echo '<div class="home-page-content-above-the-fold"><h1>Hello World (Showcase)</h1></div>';
+?>
+	<div id="showcase">
+		<h2>We're here to Help You</h2>
+		<div class="showcase-list">
+			<div class="item">
+				<a href="/building-relationships/">
+					<img loading="lazy" decoding="async" alt="Father and daughter looking lovingly at each other" 
+						src="/wp-content/uploads/2017/11/build-relationships-290x290.jpg" 
+						itemprop="image" height="200" width="200" 
+					>
+					<h3 class="item-caption">Build Relationships</h3>
+				</a>
+			</div>
+			<div class="item">
+				<a href="/teaching-values/">
+					<img loading="lazy" decoding="async" alt="Father and daughter looking lovingly at each other" 
+						src="/wp-content/uploads/2017/11/teach-values-image-300x300.jpg" 
+						itemprop="image" height="200" width="200" 
+					>
+					<h3 class="item-caption">Teach Values</h3>
+				</a>
+			</div>
+			<div class="item">
+				<a href="/systems/">
+					<img loading="lazy" decoding="async" alt="Father and son doing dishes together" 
+						src="/wp-content/uploads/2017/11/establish-systems-image-300x300.jpg" 
+						itemprop="image" height="200" width="200" 
+					>
+					<h3 class="item-caption">Establish Systems</h3>
+				</a>
+			</div>
+			<div class="item">
+				<a href="/upcoming-retreats-and-workshops/">
+					<img loading="lazy" decoding="async" alt="Group of people sitting in a circle in a discussion" 
+						src="/wp-content/uploads/2017/11/get-training-300x300.jpg" 
+						itemprop="image" height="200" width="200" 
+					>
+					<h3 class="item-caption">Get Training</h3>
+				</a>
+			</div>
+			<div class="item">
+				<a href="/find-answers/">
+					<img loading="lazy" decoding="async" alt="Rear view of husband sitting on couch with arm around wife" 
+						src="/wp-content/uploads/2017/11/Get-Answers-Image-300x300.jpg" 
+						itemprop="image" height="200" width="200" 
+					>
+					<h3 class="item-caption">Find Answers</h3>
+				</a>
+			</div>
+		</div>
+	</div>
+<?php
 }
 function pof_home_page_cta()
 {

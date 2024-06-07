@@ -1,0 +1,38 @@
+#showcase {
+    margin: 0 auto;
+    max-width: $max_site_width;
+	display: flex;
+	flex-flow: column;
+
+	h2 {
+		text-align: center;
+	}
+
+	.showcase-list {
+		display: flex;
+		flex-flow: row wrap;
+        justify-content: space-between;
+	}
+
+	.item {
+        a > * {
+            transition: all 0.5s;
+        }
+		img {
+			border-radius: 50%;
+		}
+
+        h3 {
+            text-align: center;
+        }
+
+		a:hover {
+			img {
+				filter: brightness(0.8);
+			}
+            h3 {
+                color: $color_17;
+            }
+		}
+	}
+}
