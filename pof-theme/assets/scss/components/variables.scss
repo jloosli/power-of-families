@@ -1,4 +1,8 @@
+
+
 $max_site_width: 1200px;
+
+
 
 $color_1: #65615e; // Not sure this is used anywhere
 $color_2: #fff;
@@ -20,6 +24,8 @@ $color_15: #111;
 $color_16: #373737;
 $color_17: #111111;
 $color_18: #eee;
+
+
 
 $primary: $color_3;
 $secondary: $color_7;
@@ -53,3 +59,12 @@ $background_color_23: #d5d5d5;
 $background_color_24: #f3cf3f;
 $background_color_25: rgba(255, 255, 255, 0.8);
 $border_color_1: rgba(213, 213, 213, 0);
+
+
+:root {
+    --max-site-width: #{$max_site_width};
+    --color-primary: #{$primary};
+    --color-secondary: #{$secondary};
+    --color-tertiary: #{$tertiary};
+    --color-white-text: #{$white_text};
+}

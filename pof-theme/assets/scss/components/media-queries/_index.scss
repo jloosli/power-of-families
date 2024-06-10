@@ -131,8 +131,9 @@
 	--------------------------------------------- */
 
 	.sidebar {
-		float: right;
-		width: 30%;
+		// float: right;
+		// width: 30%;
+		flex: 1;
 	}
 
 	.sidebar-content .sidebar {

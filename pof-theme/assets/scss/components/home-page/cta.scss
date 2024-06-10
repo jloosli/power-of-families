@@ -3,32 +3,86 @@
 	margin-left: calc(-100vw / 2 + 50%);
 	margin-right: calc(-100vw / 2 + 50%);
 	max-width: 100vw;
+    magrgin-bottom: 2rem;
 
 	background-color: $secondary;
-	
-    .wp-block-group__inner-container {
-        margin:0 auto;
-        max-width: $max_site_width;
-    
-        h1, h2, p {
-            color: $white_text;
-        }
 
-        .wp-block-button.tertiary-button .wp-block-button__link {
-            background-color: $tertiary;
-            color: #fff;
-            border: 1px solid $tertiary;
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: 400;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-block;
-            text-align: center;
-            text-decoration: none;
-            margin: 0;
-            border-radius: 5px;
-        }
-    }
+	.wp-block-group__inner-container {
+		margin: 0 auto;
+		max-width: $max_site_width;
+
+		h1,
+		h2,
+		p {
+			color: $white_text;
+		}
+
+		.wp-block-button.tertiary-button .wp-block-button__link {
+			background-color: $tertiary;
+			color: #fff;
+			border: 1px solid $tertiary;
+			padding: 10px 20px;
+			font-size: 16px;
+			font-weight: 400;
+			text-transform: uppercase;
+			cursor: pointer;
+			transition: all 0.3s;
+			display: inline-block;
+			text-align: center;
+			text-decoration: none;
+			margin: 0;
+			border-radius: 5px;
+		}
+	}
+}
+
+#home-cta {
+	background-color: darken($secondary, 1%);
+	// height: clamp(300px, 50vh, 500px);
+	padding: 1rem 0;
+
+	h3,
+	div,
+	p {
+		color: var(--color-white-text);
+	}
+
+	.cta-wrapper {
+		margin: 2rem auto;
+		// min-height: 300px;
+		max-width: var(--max-site-width);
+		display: grid;
+		grid-template:
+			"title image"
+			"content image"
+			"button image"
+			/ auto 280px;
+
+		gap: 1rem;
+
+		.cta-title {
+			grid-area: title;
+			font-size: 2em;
+		}
+		.cta-content {
+			grid-area: content;
+			font-size: 1.5em;
+		}
+		.cta-button {
+			grid-area: button;
+			place-self: center;
+
+			a.button {
+				background-color: var(--color-tertiary);
+				font-size: 1.25em;
+
+				&:hover {
+					background-color: darken($tertiary, 10%);
+				}
+			}
+		}
+		.cta-image {
+			grid-area: image;
+		}
+	}
 }

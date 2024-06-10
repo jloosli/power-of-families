@@ -15,7 +15,7 @@ add_filter('genesis_attr_site-inner', 'pof_attr_site_inner');
 // Use either 'genesis_after_header' or 'genesis_before_content_sidebar_wrap'
 add_action('genesis_after_header', 'pof_home_page_slider');
 add_action('genesis_after_header', 'pof_home_page_showcase');
-add_action('genesis_before_content_sidebar_wrap', 'pof_home_page_cta');
+add_action('genesis_after_header', 'pof_home_page_cta');
 
 function pof_home_page_slider()
 {
@@ -63,46 +63,31 @@ function pof_home_page_showcase()
 		<div class="showcase-list">
 			<div class="item">
 				<a href="/building-relationships/">
-					<img loading="lazy" decoding="async" alt="Father and daughter looking lovingly at each other" 
-						src="/wp-content/uploads/2017/11/build-relationships-290x290.jpg" 
-						itemprop="image" height="200" width="200" 
-					>
+					<img loading="lazy" decoding="async" alt="Father and daughter looking lovingly at each other" src="/wp-content/uploads/2017/11/build-relationships-290x290.jpg" itemprop="image" height="200" width="200">
 					<h3 class="item-caption">Build Relationships</h3>
 				</a>
 			</div>
 			<div class="item">
 				<a href="/teaching-values/">
-					<img loading="lazy" decoding="async" alt="Father and daughter looking lovingly at each other" 
-						src="/wp-content/uploads/2017/11/teach-values-image-300x300.jpg" 
-						itemprop="image" height="200" width="200" 
-					>
+					<img loading="lazy" decoding="async" alt="Father and daughter looking lovingly at each other" src="/wp-content/uploads/2017/11/teach-values-image-300x300.jpg" itemprop="image" height="200" width="200">
 					<h3 class="item-caption">Teach Values</h3>
 				</a>
 			</div>
 			<div class="item">
 				<a href="/systems/">
-					<img loading="lazy" decoding="async" alt="Father and son doing dishes together" 
-						src="/wp-content/uploads/2017/11/establish-systems-image-300x300.jpg" 
-						itemprop="image" height="200" width="200" 
-					>
+					<img loading="lazy" decoding="async" alt="Father and son doing dishes together" src="/wp-content/uploads/2017/11/establish-systems-image-300x300.jpg" itemprop="image" height="200" width="200">
 					<h3 class="item-caption">Establish Systems</h3>
 				</a>
 			</div>
 			<div class="item">
 				<a href="/upcoming-retreats-and-workshops/">
-					<img loading="lazy" decoding="async" alt="Group of people sitting in a circle in a discussion" 
-						src="/wp-content/uploads/2017/11/get-training-300x300.jpg" 
-						itemprop="image" height="200" width="200" 
-					>
+					<img loading="lazy" decoding="async" alt="Group of people sitting in a circle in a discussion" src="/wp-content/uploads/2017/11/get-training-300x300.jpg" itemprop="image" height="200" width="200">
 					<h3 class="item-caption">Get Training</h3>
 				</a>
 			</div>
 			<div class="item">
 				<a href="/find-answers/">
-					<img loading="lazy" decoding="async" alt="Rear view of husband sitting on couch with arm around wife" 
-						src="/wp-content/uploads/2017/11/Get-Answers-Image-300x300.jpg" 
-						itemprop="image" height="200" width="200" 
-					>
+					<img loading="lazy" decoding="async" alt="Rear view of husband sitting on couch with arm around wife" src="/wp-content/uploads/2017/11/Get-Answers-Image-300x300.jpg" itemprop="image" height="200" width="200">
 					<h3 class="item-caption">Find Answers</h3>
 				</a>
 			</div>
@@ -112,7 +97,19 @@ function pof_home_page_showcase()
 }
 function pof_home_page_cta()
 {
-	echo '<div class="home-page-content-above-the-fold"><h1>Hello World (CTA)</h1></div>';
+?>
+<div id="home-cta">
+	<div class="cta-wrapper">
+		<h3 class="cta-title">Would you like to see how you're setting your kids up for good behavior and where you can improve?</h3>
+		<div class="cta-content">Sign up for our free 5 minute assessment: Your Home Environment</div>
+		<div class="cta-button"><a class="button" target="_self" href="https://hm156.infusionsoft.com/app/form/home-environment-submitted?_ga=2.167372087.846642928.1717655143-291391111.1716594697">I'm ready to set my children up for success</a></div>
+		<div class="cta-image">
+			<img loading="lazy" decoding="async" src="/wp-content/uploads/2017/11/home-environment-assessment.jpg" alt="Father and daughter looking lovingly at each other. Cover for 5 minute home environment assessment">
+		</div>
+	</div>
+</div>
+
+<?php
 }
 
 /**
