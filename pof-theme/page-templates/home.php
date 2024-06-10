@@ -151,9 +151,9 @@ function pof_landing_body_class($classes)
 }
 
 // Removes Skip Links.
-// remove_action( 'genesis_before_header', 'genesis_skip_links', 5 );
+remove_action( 'genesis_before_header', 'genesis_skip_links', 5 );
 
-// add_action( 'wp_enqueue_scripts', 'pof_dequeue_skip_links' );
+add_action( 'wp_enqueue_scripts', 'pof_dequeue_skip_links' );
 /**
  * Dequeues Skip Links Script.
  *
@@ -164,24 +164,6 @@ function pof_dequeue_skip_links()
 	wp_dequeue_script('skip-links');
 }
 
-// Removes site header elements.
-// remove_action( 'genesis_header', 'genesis_header_markup_open', 5 );
-// remove_action( 'genesis_header', 'genesis_do_header' );
-// remove_action( 'genesis_header', 'genesis_header_markup_close', 15 );
-// remove_action('genesis_site_title', 'genesis_seo_site_title');
-// remove_action('genesis_site_title','');
-// remove_action('genesis_entry_header','genesis_entry_header_markup_open',5);
-// remove_action('genesis_entry_header','genesis_entry_header_markup_close',15);
-
-// Removes navigation.
-// remove_theme_support( 'genesis-menus' );
-
-// Removes site footer elements.
-// remove_action( 'genesis_footer', 'genesis_footer_markup_open', 5 );
-// remove_action( 'genesis_footer', 'genesis_do_footer' );
-// remove_action( 'genesis_footer', 'genesis_footer_markup_close', 15 );
-
-// remove_action( 'genesis_entry_header', 'genesis_do_post_title' );
 
 // Runs the Genesis loop.
 genesis();
