@@ -39,7 +39,7 @@ input[type="submit"],
 .site-container div.wpforms-container-full .wpforms-form input[type="submit"],
 .site-container div.wpforms-container-full .wpforms-form button[type="submit"],
 .button {
-	background-color: $color_4;
+	background-color: $tertiary;
 	border: 0;
 	border-radius: 5px;
 	color: $color_2;
@@ -79,7 +79,7 @@ input[type="submit"]:hover,
 	button[type="submit"]:hover,
 .button:focus,
 .button:hover {
-	background-color: #0073e5;
+	background-color: darken($tertiary, 10%);
 	border-width: 0;
 	color: $color_2;
 }
