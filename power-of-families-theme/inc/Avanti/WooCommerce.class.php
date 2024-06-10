@@ -23,6 +23,9 @@ class WooCommerce
                 woocommerce_simple_add_to_cart();
             }
         });
+        // add_action('woocommerce_single_product_summary', function () {
+        //         the_content();
+        // },1);
 
         // Replace add to card button with learn more in the store page
         add_action('init', [$this, 'remove_loop_button']);
