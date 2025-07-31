@@ -1,11 +1,6 @@
-version: '3.8'
-
 services:
   wordpress:
-    build: 
-      context: .
-      dockerfile: docker/wordpress.dockerfile
-    # image: wordpress:5.1, php:7.4 # TT version as of 2/2024: https://support.tigertech.net/wordpress-version
+    image: wordpress:php7.4
     container_name: pof_wordpress
     depends_on:
       - db
