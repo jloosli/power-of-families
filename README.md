@@ -28,6 +28,7 @@
     --exclude=~/backups-tigertech/current/www/wp-content/plugins/pom-bloom \
     pof:~/backups-tigertech/current/www/wp-content/plugins ./wordpress/wp-content/
     ```
+1. Update local password `dcr --rm wpcli user update <user> --user_pass='pass'`
 1. Update PHP Composer autoload files:
 
     ```shell
