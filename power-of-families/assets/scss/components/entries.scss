@@ -1,0 +1,67 @@
+.entry {
+  margin-bottom: 40px;
+  padding: 50px 60px;
+}
+
+.content .entry {
+  background-color: $color_2;
+}
+
+.entry-content ol,
+.entry-content ul {
+  margin-bottom: 18px;
+  margin-left: 40px;
+}
+
+.entry-content ol > li {
+  list-style-type: decimal;
+}
+
+.entry-content ul > li {
+  list-style-type: disc;
+}
+
+.entry-content ol ol,
+.entry-content ul ul {
+  margin-bottom: 0;
+}
+
+.entry-content code {
+  background-color: $color_4;
+  color: $color_11;
+}
+
+/* ## Entry Meta
+--------------------------------------------- */
+
+p.entry-meta {
+  font-size: 15px;
+  margin-bottom: 0;
+}
+
+.entry-header .entry-meta {
+  margin-bottom: 12px;
+}
+
+.entry-header .avatar {
+  margin-right: 15px;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -o-border-radius: 3px;
+}
+
+.entry-footer .entry-meta {
+  border-top: 2px solid $background_color_1;
+  padding-top: 24px;
+}
+
+.entry-categories,
+.entry-tags {
+  display: block;
+}
+
+.entry-comments-link::before {
+  content: "\2014";
+  margin: 0 6px 0 2px;
+}

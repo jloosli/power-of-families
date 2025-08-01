@@ -1,0 +1,17 @@
+.site-header .genesis-nav-menu li {
+  font-size: 18px;
+  font-weight: 300;
+}
+
+.site-header .sub-menu .sub-menu {
+  margin-top: -56px;
+}
+
+.site-header .genesis-nav-menu li li {
+  margin-left: 0;
+}
+@media screen and (min-width: 768px) {
+  .site-header .genesis-nav-menu li a {
+    padding: 	20px 10px;
+  }
+}

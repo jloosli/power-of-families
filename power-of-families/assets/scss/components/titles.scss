@@ -1,0 +1,44 @@
+.archive-title {
+  font-size: 20px;
+  padding: 50px 60px 0 60px;
+}
+
+.entry-title,
+.fl-post-feed-title {
+  font-size: 30px;
+  color: $color_7;
+  font-family: $font_family_2;
+  letter-spacing: 1px;
+  text-transform: none;
+  font-weight: normal;
+}
+.page .entry-title {
+  font-size: 42px;
+  font-family: $font_family_3;
+}
+
+.entry-title a,
+.fl-post-feed-title a,
+.sidebar .widget-title a {
+  color: $color_7
+}
+
+.entry-title a:hover {
+  color:$color_9;
+}
+
+.widget-title {
+  font-size: 16px;
+  margin-bottom: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: $color_1;
+  font-family: $font_family_5;
+  letter-spacing: 0;
+}
+
+.footer-widgets .widget-title {
+  color: $color_2;
+}
+
+

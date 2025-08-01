@@ -1,0 +1,35 @@
+.ubermenu-autocolumn + .ubermenu-item-type-custom {
+  float:none;
+  clear:both;
+}
+
+.ubermenu-skin-white.ubermenu-main {
+  background:$background_color_8;
+  border:0;
+}
+
+body .ubermenu-skin-white .ubermenu-item-level-0.ubermenu-current-menu-item > .ubermenu-target,
+body .ubermenu-skin-white .ubermenu-item-level-0.ubermenu-current-menu-parent > .ubermenu-target,
+body .ubermenu-skin-white .ubermenu-item-level-0.ubermenu-current-menu-ancestor > .ubermenu-target,
+body .ubermenu-skin-white .ubermenu-item-level-0 > .ubermenu-target {
+  color:$color_2;
+  outline:none;
+  font-size:17px;
+  font-weight:300;
+}
+
+body .ubermenu-skin-white .ubermenu-item-level-0.ubermenu-current-menu-item:hover > .ubermenu-target,
+body .ubermenu-skin-white .ubermenu-item-level-0.ubermenu-current-menu-parent:hover > .ubermenu-target,
+body .ubermenu-skin-white .ubermenu-item-level-0.ubermenu-current-menu-ancestor:hover > .ubermenu-target,
+body .ubermenu-skin-white .ubermenu-item-level-0:hover > .ubermenu-target {
+  color:$color_15!important;
+}
+
+body .ubermenu-skin-white.ubermenu-responsive-toggle, body .ubermenu-skin-white.ubermenu-responsive-toggle:hover {
+  background: $background_color_8;
+  color: $color_2;
+  border: 0;
+  font-size: 17px;
+  line-height: 26px;
+  font-weight: 300;
+}

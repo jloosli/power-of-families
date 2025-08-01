@@ -1,0 +1,168 @@
+/* ## Typographical Elements
+--------------------------------------------- */
+
+
+
+body {
+  background-color: $background_color_1;
+  color: $color_1;
+  //font-family: 'Montserrat', sans-serif;
+  font-family: $font_family_1;
+  font-size: 19px;
+  font-weight: 300;
+  line-height: 1.5;
+  //line-height:1.3;
+  margin: 0;
+}
+
+a,
+button,
+input:focus,
+input[type="button"],
+input[type="reset"],
+input[type="submit"],
+textarea:focus,
+.button,
+.gallery img {
+  -webkit-transition: all 0.1s ease-in-out;
+  -moz-transition:    all 0.1s ease-in-out;
+  -ms-transition:     all 0.1s ease-in-out;
+  -o-transition:      all 0.1s ease-in-out;
+  transition:         all 0.1s ease-in-out;
+}
+
+::-moz-selection {
+  background-color: $background_color_2;
+  color: $color_2;
+}
+
+::selection {
+  background-color: $background_color_2;
+  color: $color_2;
+}
+
+a {
+  color: $color_3;
+  text-decoration: none;
+}
+
+a:hover {
+  color: $color_4;
+}
+
+p {
+  margin: 0 0 18px;
+  padding: 0;
+}
+
+ol,
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  list-style-type: none;
+}
+
+b,
+strong {
+  font-weight: 700;
+}
+
+blockquote,
+cite,
+em,
+i {
+  font-style: italic;
+}
+
+blockquote {
+  margin: 40px 0;
+  padding: 30px;
+  background:#fafafa;
+  border: 2px solid #F1F1F1;
+  border-radius:3px;
+  -moz-border-radius:3px;
+  -webkit-border-radius:3px;
+  -o-border-radius:3px;
+}
+
+blockquote *:last-child {
+  margin-bottom:0;
+}
+
+/*blockquote::before {
+	content: "\201C";
+	display: block;
+	font-size: 30px;
+	height: 0;
+	left: -20px;
+	position: relative;
+	top: -10px;
+}*/
+
+
+div#header-bg {
+  position: absolute;
+  height: 550px;
+  width: 100%;
+  z-index: -1;
+  border-bottom: 3px solid $color_1;
+  background-color: $color_6;
+}
+/* ## Headings
+--------------------------------------------- */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: $color_5;
+  //font-family: 'Montserrat', sans-serif;
+  font-family: $font_family_2;
+  font-weight: normal;
+  line-height: 1.2;
+  margin: 0 0 18px;
+  padding-top: 15px;
+}
+
+h1 {
+  font-size: 36px;
+  font-weight: 400;
+  padding-top: 0;
+}
+
+h2 {
+  font-size: 32px;
+  color: $color_6;
+  text-transform: uppercase;
+  font-family: $font_family_3;
+
+}
+h3 {
+  font-size: 24px;
+  font-style: normal;
+  color: $color_1;
+
+}
+
+h4 {
+  font-size: 58px;
+  font-family: $font_family_4;
+  letter-spacing: 2px;
+}
+
+h5 {
+  font-size: 32px;
+  color: $color_7;
+  text-transform: uppercase;
+  font-family: $font_family_3;
+}
+
+h6 {
+  font-size: 20px;
+  text-transform: uppercase;
+}

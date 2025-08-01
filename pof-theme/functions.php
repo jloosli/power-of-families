@@ -19,7 +19,7 @@ add_action('after_setup_theme', 'pof_localization_setup');
  */
 function pof_localization_setup()
 {
-	load_child_theme_textdomain(genesis_get_theme_handle(), get_stylesheet_directory() . '/languages');
+	// load_child_theme_textdomain(genesis_get_theme_handle(), get_stylesheet_directory() . '/languages');
 }
 
 // Adds helper functions.

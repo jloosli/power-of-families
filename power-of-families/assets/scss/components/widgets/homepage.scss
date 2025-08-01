@@ -1,0 +1,69 @@
+.home-large-featured {
+  background:url(https://www.powerofmoms.com/wp-content/uploads/2014/10/deliberate_mother_bg.jpg) top right no-repeat;
+  background-size:cover;
+  min-height:328px;
+  padding:35px 60px;
+}
+
+.home-large-featured .textwidget {
+  max-width:400px;
+}
+
+.home-large-featured .textwidget *:last-child {
+  margin-bottom:0;
+}
+
+.home-large-featured h2 {
+  font-size:36px;
+  color:$color_8;
+  font-weight:700;
+}
+
+.home-large-featured  p {
+  font-size:20px;
+  font-weight:300;
+  color:$color_14;
+}
+
+.home-large-featured strong {
+  color:$color_3;
+  font-weight:500;
+}
+
+
+.home-featured-widgets {
+  padding:30px 40px;
+  background-color:$background_color_20;
+}
+
+.home-featured-widget img {
+  width:100%;
+}
+
+.home-featured-widget {
+  width:33.3333%;
+  float:left;
+  padding:0 20px;
+  box-sizing:border-box;
+  -moz-box-sizing:border-box;
+  -webkit-box-sizing:border-box;
+  -o-box-sizing:border-box;
+}
+
+.home-featured-widget-inner {
+  background-color:$color_2;
+  padding:20px;
+}
+
+.home-featured-widget-inner img {
+  margin-bottom:20px;
+}
+
+.home-featured-widget-inner p {
+  margin:0;
+}
+
+.home-featured-widgets h2.panel-title {
+  margin: 0 20px 20px 20px;
+  color:$color_4;
+}

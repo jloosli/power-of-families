@@ -1,0 +1,19 @@
+.nav-secondary {
+  background-color: $color_3;
+  z-index: 9;
+  position: relative;
+}
+
+.nav-secondary .genesis-nav-menu a:hover,
+.nav-secondary .genesis-nav-menu .current-menu-item > a,
+.nav-secondary .genesis-nav-menu .sub-menu .current-menu-item > a:hover {
+  color: $color_2;
+  text-decoration:none;
+  background-color:$background_color_12;
+}
+
+.nav-secondary i {
+  font-size:23px;
+  position:relative;
+  bottom: -2px;
+}
