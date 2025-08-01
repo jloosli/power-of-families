@@ -21,7 +21,6 @@ services:
         define('WP_SITEURL', getenv('WORDPRESS_SITEURL', ''));
     volumes:
       - ./wordpress:/var/www/html
-      - ./power-of-families-theme:/var/www/html/wp-content/themes/power-of-families
       - ./pof-theme:/var/www/html/wp-content/themes/power-of-families
       - ./pof-programs-plugin:/var/www/html/wp-content/plugins/pof-programs
       - ./pof-bloom-plugin:/var/www/html/wp-content/plugins/pof-bloom
