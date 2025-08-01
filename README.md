@@ -22,7 +22,6 @@
 
     ```shell
     rsync -avzh --exclude=~/backups-tigertech/current/www/wp-content/themes/power-of-families \
-    --exclude=~/backups-tigertech/current/www/wp-content/themes/power-of-families \
     pof:~/backups-tigertech/current/www/wp-content/themes ./wordpress/wp-content/
 
     rsync -avzh --exclude=~/backups-tigertech/current/www/wp-content/plugins/pof-programs \
