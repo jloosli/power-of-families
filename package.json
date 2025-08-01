@@ -13,15 +13,15 @@
     "deploy:theme": "npm run build && rsync -avzh --exclude=./power-of-families-theme/assets ./power-of-families-theme/ pof:html/wp-content/themes/power-of-families"
   },
   "devDependencies": {
-    "@wordpress/babel-preset-default": "^7.38.0",
-    "@wordpress/prettier-config": "^3.11.0",
-    "@wordpress/scripts": "^27.5.0",
-    "filemanager-webpack-plugin": "^8.0.0",
+    "@wordpress/babel-preset-default": "^8.27.0",
+    "@wordpress/prettier-config": "^4.27.0",
+    "@wordpress/scripts": "^30.20.0",
+    "filemanager-webpack-plugin": "^9.0.1",
     "normalize.css": "^8.0.1",
     "prettier": "^3.2.5",
     "ts-loader": "^9.5.1",
     "typescript": "^5.4.3",
     "webpack-remove-empty-scripts": "^1.0.4",
-    "wp-types": "^3.64.0"
+    "wp-types": "^4.68.1"
   }
 }
