@@ -6,28 +6,36 @@
 - [Power of Families Programs](pof-programs-plugin)
 - [Power of Families Bloom](pof-bloom-plugin)
 
-### First Time Setup
+## First Time Setup
 
-#### Import DB
+1. Run `docker-compose up -d wordpress` to start the containers.
+1. Set up the admin user
+1. Update Wordpress and database to the latest version
+1. Import the database backup:
 
-Copy database backup:
-`rsync -avzh pof:backups-tigertech/current/mysql/poweroffamilies/poweroffamilies.dump db-backups/`
+    - ```shell
+      rsync -avzh pof:backups-tigertech/current/mysql/poweroffamilies/poweroffamilies.dump db-backups/
+      ```
 
-Use [phpMyAdmin](http://localhost:8180) to upload database. See [docker-compose.yml](docker-compose.yml) for password.
+    - Use [phpMyAdmin](http://localhost:8180) to upload database. See [docker-compose.yml](docker-compose.yml) for password.
+1. Import the themes and plugins
 
-#### Import Themes and Plugins
+    ```shell
+    rsync -avzh --exclude=~/backups-tigertech/current/www/wp-content/themes/power-of-families \
+    --exclude=~/backups-tigertech/current/www/wp-content/themes/power-of-families \
+    pof:~/backups-tigertech/current/www/wp-content/themes ./wordpress/wp-content/
 
-```shell
-rsync -avzh --exclude=~/backups-tigertech/current/www/wp-content/themes/power-of-families \
-  --exclude=~/backups-tigertech/current/www/wp-content/themes/power-of-families \
-  pof:~/backups-tigertech/current/www/wp-content/themes ./wordpress/wp-content/
+    rsync -avzh --exclude=~/backups-tigertech/current/www/wp-content/plugins/pof-programs \
+    --exclude=~/backups-tigertech/current/www/wp-content/plugins/pom-bloom \
+    pof:~/backups-tigertech/current/www/wp-content/plugins ./wordpress/wp-content/
+    ```
+1. Update PHP Composer autoload files:
 
-rsync -avzh --exclude=~/backups-tigertech/current/www/wp-content/plugins/pof-programs \
-  --exclude=~/backups-tigertech/current/www/wp-content/plugins/pom-bloom \
-  pof:~/backups-tigertech/current/www/wp-content/plugins ./wordpress/wp-content/
-```
+    ```shell
+    docker-compose run --rm composer dump-autoload -o
+    ```
 
-### Ongoing Development
+## Ongoing Development
 
 Javascript building is done with `npm run start` or `npm run build`. This will watch for changes and rebuild the JS files as needed.
 

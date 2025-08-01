@@ -22,11 +22,10 @@ services:
     volumes:
       - ./wordpress:/var/www/html
       - ./power-of-families-theme:/var/www/html/wp-content/themes/power-of-families
-      - ./pof-theme:/var/www/html/wp-content/themes/pof-theme
+      - ./pof-theme:/var/www/html/wp-content/themes/power-of-families
       - ./pof-programs-plugin:/var/www/html/wp-content/plugins/pof-programs
       - ./pof-bloom-plugin:/var/www/html/wp-content/plugins/pof-bloom
       - ./bin/add_local_config.sh:/usr/local/bin/add_local_config.sh
-
   
   wpcli:
     depends_on:
@@ -72,8 +71,8 @@ services:
     image: composer:latest
     container_name: pof_composer
     volumes:
-      - ./pof-theme:/var/www/html/wp-content/themes/pof-theme
-    working_dir: /var/www/html/wp-content/themes/pof-theme
+      - ./pof-theme:/var/www/html/wp-content/themes/power-of-families
+    working_dir: /var/www/html/wp-content/themes/power-of-families
 
 volumes:
   wordpress:
