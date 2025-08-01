@@ -24,7 +24,6 @@ services:
       - ./pof-theme:/var/www/html/wp-content/themes/power-of-families
       - ./pof-programs-plugin:/var/www/html/wp-content/plugins/pof-programs
       - ./pof-bloom-plugin:/var/www/html/wp-content/plugins/pof-bloom
-      - ./bin/add_local_config.sh:/usr/local/bin/add_local_config.sh
   
   wpcli:
     depends_on:
