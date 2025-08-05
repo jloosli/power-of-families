@@ -21,13 +21,17 @@
 1. Import the themes and plugins
 
     ```shell
-    rsync -avzh --exclude=~/backups-tigertech/current/www/wp-content/themes/power-of-families \
-    pof:~/backups-tigertech/current/www/wp-content/themes ./wordpress/wp-content/
+    rsync -avzh \
+    --exclude=power-of-families \
+    pof:backups-tigertech/current/www/wp-content/themes ./wordpress/wp-content/
 
-    rsync -avzh --exclude=~/backups-tigertech/current/www/wp-content/plugins/pof-programs \
-    --exclude=~/backups-tigertech/current/www/wp-content/plugins/pom-bloom \
+    rsync -avzh \
+    --exclude=pof-programs \
+    --exclude=pom-bloom \
+    --exclude=pof-bloom \
     pof:~/backups-tigertech/current/www/wp-content/plugins ./wordpress/wp-content/
     ```
+
 1. Update local password `dcr --rm wpcli user update <user> --user_pass='pass'`
 1. Update PHP Composer autoload files:
 
