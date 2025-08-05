@@ -59,3 +59,5 @@ General Wordpress and wp-scripts help:
 
 - https://wordpress.tv/2023/12/19/developer-hours-modern-wordpress-development-with-the-wp-scripts-package/
 
+Cursor helps:
+https://github.com/snarktank/ai-dev-tasks
