@@ -2,26 +2,18 @@
   "name": "power-of-families-theme",
   "version": "3.0.0",
   "description": "Custom wordpress theme for Power of Families",
-  "main": "scripts.js",
   "author": "Jared Loosli",
   "license": "UNLICENSED",
   "scripts": {
-    "start": "wp-scripts start",
-    "build": "wp-scripts build",
-    "version-bump": "node ./bin/bump-version",
-    "deploy": "npm run deploy:theme",
-    "deploy:theme": "npm run build && rsync -avzh --exclude=./power-of-families-theme/assets ./power-of-families-theme/ pof:html/wp-content/themes/power-of-families"
+    "start": "wp-scripts start power-of-families/src/main.ts --output-path=power-of-families/dist",
+    "build": "wp-scripts build power-of-families/src/main.ts --output-path=power-of-families/dist",
+    "version-bump": "node ./bin/bump-version"
   },
   "devDependencies": {
-    "@wordpress/babel-preset-default": "^8.27.0",
     "@wordpress/prettier-config": "^4.27.0",
     "@wordpress/scripts": "^30.20.0",
-    "filemanager-webpack-plugin": "^9.0.1",
     "normalize.css": "^8.0.1",
     "prettier": "^3.2.5",
-    "ts-loader": "^9.5.1",
-    "typescript": "^5.4.3",
-    "webpack-remove-empty-scripts": "^1.0.4",
     "wp-types": "^4.68.1"
   }
 }
