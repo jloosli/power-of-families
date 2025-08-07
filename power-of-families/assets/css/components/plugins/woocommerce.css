@@ -1,3 +1,7 @@
+.woocommerce .content {
+	padding: 2em;
+}
+
 div .woocommerce #respond input#submit,
 div .woocommerce a.button,
 div .woocommerce button.button,
