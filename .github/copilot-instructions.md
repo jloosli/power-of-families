@@ -2,28 +2,28 @@
 
 ## Repository Summary
 
-This repository contains the full codebase for the Power of Families Wordpress site, including:
+This repository contains the full codebase for the Power of Families WordPress site, including:
 
 - Custom theme (`power-of-families`)
-- Wordpress core files (`wordpress/`)
+- WordPress core files (`wordpress/`)
 - Database and backup scripts
 - Docker setup for local development
 
-The main purpose is to provide a modern, maintainable, and extensible Wordpress environment for Power of Families, leveraging custom themes and plugins.
+The main purpose is to provide a modern, maintainable, and extensible WordPress environment for Power of Families, leveraging custom themes and plugins.
 
 ## High-Level Information
 
-- **Languages:** PHP, TypeScript, JavaScript, CSS
-- **Frameworks:** Wordpress, Genesis Framework (child theme)
+- **Languages:** PHP, TypeScript, JavaScript, CSS, LESS, SCSS
+- **Frameworks:** WordPress, Genesis Framework (child theme)
 - **Build Tools:** npm, Docker
 - **Repo Size:** Large, with multiple subprojects and plugins
-- **Target Runtime:** PHP 7.4+ (Wordpress), Node.js (build tools)
+- **Target Runtime:** PHP 7.4+ (WordPress), Node.js (build tools)
 
 ## Build, Bootstrap, and Validation Steps
 
 ### Environment Setup
 
-- Always run `docker-compose up -d wordpress` before any build or test steps. This starts the Wordpress, database, and phpMyAdmin containers.
+- Always run `docker-compose up -d wordpress` before any build or test steps. This starts the WordPress, database, and phpMyAdmin containers.
 - Use `phpMyAdmin` at [http://localhost:8180](http://localhost:8180) for DB management. Credentials are in `docker-compose.yml`.
 - Import database backups using rsync and phpMyAdmin as described in the root `README.md`.
 
