@@ -1,0 +1,51 @@
+.sidebar-button a {
+	color: var(--color-2);
+	font-size: 18px;
+	font-weight: bold;
+	padding: 12px 20px;
+	display: block;
+	float: none;
+	transition: background-color 0.25s ease-in-out;
+	-moz-transition: background-color 0.25s ease-in-out;
+	-webkit-transition: background-color 0.25s ease-in-out;
+	-o-transition: background-color 0.25s ease-in-out;
+}
+
+.sidebar .widget.sidebar-button {
+	margin: 40px 0 0 0;
+}
+
+.sidebar-button + .sidebar-button {
+	margin-top: 7px !important;
+}
+
+.sidebar-button + .widget:not(.sidebar-button) {
+	margin-top: 40px;
+}
+
+.sidebar-button a:hover {
+	text-decoration: none;
+}
+
+.widget.orange-button a {
+	background-color: var(--background-color-5);
+	border-bottom: 3px solid var(--background-color-13);
+}
+
+.widget.orange-button a:hover {
+	background-color: var(--background-color-13);
+}
+
+.widget.blue-button a {
+	background-color: var(--background-color-14);
+	border-bottom: 3px solid var(--background-color-16);
+}
+
+.widget.blue-button a:hover {
+	background-color: var(--background-color-15);
+}
+
+.widget.green-button a {
+	background-color: var(--color-7);
+	border-bottom: 3px solid var(--color-9);
+}
