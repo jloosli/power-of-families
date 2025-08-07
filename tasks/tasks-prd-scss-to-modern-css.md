@@ -35,18 +35,18 @@
     - [x] 1.2 Convert SCSS variables in `variables.scss` to CSS Custom Properties
     - [x] 1.3 Create the main CSS variables file with proper CSS Custom Properties syntax
     - [x] 1.4 Test that CSS Custom Properties are properly defined and accessible
-- [ ] 2.0 Convert main SCSS file and update build integration
+- [x] 2.0 Convert main SCSS file and update build integration
     - [x] 2.1 Convert `main.scss` to `main.css` with CSS `@import` statements
     - [x] 2.2 Update the import reference in `power-of-families/src/main.ts`
     - [x] 2.3 Test that the build process works with the new CSS file
     - [x] 2.4 Verify that all imports resolve correctly in the new CSS structure
 - [ ] 3.0 Convert layout and structural components
-    - [ ] 3.1 Convert `layout/layout.scss` to modern CSS with CSS Grid/Flexbox
-    - [ ] 3.2 Convert `layout/sidebars.scss` to modern CSS
-    - [ ] 3.3 Convert `layout/_index.scss` to use CSS `@import` statements
-    - [ ] 3.4 Convert `objects.scss` to modern CSS
-    - [ ] 3.5 Convert `common.scss` to modern CSS
-    - [ ] 3.6 Test layout components render correctly with modern CSS
+    - [x] 3.1 Convert `layout/layout.scss` to modern CSS
+    - [x] 3.2 Convert `layout/sidebars.scss` to modern CSS
+    - [x] 3.3 Convert `layout/_index.scss` to use CSS `@import` statements
+    - [x] 3.4 Convert `objects.scss` to modern CSS
+    - [x] 3.5 Convert `common.scss` to modern CSS
+    - [x] 3.6 Test layout components render correctly with modern CSS
 - [ ] 4.0 Convert typography and form components
     - [ ] 4.1 Convert `typography.scss` to modern CSS with CSS Custom Properties
     - [ ] 4.2 Convert `forms.scss` to modern CSS with modern form styling

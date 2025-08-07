@@ -1,0 +1,26 @@
+.sidebar {
+	font-size: 16px;
+}
+
+.sidebar li {
+	border-bottom: 1px dotted var(--color-11);
+	margin-bottom: 10px;
+	padding-bottom: 10px;
+}
+
+.sidebar p:last-child,
+.sidebar ul > li:last-child {
+	margin-bottom: 0;
+}
+
+.sidebar .widget,
+.fl-module-sidebar .widget {
+	background-color: var(--color-2);
+	margin-bottom: 50px;
+	/*padding: 40px;*/
+}
+
+div .fl-post-feed-post {
+	/*border-bottom: 2px solid var(--color-6);*/
+	border-bottom-width: 2px;
+}
