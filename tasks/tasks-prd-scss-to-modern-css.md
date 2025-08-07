@@ -40,19 +40,19 @@
     - [x] 2.2 Update the import reference in `power-of-families/src/main.ts`
     - [x] 2.3 Test that the build process works with the new CSS file
     - [x] 2.4 Verify that all imports resolve correctly in the new CSS structure
-- [ ] 3.0 Convert layout and structural components
+- [x] 3.0 Convert layout and structural components
     - [x] 3.1 Convert `layout/layout.scss` to modern CSS
     - [x] 3.2 Convert `layout/sidebars.scss` to modern CSS
     - [x] 3.3 Convert `layout/_index.scss` to use CSS `@import` statements
     - [x] 3.4 Convert `objects.scss` to modern CSS
     - [x] 3.5 Convert `common.scss` to modern CSS
     - [x] 3.6 Test layout components render correctly with modern CSS
-- [ ] 4.0 Convert typography and form components
-    - [ ] 4.1 Convert `typography.scss` to modern CSS with CSS Custom Properties
-    - [ ] 4.2 Convert `forms.scss` to modern CSS with modern form styling
-    - [ ] 4.3 Convert `titles.scss` to modern CSS
-    - [ ] 4.4 Convert `fonts.scss` to modern CSS with `@font-face` declarations
-    - [ ] 4.5 Test typography and form components display correctly
+- [x] 4.0 Convert typography and form components
+    - [x] 4.1 Convert `typography.scss` to modern CSS with CSS Custom Properties
+    - [x] 4.2 Convert `forms.scss` to modern CSS with modern form styling
+    - [x] 4.3 Convert `titles.scss` to modern CSS
+    - [x] 4.4 Convert `fonts.scss` to modern CSS with `@font-face` declarations
+    - [x] 4.5 Test typography and form components display correctly
 - [ ] 5.0 Convert remaining components and media queries
     - [ ] 5.1 Convert `media-queries.scss` to modern CSS with logical properties
     - [ ] 5.2 Convert `site-header/` directory components to modern CSS
