@@ -30,16 +30,16 @@
 
 ## Tasks
 
-- [ ] 1.0 Create CSS directory structure and convert variables
+- [x] 1.0 Create CSS directory structure and convert variables
     - [x] 1.1 Create the CSS directory structure mirroring the SCSS structure
     - [x] 1.2 Convert SCSS variables in `variables.scss` to CSS Custom Properties
     - [x] 1.3 Create the main CSS variables file with proper CSS Custom Properties syntax
     - [x] 1.4 Test that CSS Custom Properties are properly defined and accessible
 - [ ] 2.0 Convert main SCSS file and update build integration
-    - [ ] 2.1 Convert `main.scss` to `main.css` with CSS `@import` statements
-    - [ ] 2.2 Update the import reference in `power-of-families/src/main.ts`
-    - [ ] 2.3 Test that the build process works with the new CSS file
-    - [ ] 2.4 Verify that all imports resolve correctly in the new CSS structure
+    - [x] 2.1 Convert `main.scss` to `main.css` with CSS `@import` statements
+    - [x] 2.2 Update the import reference in `power-of-families/src/main.ts`
+    - [x] 2.3 Test that the build process works with the new CSS file
+    - [x] 2.4 Verify that all imports resolve correctly in the new CSS structure
 - [ ] 3.0 Convert layout and structural components
     - [ ] 3.1 Convert `layout/layout.scss` to modern CSS with CSS Grid/Flexbox
     - [ ] 3.2 Convert `layout/sidebars.scss` to modern CSS
