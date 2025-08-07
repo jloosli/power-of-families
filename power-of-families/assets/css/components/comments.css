@@ -56,9 +56,6 @@ li.comment {
 	display: none;
 }
 
-.bypostauthor {
-}
-
 .form-allowed-tags {
 	background-color: var(--background-color-1);
 	font-size: 16px;
