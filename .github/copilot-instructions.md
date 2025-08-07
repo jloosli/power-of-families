@@ -13,7 +13,7 @@ The main purpose is to provide a modern, maintainable, and extensible Wordpress 
 
 ## High-Level Information
 
-- **Languages:** PHP, TypeScript, JavaScript, CSS, LESS, SCSS
+- **Languages:** PHP, TypeScript, JavaScript, CSS
 - **Frameworks:** Wordpress, Genesis Framework (child theme)
 - **Build Tools:** npm, Docker
 - **Repo Size:** Large, with multiple subprojects and plugins
