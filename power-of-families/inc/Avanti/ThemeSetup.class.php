@@ -7,16 +7,11 @@ class ThemeSetup
 {
     const RUNNING_PROD = 2 ** 0;
     const RUNNING_DEV = 2 ** 1;
-    public string $theme_version;
-    public string $build_directory;
     public int $run_location;
 
     function __construct()
     {
-        $this->theme_version =  trim(file_get_contents(__DIR__ . '/../../version.txt'));
         $this->run_location = strpos($_SERVER['SERVER_NAME'], '.com') !== false ? self::RUNNING_PROD : self::RUNNING_DEV;
-        $this->build_directory = get_stylesheet_directory_uri() . '/build';
-
         // Start up the theme setup
         include_once get_template_directory() . '/lib/init.php';
         $this->child_theme_setup();
@@ -26,33 +21,28 @@ class ThemeSetup
 
     function custom_load_styles_and_scripts()
     {
-        $js_asset = include get_theme_file_path('build/theme/js/main.asset.php');
+        $js_asset = include get_theme_file_path('dist/main.ts.asset.php');
         wp_enqueue_script(
             'pof_theme_scripts',
-            get_stylesheet_directory_uri() . '/build/theme/js/main.js',
+            get_stylesheet_directory_uri() . '/dist/main.ts.js',
             $js_asset['dependencies'],
             $js_asset['version']
         );
 
-
-        $stylesheet_loc = $this->build_directory . '/theme/css/main.css';
-        $stylesheet_asset = include get_theme_file_path('build/theme/css/main.asset.php');
         wp_enqueue_style('custom-google-fonts', 'https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,600,700|Playfair+Display:400,700', false);
-        wp_enqueue_style('power_of_families_styles', $stylesheet_loc, $stylesheet_asset['dependencies'], $stylesheet_asset['version']);
-    }
-
-    function getVersion()
-    {
-        return trim(file_get_contents(__DIR__ . '/../../version.txt'));
+        wp_enqueue_style(
+            'power_of_families_styles', 
+            get_stylesheet_directory_uri() . '/dist/main.ts.css', 
+            $js_asset['dependencies'], 
+            $js_asset['version']
+        );
     }
 
     function child_theme_setup()
     {
-        $version = $this->getVersion();
         //* Child theme (do not remove)
         define('CHILD_THEME_NAME', 'Power of Families');
         define('CHILD_THEME_URL', 'http://avantidevelopment.com/');
-        define('CHILD_THEME_VERSION', $this->theme_version);
 
         $this->register_theme_support();
 

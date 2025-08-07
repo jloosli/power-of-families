@@ -124,7 +124,7 @@ class WooCommerce
     function add_text_to_checkout()
     {
         if (is_user_logged_in()) return;
-        echo "If you already have an account on Power of Families or Power of Moms, use the link at the top of this page to log in before continuing. Otherwise, we'll 
+        echo "If you already have an account on Power of Families, use the link at the top of this page to log in before continuing. Otherwise, we'll 
 need to quickly create an account for you. Your email will be your username and you choose your password. You will use your username/email 
 and password to log in and access your materials whenever you wish.";
     }
