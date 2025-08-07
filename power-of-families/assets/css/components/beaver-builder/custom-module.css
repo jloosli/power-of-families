@@ -1,0 +1,56 @@
+.fl-photo-link .fl-photo-caption {
+	font-size: 20px;
+	padding-top: 20px;
+	font-family: var(--font-family-3);
+}
+
+.fl-photo-link a .fl-photo-caption {
+	color: var(--color-6);
+	transition: color 0.25s ease-in-out;
+	-moz-transition: color 0.25s ease-in-out;
+	-webkit-transition: color 0.25s ease-in-out;
+	-o-transition: color 0.25s ease-in-out;
+	line-height: 22px;
+	overflow: visible;
+	text-overflow: unset;
+	white-space: normal;
+}
+
+.fl-photo-link a {
+	transition: color 0.25s ease-in-out;
+	-moz-transition: color 0.25s ease-in-out;
+	-webkit-transition: color 0.25s ease-in-out;
+	-o-transition: color 0.25s ease-in-out;
+}
+
+.fl-photo-link a:hover,
+.fl-photo-link a:hover .fl-photo-caption {
+	color: var(--color-5);
+	text-decoration: none !important;
+}
+
+.fl-photo-link.fl-photo-crop-circle .overlay {
+	border-radius: 50%;
+	background-color: var(--background-color-10);
+	max-width: 229px;
+	margin: auto;
+}
+
+.fl-photo-link.fl-photo-crop-circle .overlay img {
+	opacity: 1;
+	margin: -1px;
+	width: 101%;
+	max-width: 101%;
+	transition: opacity 0.25s ease-in-out;
+	-moz-transition: opacity 0.25s ease-in-out;
+	-webkit-transition: opacity 0.25s ease-in-out;
+	-o-transition: opacity 0.25s ease-in-out;
+}
+
+.fl-photo-link.fl-photo-crop-circle a:hover img {
+	opacity: 0.8;
+}
+
+.fl-node-59fce87667a55 .fl-heading {
+	text-transform: none;
+}

@@ -53,13 +53,14 @@
     - [x] 4.3 Convert `titles.scss` to modern CSS
     - [x] 4.4 Convert `fonts.scss` to modern CSS with `@font-face` declarations
     - [x] 4.5 Test typography and form components display correctly
-- [ ] 5.0 Convert remaining components and media queries
-    - [ ] 5.1 Convert `media-queries.scss` to modern CSS with logical properties
-    - [ ] 5.2 Convert `site-header/` directory components to modern CSS
-    - [ ] 5.3 Convert `nav/` directory components to modern CSS
-    - [ ] 5.4 Convert `plugins/` directory components to modern CSS
-    - [ ] 5.5 Convert `widgets/` directory components to modern CSS
-    - [ ] 5.6 Convert `beaver-builder/` directory components to modern CSS
-    - [ ] 5.7 Convert remaining individual component files (gallery, tables, etc.)
-    - [ ] 5.8 Test all components render correctly with modern CSS
-    - [ ] 5.9 Verify the complete build process works end-to-end
+- [x] 5.0 Convert remaining components and media queries
+    - [x] 5.1 Convert `media-queries.scss` to modern CSS with logical properties
+    - [x] 5.2 Convert `site-header/` directory components to modern CSS
+    - [x] 5.3 Convert `nav/` directory components to modern CSS
+    - [x] 5.4 Convert `plugins/` directory components to modern CSS
+    - [x] 5.5 Convert `widgets/` directory components to modern CSS
+    - [x] 5.6 Convert `beaver-builder/` directory components to modern CSS
+    - [x] 5.7 Convert remaining individual component files (gallery, tables, etc.)
+    - [x] 5.8 Make sure all the imports are correct and uncommented in the main.css file
+    - [x] 5.9 Test all components render correctly with modern CSS
+    - [x] 5.10 Verify the complete build process works end-to-end
