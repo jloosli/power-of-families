@@ -38,7 +38,7 @@
 
 .widget.blue-button a {
 	background-color: var(--background-color-14);
-	border-bottom: 3px solid #167da1;
+	border-bottom: 3px solid var(--background-color-16);
 }
 
 .widget.blue-button a:hover {
