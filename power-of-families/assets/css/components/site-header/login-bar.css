@@ -1,4 +1,8 @@
 .login-bar {
+    display: none;
+}
+
+.login-bar {
 	background-color: var(--color-6);
 }
 

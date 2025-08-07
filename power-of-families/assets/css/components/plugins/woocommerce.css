@@ -2,6 +2,36 @@
 	padding: 2em;
 }
 
+.woocommerce.single form {
+    margin: 2rem;
+}
+.woocommerce.single .site-main p {
+    margin: 2rem;
+}
+.woocommerce.single .site-main h5 {
+	margin-left: 2rem;
+}
+.woocommerce form .quantity {
+    display: none;
+}
+
+.product-template-default .site-main {
+    padding: 2em;
+
+	ul {
+		display: block;
+		list-style: disc outside;
+		margin: initial;
+		padding: 0 0 0 40px;
+
+		li {
+			display: list-item;
+			  list-style-type: disc;
+			  line-height: inherit;
+		}
+	}
+}
+
 div .woocommerce #respond input#submit,
 div .woocommerce a.button,
 div .woocommerce button.button,
