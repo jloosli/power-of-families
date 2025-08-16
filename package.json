@@ -5,7 +5,7 @@
   "author": "Jared Loosli",
   "license": "UNLICENSED",
   "scripts": {
-    "start": "wp-scripts start power-of-families/src/main.ts --output-path=power-of-families/dist",
+    "start": "wp-scripts start power-of-families/src/admin.ts power-of-families/src/main.ts --output-path=power-of-families/dist",
     "build": "wp-scripts build power-of-families/src/main.ts --output-path=power-of-families/dist",
     "version-bump": "node ./bin/bump-version"
   },
