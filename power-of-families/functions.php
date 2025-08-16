@@ -7,4 +7,4 @@ $ThemeSetup = new \Avanti\ThemeSetup();
 new \Avanti\WooCommerce();
 new \Avanti\Readme();
 
-$PowerOfFamiliesPrograms = new \POF\Power_of_Families_Programs(trailingslashit(get_template_directory()));
+$PowerOfFamiliesPrograms = new \POF\Power_of_Families_Programs();
