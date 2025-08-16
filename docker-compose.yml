@@ -24,9 +24,6 @@ services:
       - type: bind
         source: ./power-of-families
         target: /var/www/html/wp-content/themes/power-of-families
-      # - type: bind
-      #   source: ./pof-programs-plugin
-      #   target: /var/www/html/wp-content/plugins/pof-programs
       - type: bind
         source: ./pof-bloom-plugin
         target: /var/www/html/wp-content/plugins/pof-bloom
