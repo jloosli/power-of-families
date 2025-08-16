@@ -124,7 +124,7 @@ class Power_of_Families_Programs
      */
     public function admin_register_scripts()
     {
-        $js_asset = include get_theme_file_path('dist/admin.ts.asset.php');
+        $js_asset = include get_stylesheet_directory() . '/dist/admin.ts.asset.php';
         $url = get_stylesheet_directory_uri() . '/dist/admin.ts.js';
         wp_enqueue_script(
             $this->token . '-admin',
