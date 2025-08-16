@@ -7,6 +7,15 @@ if (!defined('ABSPATH')) {
 }
 
 
+/**
+ * Main class for managing the Power of Families plugin programs.
+ *
+ * Handles registration of custom post types and taxonomies, loading of settings,
+ * and enqueuing of admin scripts. This class serves as the core of the migrated
+ * Power of Families plugin, providing integration points and administrative functionality.
+ *
+ * @since 1.0.0
+ */
 class Power_of_Families_Programs
 {
 
