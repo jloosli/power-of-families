@@ -26,6 +26,7 @@ The main purpose is to provide a modern, maintainable, and extensible WordPress 
 - Always run `docker-compose up -d wordpress` before any build or test steps. This starts the WordPress, database, and phpMyAdmin containers.
 - Use `phpMyAdmin` at [http://localhost:8180](http://localhost:8180) for DB management. Credentials are in `docker-compose.yml`.
 - Import database backups using rsync and phpMyAdmin as described in the root `README.md`.
+- [wp-cli](https://wp-cli.org/) is available in the `wpcli` docker service and can be run using something like `docker-compose run --rm wpcli <command>` where "<command>" is something like `plugin install user-switching --activate`.
 
 ### Theme Development
 
