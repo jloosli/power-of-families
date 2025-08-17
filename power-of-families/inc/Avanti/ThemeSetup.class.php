@@ -11,7 +11,9 @@ class ThemeSetup
 
     function __construct()
     {
-        $this->run_location = strpos($_SERVER['SERVER_NAME'], '.com') !== false ? self::RUNNING_PROD : self::RUNNING_DEV;
+        $server_name = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost';
+
+        $this->run_location = strpos($server_name, '.com') !== false ? self::RUNNING_PROD : self::RUNNING_DEV;
         // Start up the theme setup
         include_once get_template_directory() . '/lib/init.php';
         $this->child_theme_setup();
@@ -31,9 +33,9 @@ class ThemeSetup
 
         wp_enqueue_style('custom-google-fonts', 'https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,600,700|Playfair+Display:400,700', false);
         wp_enqueue_style(
-            'power_of_families_styles', 
-            get_stylesheet_directory_uri() . '/dist/main.ts.css', 
-            $js_asset['dependencies'], 
+            'power_of_families_styles',
+            get_stylesheet_directory_uri() . '/dist/main.ts.css',
+            $js_asset['dependencies'],
             $js_asset['version']
         );
     }
