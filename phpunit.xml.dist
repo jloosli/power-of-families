@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<phpunit
+    bootstrap="power-of-families/tests/bootstrap.php"
+    backupGlobals="false"
+    colors="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    >
+    <testsuites>
+        <testsuite name="Theme Test Suite">
+            <directory prefix="test-" suffix=".php">./power-of-families/tests/</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

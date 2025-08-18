@@ -39,6 +39,9 @@ services:
     container_name: pof_wpcli
     volumes:
       - ./wordpress:/var/www/html
+      - type: bind
+        source: ./power-of-families
+        target: /var/www/html/wp-content/themes/power-of-families
     working_dir: /var/www/html
     environment: 
       WORDPRESS_DB_HOST: db
