@@ -28,6 +28,8 @@ function _register_theme() {
 	$current_theme = basename( $theme_dir );
 	$theme_root    = dirname( $theme_dir );
 
+	add_filter( 'template_directory', 'fix_phpunit_get_template_directory', 10, 3 );
+
 	add_filter( 'theme_root', function () use ( $theme_root ) {
 		return $theme_root;
 	} );
@@ -41,6 +43,10 @@ function _register_theme() {
 	add_filter( 'pre_option_stylesheet', function () use ( $current_theme ) {
 		return $current_theme;
 	} );
+}
+
+function fix_phpunit_get_template_directory( $template_dir, $template, $theme_root ) {
+	return wp_get_theme()->parent()->get_stylesheet_directory();
 }
 
 tests_add_filter( 'muplugins_loaded', '_register_theme' );
