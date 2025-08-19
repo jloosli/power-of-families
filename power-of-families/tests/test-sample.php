@@ -1,8 +1,20 @@
 <?php
+/**
+ * Class SampleTest
+ *
+ * @package Power_Of_Families
+ */
 
+/**
+ * Sample test case.
+ */
 class SampleTest extends WP_UnitTestCase {
 
-    public function test_simple_assertion() {
-        $this->assertTrue( true );
-    }
+	/**
+	 * A single example test.
+	 */
+	public function test_sample() {
+		// Replace this with some actual testing code.
+		$this->assertTrue( true );
+	}
 }
