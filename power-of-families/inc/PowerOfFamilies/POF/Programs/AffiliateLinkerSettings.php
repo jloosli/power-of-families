@@ -1,6 +1,6 @@
 <?php
 
-namespace POF\Programs;
+namespace PowerOfFamilies\POF\Programs;
 class Affiliate_Linker_Settings {
 
     public function __construct() {
@@ -25,7 +25,8 @@ function pof_runAffiliateScript(me) {
 }
 
 JS;
-        $javascript = preg_replace( "/[\n\t]/", "", $javascript );
+        $javascript = preg_replace( "/[
+	]/", "", $javascript );
         printf( "<script>%s</script>", $javascript );
     }
 

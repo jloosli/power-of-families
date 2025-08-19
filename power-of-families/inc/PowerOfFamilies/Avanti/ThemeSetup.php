@@ -1,6 +1,6 @@
 <?php
 
-namespace Avanti;
+namespace PowerOfFamilies\Avanti;
 
 
 class ThemeSetup
@@ -15,7 +15,7 @@ class ThemeSetup
 
         $this->run_location = strpos($server_name, '.com') !== false ? self::RUNNING_PROD : self::RUNNING_DEV;
         // Start up the theme setup
-        include_once get_template_directory() . '/lib/init.php';
+        require_once get_template_directory() . '/lib/init.php';
         $this->child_theme_setup();
         $this->hideAdminBarFromSubscribers();
         $this->display_author_box_on_single_posts();
@@ -23,7 +23,7 @@ class ThemeSetup
 
     function custom_load_styles_and_scripts()
     {
-        $js_asset = include get_theme_file_path('dist/main.ts.asset.php');
+        $js_asset = require get_theme_file_path('dist/main.ts.asset.php');
         wp_enqueue_script(
             'pof_theme_scripts',
             get_stylesheet_directory_uri() . '/dist/main.ts.js',

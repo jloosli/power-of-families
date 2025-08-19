@@ -7,7 +7,7 @@
  * Time: 9:51 AM
  */
 
-namespace POF\Programs;
+namespace PowerOfFamilies\POF\Programs;
 function POF_Affiliate_Linker_CRON()
 {
     $linker = new Affiliate_Linker();
@@ -79,6 +79,7 @@ class Affiliate_Linker
         } // ignore if already has tag query
         $prefix = isset($url['query']) ? "&" : "?"; // add & if already query, ? if no query
         return str_replace($matches[2], $matches[2] . $prefix . "tag={$this->affiliate_id}", $matches[0]); // add tag
+
     }
 
     function add_amazon_ajax()
@@ -100,7 +101,7 @@ class Affiliate_Linker
 		AND post_content LIKE '%amazon.com%';
 sql
         );
-        $url_find = "<a\s[^>]*href=([\"']??)([^\" >]*?)\\1[^>]*>";
+        $url_find = "<a\s[^>]*href=(\"|'??)([^" >]*?)\1[^>]*>";
         $changeCount = 0;
         foreach ($has_amazon as $am) {
             $new_content = preg_replace_callback("/$url_find/siU", array(

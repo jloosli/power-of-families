@@ -1,6 +1,6 @@
 <?php
 
-namespace POF;
+namespace PowerOfFamilies\POF;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class Taxonomy {

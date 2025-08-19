@@ -1,9 +1,9 @@
 <?php
 
-namespace POF;
+namespace PowerOfFamilies\POF;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class Admin_API {
+class AdminAPI {
 
 	/**
 	 * Constructor function
@@ -15,6 +15,7 @@ class Admin_API {
 	/**
 	 * Generate HTML for displaying fields
 	 * @param  array   $field Field data
+	 * @param  object  $post  Post object
 	 * @param  boolean $echo  Whether to echo the field HTML or return it
 	 * @return void
 	 */
