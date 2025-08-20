@@ -6,7 +6,13 @@
  */
 
 /**
- * Sample test case.
+ * Class ThemeSetupTest
+ *
+ * @package Power_Of_Families
+ */
+
+/**
+ * Test case for the ThemeSetup class.
  */
 class ThemeSetupTest extends WP_UnitTestCase {
 
