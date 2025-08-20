@@ -1,6 +1,7 @@
 <?php
 require_once 'vendor/autoload.php';
-new \PowerOfFamilies\Avanti\ThemeSetup();
+$theme_setup = new \PowerOfFamilies\Avanti\ThemeSetup();
+$theme_setup->init();
 new \PowerOfFamilies\Avanti\WooCommerce();
 new \PowerOfFamilies\Avanti\Readme();
 

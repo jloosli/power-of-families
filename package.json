@@ -7,7 +7,8 @@
   "scripts": {
     "start": "wp-scripts start power-of-families/src/admin.ts power-of-families/src/main.ts --output-path=power-of-families/dist",
     "build": "wp-scripts build power-of-families/src/admin.ts power-of-families/src/main.ts --output-path=power-of-families/dist",
-    "test:php": "docker compose exec wordpress wp-content/themes/power-of-families/vendor/bin/phpunit"
+    "test:php-setup": "docker compose exec wordpress bash bin/install-wp-tests.sh wordpress_test root 'password' db latest",
+    "test:php": "docker compose exec --workdir=/var/www/html/wp-content/themes/power-of-families/ wordpress vendor/bin/phpunit"
   },
   "devDependencies": {
     "@wordpress/prettier-config": "^4.27.0",

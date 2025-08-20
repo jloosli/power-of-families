@@ -60,12 +60,8 @@ Helpful Docker tips:
 
 This theme is a child theme of the [https://www.studiopress.com/themes/genesis/](Genesis Framework).
 
-- [Genesis Framework Documentation](https://developer.wpengine.com/themes/genesis-framework/)
+- [Genesis Framework Documentation](https://studiopress.github.io/genesis/)
 - [Sample Gensis Child Theme](https://github.com/studiopress/genesis-sample)
 
-General Wordpress and wp-scripts help:
-
-- https://wordpress.tv/2023/12/19/developer-hours-modern-wordpress-development-with-the-wp-scripts-package/
-
-Cursor helps:
+Cursor AI helps:
 https://github.com/snarktank/ai-dev-tasks

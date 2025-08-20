@@ -30,8 +30,8 @@ services:
       - type: bind
         source: ./pof-bloom-plugin
         target: /var/www/html/wp-content/plugins/pof-bloom
-      - ./phpunit.xml.dist:/var/www/html/phpunit.xml.dist
-      - ./.phpcs.xml.dist:/var/www/html/.phpcs.xml.dist
+      - ./phpunit.xml.dist:/var/www/html/wp-content/themes/power-of-families/phpunit.xml
+      - ./.phpcs.xml.dist:/var/www/html/wp-content/themes/power-of-families/.phpcs.xml
       - ./bin:/var/www/html/bin
 
   wpcli:

@@ -31,17 +31,17 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y subversion
 
-      - name: Install dependencies
-        run: |
-            cd power-of-families
-            composer install 
-            composer dump-autoload --optimize
-
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
           tools: phpunit-polyfills:1.1
+
+      - name: Install php dependencies
+        run: |
+            cd power-of-families
+            composer install 
+            composer dump-autoload --optimize
 
       - name: Setup tests
         run: bash bin/install-wp-tests.sh wordpress_tests root root 127.0.0.1 latest true
