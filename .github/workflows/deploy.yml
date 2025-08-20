@@ -35,6 +35,7 @@ jobs:
             - name: Build project
               run: |
                   npm run build
+                  cd power-of-families
                   composer install 
                   composer dump-autoload --optimize
 
