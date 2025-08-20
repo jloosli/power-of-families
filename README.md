@@ -32,12 +32,20 @@
     pof:~/backups-tigertech/current/www/wp-content/plugins ./wordpress/wp-content/
     ```
 
-1. Update local password `dcr --rm wpcli user update <user> --user_pass='pass'`
-1. Update PHP Composer autoload files:
+1. Install composer
 
     ```shell
-    docker-compose run --rm composer dump-autoload -o
+    docker-compose run --rm composer install
     ```
+
+1. Update local password `docker-compose run --rm wpcli user update <user> --user_pass='pass'`
+1. Setup PHP testing environment
+
+    ```shell
+    docker compose exec wordpress bash bin/install-wp-tests.sh wordpress_test root 'password' db latest
+    ```
+
+1. Run tests. `npm run test:php`
 
 ## Ongoing Development
 
@@ -52,12 +60,8 @@ Helpful Docker tips:
 
 This theme is a child theme of the [https://www.studiopress.com/themes/genesis/](Genesis Framework).
 
-- [Genesis Framework Documentation](https://developer.wpengine.com/themes/genesis-framework/)
+- [Genesis Framework Documentation](https://studiopress.github.io/genesis/)
 - [Sample Gensis Child Theme](https://github.com/studiopress/genesis-sample)
 
-General Wordpress and wp-scripts help:
-
-- https://wordpress.tv/2023/12/19/developer-hours-modern-wordpress-development-with-the-wp-scripts-package/
-
-Cursor helps:
+Cursor AI helps:
 https://github.com/snarktank/ai-dev-tasks

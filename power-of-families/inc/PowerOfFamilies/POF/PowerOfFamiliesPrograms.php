@@ -1,6 +1,6 @@
 <?php
 
-namespace POF;
+namespace PowerOfFamilies\POF;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
  *
  * @since 1.0.0
  */
-class Power_of_Families_Programs
+class PowerOfFamiliesPrograms
 {
 
     /**
@@ -68,7 +68,7 @@ class Power_of_Families_Programs
 
         // Load API for generic admin functions
         if (is_admin()) {
-            $this->admin = new Admin_API();
+            $this->admin = new AdminAPI();
         }
     } 
 

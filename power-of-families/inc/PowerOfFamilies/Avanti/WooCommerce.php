@@ -7,7 +7,7 @@
  * Time: 5:40 PM
  */
 
-namespace Avanti;
+namespace PowerOfFamilies\Avanti;
 
 global $product;
 

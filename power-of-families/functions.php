@@ -1,10 +1,8 @@
 <?php
+require_once 'vendor/autoload.php';
+$theme_setup = new \PowerOfFamilies\Avanti\ThemeSetup();
+$theme_setup->init();
+new \PowerOfFamilies\Avanti\WooCommerce();
+new \PowerOfFamilies\Avanti\Readme();
 
-include_once('inc/Autoloader.class.php');
-$Autoloader = new \POF\Autoloader();
-$ThemeSetup = new \Avanti\ThemeSetup();
-
-new \Avanti\WooCommerce();
-new \Avanti\Readme();
-
-$PowerOfFamiliesPrograms = new \POF\Power_of_Families_Programs();
+$PowerOfFamiliesPrograms = new \PowerOfFamilies\POF\PowerOfFamiliesPrograms();

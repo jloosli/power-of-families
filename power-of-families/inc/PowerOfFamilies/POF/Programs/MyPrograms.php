@@ -1,6 +1,6 @@
 <?php
 
-namespace POF\Programs;
+namespace PowerOfFamilies\POF\Programs;
 /**
  * Helper utilities for diplaying My Programs
  * @property \POF\Power_of_Families_Programs parent
@@ -50,7 +50,7 @@ class My_Programs
             'showtitle' => "true",
             'title' => 'My Programs',
             'notloggedin' => "Sorry. You need to log in to view your Programs.",
-            'nosubscriptions' => "You haven't subscribed to any Programs. Go check out some of <a href='/store'>our Programs</a> and see what may be of use to you."
+            'nosubscriptions' => "You haven\'t subscribed to any Programs. Go check out some of <a href='/store'>our Programs</a> and see what may be of use to you."
         ), $atts));
         $title = $showtitle == "true" ? "<h2>$title</h2>" : "";
         $output = "<div id='pof_userprograms'>$title\n";

@@ -1,6 +1,6 @@
 <?php
 
-namespace Avanti;
+namespace PowerOfFamilies\Avanti;
 
 
 class ThemeSetup
@@ -11,40 +11,23 @@ class ThemeSetup
 
     function __construct()
     {
-        $server_name = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost';
-
-        $this->run_location = strpos($server_name, '.com') !== false ? self::RUNNING_PROD : self::RUNNING_DEV;
-        // Start up the theme setup
-        include_once get_template_directory() . '/lib/init.php';
-        $this->child_theme_setup();
-        $this->hideAdminBarFromSubscribers();
-        $this->display_author_box_on_single_posts();
     }
 
-    function custom_load_styles_and_scripts()
+    function init()
     {
-        $js_asset = include get_theme_file_path('dist/main.ts.asset.php');
-        wp_enqueue_script(
-            'pof_theme_scripts',
-            get_stylesheet_directory_uri() . '/dist/main.ts.js',
-            $js_asset['dependencies'],
-            $js_asset['version']
-        );
-
-        wp_enqueue_style('custom-google-fonts', 'https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,600,700|Playfair+Display:400,700', false);
-        wp_enqueue_style(
-            'power_of_families_styles',
-            get_stylesheet_directory_uri() . '/dist/main.ts.css',
-            $js_asset['dependencies'],
-            $js_asset['version']
-        );
+        $this->child_theme_setup();
+        $this->hideAdminBarFromSubscribers(wp_get_current_user());
+        $this->display_author_box_on_single_posts();
     }
 
     function child_theme_setup()
     {
-        //* Child theme (do not remove)
-        define('CHILD_THEME_NAME', 'Power of Families');
-        define('CHILD_THEME_URL', 'http://avantidevelopment.com/');
+        if (!defined('PHPUNIT_RUNNING')) {
+            require_once get_template_directory() . '/lib/init.php';
+        }
+        // //* Child theme (do not remove)
+        // define('CHILD_THEME_NAME', 'Power of Families');
+        // define('CHILD_THEME_URL', 'http://avantidevelopment.com/');
 
         $this->register_theme_support();
 
@@ -114,6 +97,25 @@ class ThemeSetup
         add_action('wp_enqueue_scripts', [$this, 'custom_load_styles_and_scripts'], 0);
     }
 
+    function custom_load_styles_and_scripts()
+    {
+        $js_asset = require get_theme_file_path('dist/main.ts.asset.php');
+        wp_enqueue_script(
+            'pof_theme_scripts',
+            get_stylesheet_directory_uri() . '/dist/main.ts.js',
+            $js_asset['dependencies'],
+            $js_asset['version']
+        );
+
+        wp_enqueue_style('custom-google-fonts', 'https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,600,700|Playfair+Display:400,700', false);
+        wp_enqueue_style(
+            'power_of_families_styles',
+            get_stylesheet_directory_uri() . '/dist/main.ts.css',
+            $js_asset['dependencies'],
+            $js_asset['version']
+        );
+    }
+
     function register_theme_support()
     {
         $theme_supports = genesis_get_config('theme-supports');
@@ -159,16 +161,21 @@ class ThemeSetup
         }
     }
 
-    function hideAdminBarFromSubscribers()
+    /**
+     * Hide the admin bar for subscribers.
+     *
+     * @param \WP_User $current_user The current user object.
+     */
+    function hideAdminBarFromSubscribers($current_user)
     {
-        if (is_user_logged_in()) {
-            global $current_user;
+        if ($current_user && $current_user->exists()) {
             $user_roles = $current_user->roles;
-            $user_role = array_shift($user_roles);
-            if (strtolower($user_role) === 'subscriber') {
+            if (in_array('subscriber', $user_roles)) {
                 show_admin_bar(false);
+                return false;
             }
         }
+        return true;
     }
 
     function be_follow_icons($menu, $args)

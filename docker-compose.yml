@@ -1,6 +1,8 @@
 services:
   wordpress:
-    image: wordpress:php7.4
+    build:
+      context: .
+      dockerfile: docker/wordpress.dockerfile
     container_name: pof_wordpress
     depends_on:
       - db
@@ -16,6 +18,7 @@ services:
       WORDPRESS_HOME: http://localhost:8080
       WORDPRESS_SITEURL: http://localhost:8080
       # WORDPRESS_DEBUG: true
+      # WP_TESTS_DIR: /tmp
       WORDPRESS_CONFIG_EXTRA: |
         define('WP_HOME', getenv('WORDPRESS_HOME', ''));
         define('WP_SITEURL', getenv('WORDPRESS_SITEURL', ''));
@@ -27,7 +30,10 @@ services:
       - type: bind
         source: ./pof-bloom-plugin
         target: /var/www/html/wp-content/plugins/pof-bloom
-  
+      - ./phpunit.xml.dist:/var/www/html/wp-content/themes/power-of-families/phpunit.xml
+      - ./.phpcs.xml.dist:/var/www/html/wp-content/themes/power-of-families/.phpcs.xml
+      - ./bin:/var/www/html/bin
+
   wpcli:
     depends_on:
       - db
@@ -39,12 +45,16 @@ services:
     container_name: pof_wpcli
     volumes:
       - ./wordpress:/var/www/html
+      - type: bind
+        source: ./power-of-families
+        target: /var/www/html/wp-content/themes/power-of-families
     working_dir: /var/www/html
     environment: 
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: pofuser
       WORDPRESS_DB_PASSWORD: pofpass
       WORDPRESS_DB_NAME: poweroffamilies
+      memory_limit: 4096M
 
   db:
     image: mariadb:10.5.21 # TT version as of 2/2024: https://support.tigertech.net/mysql-version
@@ -76,7 +86,7 @@ services:
     image: composer:latest
     container_name: pof_composer
     volumes:
-      - ./pof-theme:/var/www/html/wp-content/themes/power-of-families
+      - ./power-of-families:/var/www/html/wp-content/themes/power-of-families
     working_dir: /var/www/html/wp-content/themes/power-of-families
 
 volumes:

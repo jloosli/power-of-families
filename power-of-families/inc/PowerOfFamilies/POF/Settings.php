@@ -1,6 +1,6 @@
 <?php
 
-namespace POF;
+namespace PowerOfFamilies\POF;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -66,7 +66,7 @@ class Settings
         add_action('admin_menu', array($this, 'add_menu_item'));
 
         // Add settings link to plugins page
-        add_filter('plugin_action_links_' . plugin_basename(Power_of_Families_Programs::class), array(
+        add_filter('plugin_action_links_' . plugin_basename(PowerOfFamiliesPrograms::class), array(
             $this,
             'add_settings_link'
         ));
@@ -183,7 +183,7 @@ class Settings
         $programs = [];
         foreach ($this->getActivePrograms() as $program) {
             if (array_key_exists($program, $this->getAvailablePrograms())) {
-                $ClassName = '\\POF\\Programs\\' . $program;
+                $ClassName = '\PowerOfFamilies\POF\Programs\\' . $program;
                 $programs[$program] = new $ClassName($this->parent);
             }
         }
