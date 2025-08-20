@@ -101,7 +101,7 @@ class Affiliate_Linker
 		AND post_content LIKE '%amazon.com%';
 sql
         );
-        $url_find = "<a\s[^>]*href=(\"|'??)([^" >]*?)\1[^>]*>";
+        $url_find = "<a\s[^>]*href=(\"|'??)([^\" >]*?)\1[^>]*>";
         $changeCount = 0;
         foreach ($has_amazon as $am) {
             $new_content = preg_replace_callback("/$url_find/siU", array(
