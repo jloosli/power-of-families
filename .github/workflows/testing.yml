@@ -50,4 +50,5 @@ jobs:
         run: |
             mv phpunit.xml.dist power-of-families/phpunit.xml
             cd power-of-families
+            pwd
             phpunit
