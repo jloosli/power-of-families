@@ -26,7 +26,7 @@ function pof_runAffiliateScript(me) {
 
 JS;
         $javascript = preg_replace( "/[
-	]/", "", $javascript );
+        $javascript = preg_replace("/[\n\t]/", "", $javascript);
         printf( "<script>%s</script>", $javascript );
     }
 
