@@ -48,7 +48,7 @@ jobs:
 
       - name: Run tests
         run: |
-            mv phpunit.xml.test power-of-families/phpunit.xml
+            mv phpunit.xml.dist power-of-families/phpunit.xml
             cd power-of-families
             pwd
             ls -lrt
