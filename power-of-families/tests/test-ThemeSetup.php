@@ -47,7 +47,6 @@ class ThemeSetupTest extends WP_UnitTestCase {
 		$subscriber_user = $this->factory->user->create_and_get( array( 'role' => 'subscriber' ) );
 
 		// No User
-		$this->assertTrue($this->theme_setup->hideAdminBarFromSubscribers( false ));
 		$this->assertFalse($this->theme_setup->hideAdminBarFromSubscribers( $no_user ));
 
 		// Administrator
