@@ -32,7 +32,12 @@ jobs:
             sudo apt-get install -y subversion
 
       - name: Install dependencies
-        run: composer config --global use-parent-dir true && composer install && composer dump-autoload --optimize
+        run: |
+            ls -lrt
+            pwd
+            cd power-of-families
+            composer install 
+            composer dump-autoload --optimize
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
