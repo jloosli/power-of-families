@@ -41,6 +41,7 @@ jobs:
         run: |
             cd power-of-families
             composer install 
+            composer update
             composer dump-autoload --optimize
 
       - name: Setup tests
