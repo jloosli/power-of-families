@@ -49,6 +49,7 @@ The main purpose is to provide a modern, maintainable, and extensible WordPress 
 
 - **Root:** `README.md`, `docker-compose.yml`, `package.json`, `tsconfig.json`, `prettier.config.js`
 - **Theme:** `power-of-families/` (main theme code, build scripts, config, linting)
+- **CSS:** `power-of-families/assets/css/` (CSS files for the theme)
 - **Wordpress:** `wordpress/` (core files, `wp-content/themes/`, `wp-content/plugins/`)
 - **Database:** `db_data/`, `db-backups/`
 - **Tasks:** `tasks/` (project requirements and task lists)
