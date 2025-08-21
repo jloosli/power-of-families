@@ -31,7 +31,7 @@
 @import "components/featured-content.css";
 @import "components/plugins/_index.css";
 @import "components/site-header/_index.css";
-@import "components/nav/_index.css";
+@import "components/nav.css";
 @import "components/entries.css";
 @import "components/pagination.css";
 @import "components/comments.css";

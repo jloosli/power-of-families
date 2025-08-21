@@ -10,10 +10,15 @@
 	justify-content: space-between;
 	
 }
-@media screen and (min-width: var(--breakpoint-medium)) {
+@media (min-width: 1000px) {
 	.site-header .wrap {
 		flex-direction: row;
-		align-items: center;
+	}
+
+	.site-header .wrap > * {
+		flex-grow: 1;
+		flex-shrink: 1;
+		flex-basis: 0;
 	}
 	
 }
@@ -23,7 +28,7 @@
 	padding: 1em 1em;
 	.site-title {
 		a {
-			background: url(../../../images/logo@2x.png) no-repeat left;
+			background: url(../../../images/logo@2x.png) no-repeat center;
 			aspect-ratio: 618 / 81;
 			display: block;
 			background-size: contain;
