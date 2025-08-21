@@ -31,7 +31,6 @@
 @import "components/featured-content.css";
 @import "components/plugins/_index.css";
 @import "components/site-header/_index.css";
-@import "components/site-nav.css";
 @import "components/nav/_index.css";
 @import "components/entries.css";
 @import "components/pagination.css";
@@ -40,6 +39,4 @@
 @import "components/archive.css";
 @import "components/footer.css";
 @import "components/footer-menu.css";
-/* @import "components/header-opt-in.css"; */
-@import "components/media-queries.css";
 @import "components/pof-programs.css";
