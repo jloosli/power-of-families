@@ -1,5 +1,5 @@
 .login-bar {
-    display: none;
+	display: none;
 }
 
 .login-bar {
@@ -28,7 +28,7 @@
 	clear: left;
 	width: 40%;
 	padding: 20px !important;
-	color: var(--color-2);
+	color: var(--color-background-white);
 }
 
 #loginform .login-username label,
@@ -55,18 +55,18 @@
 	display: inline-block;
 	float: left;
 	padding-top: 60px;
-	color: var(--color-2);
+	color: var(--color-background-white);
 	margin-right: 20px;
 }
 
 .login-bar .close {
-	color: var(--color-2);
+	color: var(--color-background-white);
 	margin: 0;
 	position: absolute;
 	top: 10px;
 	right: 10px;
 	opacity: 1;
-	border: 1px solid var(--color-2);
+	border: 1px solid var(--color-background-white);
 	width: 27px;
 	height: 27px;
 	line-height: 24px;
@@ -91,7 +91,7 @@
 }
 
 .login-bar #loginform + div.register {
-	color: var(--color-2);
+	color: var(--color-background-white);
 	padding-top: 49px;
 	display: inline-block;
 }
@@ -109,7 +109,7 @@
 }
 
 .login-bar div.lost_password a {
-	color: var(--color-2);
+	color: var(--color-background-white);
 }
 
 @media screen and (min-width: 961px) and (max-width: 1500px) {

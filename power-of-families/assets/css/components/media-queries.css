@@ -34,7 +34,7 @@
 		right: 0;
 		top: 0;
 		background-color: var(--color-6);
-		color: var(--color-2);
+		color: var(--color-background-white);
 	}
 	.sub-menu-toggle span {
 		display: none;
@@ -115,7 +115,7 @@
 	}
 
 	.genesis-nav-menu .sub-menu .sub-menu .sub-menu a {
-		background-color: var(--color-2);
+		background-color: var(--color-background-white);
 		padding-left: 40px;
 	}
 
@@ -149,7 +149,7 @@
 	}
 }
 
-@media only screen and (min-width: 961px) and (max-width: 1200px) {
+@media only screen and (min-width: 961px) and (max-width: var(--site-width)) {
 	/*.search-form input[type=search]{
       display:none;
   }*/
@@ -160,7 +160,7 @@
 	}
 }
 
-@media only screen and (max-width: 1200px) {
+@media only screen and (max-width: var(--site-width)) {
 	.site-inner,
 	.wrap {
 		max-width: 960px;
@@ -350,7 +350,7 @@
 
 @media only screen and (max-width: 800px) {
 	body {
-		background-color: var(--color-2);
+		background-color: var(--color-background-white);
 		font-size: 16px;
 	}
 
@@ -375,20 +375,6 @@
 		margin-bottom: 4px;
 	}
 
-	.five-sixths,
-	.four-sixths,
-	.one-fourth,
-	.one-half,
-	.one-sixth,
-	.one-third,
-	.three-fourths,
-	.three-sixths,
-	.two-fourths,
-	.two-sixths,
-	.two-thirds {
-		margin: 0;
-		width: 100%;
-	}
 
 	.sidebar .widget.enews-widget {
 		padding: 40px;
@@ -455,7 +441,7 @@
 
 	.home-large-featured .widget_black_studio_tinymce .widget-wrap {
 		padding: 20px;
-		background-color: var(--color-2);
+		background-color: var(--color-background-white);
 		background-color: var(--background-color-2) 5;
 		overflow: auto;
 	}
@@ -644,15 +630,15 @@
 		> .ubermenu-target,
 	body .ubermenu-skin-white .ubermenu-item-level-0 > .ubermenu-target:hover,
 	body .ubermenu-skin-white .ubermenu-item-level-0.ubermenu-active {
-		color: var(--color-1) 5 !important;
+		color: var(--color-primary-text) 5 !important;
 	}
 
 	.ubermenu-skin-white .ubermenu-item-level-0:hover > .ubermenu-target,
 	.ubermenu-skin-white
 		.ubermenu-item-level-0.ubermenu-active
 		> .ubermenu-target {
-		background: var(--color-1) 8;
-		color: var(--color-1) 7 !important;
+		background: var(--color-primary-text) 8;
+		color: var(--color-primary-text) 7 !important;
 	}
 
 	.home-large-featured h2 {

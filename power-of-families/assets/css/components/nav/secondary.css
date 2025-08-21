@@ -1,5 +1,5 @@
 .nav-secondary {
-	background-color: var(--color-3);
+	background-color: var(--color-secondary);
 	z-index: 9;
 	position: relative;
 }
@@ -7,7 +7,7 @@
 .nav-secondary .genesis-nav-menu a:hover,
 .nav-secondary .genesis-nav-menu .current-menu-item > a,
 .nav-secondary .genesis-nav-menu .sub-menu .current-menu-item > a:hover {
-	color: var(--color-2);
+	color: var(--color-background-white);
 	text-decoration: none;
 	background-color: var(--background-color-12);
 }

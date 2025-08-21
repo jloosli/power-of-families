@@ -32,7 +32,7 @@
 .home.blog .entry-title a,
 .search-results .entry-title a,
 .page-template-pagewithcategory-php .type-post .entry-title a {
-	color:var(--color-3);
+	color:var(--color-secondary);
 }*/
 
 .archive .entry-footer,

@@ -16,5 +16,10 @@
     "normalize.css": "^8.0.1",
     "prettier": "^3.2.5",
     "wp-types": "^4.68.1"
+  },
+  "dependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "postcss-nested": "^7.0.2"
   }
 }

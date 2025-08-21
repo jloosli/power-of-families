@@ -14,7 +14,7 @@
 
 .archive-pagination li a {
 	background-color: var(--color-4);
-	color: var(--color-2);
+	color: var(--color-background-white);
 	cursor: pointer;
 	display: inline-block;
 	font-size: 16px;
@@ -24,6 +24,6 @@
 .archive-pagination li a:hover,
 .archive-pagination .active a,
 .wpv_pagination_dots li.wpv_page_current a {
-	background-color: var(--color-3);
+	background-color: var(--color-secondary);
 	text-decoration: none;
 }

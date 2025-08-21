@@ -1,7 +1,7 @@
 input,
 select,
 textarea {
-	background-color: var(--color-2);
+	background-color: var(--color-background-white);
 	border: 1px solid var(--color-11);
 	color: var(--color-4);
 	font-size: 18px;
@@ -41,7 +41,7 @@ input[type="submit"],
 	font-family: var(--font-family-3);
 	background-color: var(--background-color-5);
 	border: none;
-	color: var(--color-2);
+	color: var(--color-background-white);
 	cursor: pointer;
 	font-size: 16px;
 	font-weight: 300;
@@ -60,8 +60,8 @@ input[type="submit"],
 .footer-widgets input[type="reset"],
 .footer-widgets input[type="submit"],
 .footer-widgets .button {
-	background-color: var(--color-3);
-	color: var(--color-2);
+	background-color: var(--color-secondary);
+	color: var(--color-background-white);
 }
 
 button:hover,
@@ -70,11 +70,11 @@ input:hover[type="reset"],
 input:hover[type="submit"],
 .button:hover {
 	background-color: var(--background-color-7);
-	color: var(--color-2);
+	color: var(--color-background-white);
 }
 
 .entry-content .button:hover {
-	color: var(--color-2);
+	color: var(--color-background-white);
 }
 
 .footer-widgets button:hover,
@@ -82,7 +82,7 @@ input:hover[type="submit"],
 .footer-widgets input:hover[type="reset"],
 .footer-widgets input:hover[type="submit"],
 .footer-widgets .button:hover {
-	background-color: var(--color-2);
+	background-color: var(--color-background-white);
 	color: var(--color-4);
 }
 

@@ -1,6 +1,6 @@
 .enews-widget,
 .enews-widget .widget-title {
-	color: var(--color-2);
+	color: var(--color-background-white);
 }
 
 .sidebar .widget.enews-widget {
@@ -18,14 +18,14 @@
 }
 
 .enews-widget input[type="submit"] {
-	background-color: var(--color-3);
-	color: var(--color-2);
+	background-color: var(--color-secondary);
+	color: var(--color-background-white);
 	margin: 0;
 	width: 100%;
 }
 
 .enews-widget input:hover[type="submit"] {
-	background-color: var(--color-2);
+	background-color: var(--color-background-white);
 	color: var(--color-4);
 }
 

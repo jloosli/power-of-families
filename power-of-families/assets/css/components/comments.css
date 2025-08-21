@@ -1,7 +1,7 @@
 .comment-respond,
 .entry-comments,
 .entry-pings {
-	background-color: var(--color-2);
+	background-color: var(--color-background-white);
 	margin-bottom: 40px;
 }
 
@@ -20,7 +20,7 @@
 
 li.comment {
 	background-color: var(--background-color-1);
-	border: 2px solid var(--color-2);
+	border: 2px solid var(--color-background-white);
 	border-right: none;
 }
 

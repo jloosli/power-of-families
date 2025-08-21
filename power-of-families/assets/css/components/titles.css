@@ -6,8 +6,8 @@
 .entry-title,
 .fl-post-feed-title {
 	font-size: 30px;
-	color: var(--color-7);
-	font-family: var(--font-family-2);
+	color: var(--color-primary);
+	font-family: var(--font-headings);
 	letter-spacing: 1px;
 	text-transform: none;
 	font-weight: normal;
@@ -15,13 +15,13 @@
 
 .page .entry-title {
 	font-size: 42px;
-	font-family: var(--font-family-3);
+	font-family: var(--font-headings-light);
 }
 
 .entry-title a,
 .fl-post-feed-title a,
 .sidebar .widget-title a {
-	color: var(--color-7);
+	color: var(--color-primary);
 }
 
 .entry-title a:hover {
@@ -33,11 +33,11 @@
 	margin-bottom: 20px;
 	font-weight: 700;
 	text-transform: uppercase;
-	color: var(--color-1);
-	font-family: var(--font-family-5);
+	color: var(--color-primary-text);
+	font-family: var(--font-headings);
 	letter-spacing: 0;
 }
 
 .footer-widgets .widget-title {
-	color: var(--color-2);
+	color: var(--color-background-white);
 }

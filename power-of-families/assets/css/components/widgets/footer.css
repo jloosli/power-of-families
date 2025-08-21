@@ -15,7 +15,7 @@
 
 .footer-widgets a.button,
 .footer-widgets a:hover {
-	color: var(--color-2);
+	color: var(--color-background-white);
 }
 
 .footer-widgets li {

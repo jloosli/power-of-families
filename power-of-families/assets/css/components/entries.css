@@ -4,7 +4,7 @@
 }
 
 .content .entry {
-	background-color: var(--color-2);
+	background-color: var(--color-background-white);
 }
 
 .entry-content ol,

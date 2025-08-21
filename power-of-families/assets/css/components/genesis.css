@@ -26,7 +26,7 @@
 .author-box-title {
 	font-size: 24px;
 	margin-bottom: 4px;
-	color: var(--color-8);
+	color: var(--color-primary);
 }
 
 .archive-description p:last-child,
