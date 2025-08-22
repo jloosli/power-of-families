@@ -51,8 +51,9 @@
 	--border-color-1: rgba(213, 213, 213, 0);
 
 	/* Breakpoints */
-	--breakpoint-small: 480px;
-	--breakpoint-medium: 768px;
-	--breakpoint-large: 1024px;
+
 	--site-width: 1200px;
 }
+	@custom-media --breakpoint-small (min-width: 480px);
+	@custom-media --breakpoint-medium (min-width: 768px);
+	@custom-media --breakpoint-large (min-width: 1024px);

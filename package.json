@@ -18,8 +18,10 @@
     "wp-types": "^4.68.1"
   },
   "dependencies": {
+    "@csstools/postcss-global-data": "^3.0.0",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
+    "postcss-custom-media": "^11.0.6",
     "postcss-nested": "^7.0.2"
   }
 }

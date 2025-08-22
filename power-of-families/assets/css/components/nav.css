@@ -101,7 +101,7 @@ li.menu-item-has-children {
 	transform: scaleY(1);
 }
 
-@media screen and (min-width: 1000px) {
+@media (--breakpoint-large) {
 	.sub-menu-toggle-container {
 		display: none;
 	}
