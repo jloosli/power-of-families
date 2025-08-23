@@ -36,44 +36,41 @@ function power_of_families_main_category_widgets()
         array(
             'title' => 'Build Relationships',
             'link' => '/building-relationships/',
-            'img' => '/wp-content/uploads/2017/11/build-relationships-290x290.jpg'
+            'img' => 'https://poweroffamilies.com/wp-content/uploads/2017/11/build-relationships-290x290.jpg'
         ),
         array(
             'title' => 'Teach Values',
             'link' => '/teaching-values/',
-            'img' => '/wp-content/uploads/2017/11/teach-values-image-290x290.jpg'
+            'img' => 'https://poweroffamilies.com/wp-content/uploads/2017/11/teach-values-image-290x290.jpg'
         ),
         array(
             'title' => 'Establish Systems',
             'link' => '/systems/',
-            'img' => '/wp-content/uploads/2017/11/establish-systems-image-290x290.jpg'
+            'img' => 'https://poweroffamilies.com/wp-content/uploads/2017/11/establish-systems-image-290x290.jpg'
         ),
         array(
             'title' => 'Get Training',
             'link' => '/upcoming-retreats-and-workshops/',
-            'img' => '/wp-content/uploads/2017/11/get-training-290x290.jpg'
+            'img' => 'https://poweroffamilies.com/wp-content/uploads/2017/11/get-training-290x290.jpg'
         ),
         array(
             'title' => 'Find Answers',
             'link' => '/find-answers/',
-            'img' => '/wp-content/uploads/2017/11/Get-Answers-Image-290x290.jpg'
+            'img' => 'https://poweroffamilies.com/wp-content/uploads/2017/11/Get-Answers-Image-290x290.jpg'
         )
     );
 ?>
     <div class="main-category-widgets">
         <h2>We're here to help you</h2>
-        <ul>
+
+        <div class="category-widget-wrapper">
             <?php foreach ($categories_and_links as $category) : ?>
-                <li>
-                    <div class="category-widget">
-                        <img src="<?php echo esc_url($category['img']); ?>" alt="<?php echo esc_attr($category['title']); ?>" />
-                        <a href="<?php echo esc_url($category['link']); ?>">
-                            <?php echo esc_html($category['title']); ?>
-                        </a>
-                    </div>
-                </li>
+                <a class="category-widget" href="<?php echo esc_url($category['link']); ?>">
+                    <img src="<?php echo esc_url($category['img']); ?>" alt="<?php echo esc_attr($category['title']); ?>" />
+                    <h4><?php echo esc_html($category['title']); ?></h4>
+                </a>
             <?php endforeach; ?>
-        </ul>
+        </div>
     </div>
 <?php
 }
