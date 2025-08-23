@@ -38,7 +38,7 @@ jobs:
                   cd power-of-families
                   composer install 
                   composer dump-autoload --optimize
-
+# @todo: Maybe use this github action instead: https://github.com/easingthemes/ssh-deploy
             - name: Rsync to remote host
               env:
                   SSH_KEY: ${{ secrets.SSH_KEY }}

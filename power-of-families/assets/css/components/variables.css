@@ -3,6 +3,7 @@
 :root {
 	/* Color variables */
 	--color-primary-text: #65615e;
+	--color-white: #fff;
 	--color-background-white: #fff;
 	--color-secondary: #2facd9;
 	--color-4: #333;
