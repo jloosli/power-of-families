@@ -10,6 +10,7 @@
 	--color-5: #3c3632;
 	--color-6: #918b87;
 	--color-primary: #9cbe30;
+	--color-primary-backed-off: #a4bf4c;
 	--color-8: #90c74a;
 	--color-9: #7a9c0f;
 	--color-10: #f8f7f3;
@@ -53,6 +54,9 @@
 
 	/* Breakpoints */
 
+	--small: 4780px;
+	--medium: 768px;
+	--large: 1024px;
 	--site-width: 1200px;
 }
 	@custom-media --breakpoint-small (min-width: 480px);

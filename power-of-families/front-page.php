@@ -79,12 +79,17 @@ function power_of_families_home_cta()
 {
 ?>
     <div class="home-cta">
-        <div class="cta-main">
-            <h4>Would you like to see how you&rsquo;re setting your kids up for good behavior and where you can improve?</h4>
-            <p>Sign up for our free 5-minute assessment: <em>Your Home Environment</em></p>
-            <a href="https://sibforms.com/serve/MUIFADzIwAKC7lCxiA0_8Y38donGmB6G1QYpA9hTduVI5bBD_YxK2Rkgntjv2CU8LTtQbxWvJg783OGy6Ft0Ss2urtacm2y29SN4lVLWw9E-boeHkVk8JB8BzhXPfRlUyTN_og243mGKm0J8m4MgO8EZE5ECpjv_VN-ja8VvdJ1JTI1I-B4vmEi2RlAvChSFq6nESKq1_M72655I/" class="button">I'm ready to set my children up for success</a>
+        <div class="home-cta-wrapper">
+            <div class="cta-main">
+                <h4>Would you like to see how you&rsquo;re setting your kids up for good behavior and where you can improve?</h4>
+                <p>Sign up for our free 5-minute assessment: <em>Your Home Environment</em></p>
+                <a href="https://sibforms.com/serve/MUIFADzIwAKC7lCxiA0_8Y38donGmB6G1QYpA9hTduVI5bBD_YxK2Rkgntjv2CU8LTtQbxWvJg783OGy6Ft0Ss2urtacm2y29SN4lVLWw9E-boeHkVk8JB8BzhXPfRlUyTN_og243mGKm0J8m4MgO8EZE5ECpjv_VN-ja8VvdJ1JTI1I-B4vmEi2RlAvChSFq6nESKq1_M72655I/" 
+                class="button" target="_blank">I'm ready to set my children up for success</a>
+            </div>
+            <div class="cta-img">
+                <img src="https://poweroffamilies.com/wp-content/uploads/2017/11/home-environment-assessment-212x300.jpg" alt="5 minute assessment asking if you are setting your kids up for positive behavior" />
+            </div>
         </div>
-        <div class="cta-img"><img src="https://poweroffamilies.com/wp-content/uploads/2017/11/home-environment-assessment-212x300.jpg" alt="5 minute assessment asking if you are setting your kids up for positive behavior" /></div>
     </div>
 <?php
 }
