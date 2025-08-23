@@ -1,6 +1,9 @@
 .site-header {
 	background-color: var(--color-background-white);
 	min-height: 108px;
+	position: relative;
+	z-index: 100;
+
 }
 
 .site-header .wrap {
