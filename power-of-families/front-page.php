@@ -35,17 +35,17 @@ function power_of_families_main_category_widgets()
     $categories_and_links = array(
         array(
             'title' => 'Build Relationships',
-            'link' => '/building-relationships/',
+            'link' => '/category/building-relationships/',
             'img' => 'https://poweroffamilies.com/wp-content/uploads/2017/11/build-relationships-290x290.jpg'
         ),
         array(
             'title' => 'Teach Values',
-            'link' => '/teaching-values/',
+            'link' => '/category/teaching-values/',
             'img' => 'https://poweroffamilies.com/wp-content/uploads/2017/11/teach-values-image-290x290.jpg'
         ),
         array(
             'title' => 'Establish Systems',
-            'link' => '/systems/',
+            'link' => '/category/systems/',
             'img' => 'https://poweroffamilies.com/wp-content/uploads/2017/11/establish-systems-image-290x290.jpg'
         ),
         array(
@@ -61,7 +61,7 @@ function power_of_families_main_category_widgets()
     );
 ?>
     <div class="main-category-widgets">
-        <h2>We're here to help you</h2>
+        <h2>We&rsquo;re here to help you</h2>
 
         <div class="category-widget-wrapper">
             <?php foreach ($categories_and_links as $category) : ?>
