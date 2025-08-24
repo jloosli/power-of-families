@@ -86,7 +86,7 @@ class ThemeSetup
         //        add_filter( 'wp_nav_menu_items', [$this, 'genesis_search_secondary_nav_menu'], 10, 2 );
 
         // Update category header
-        add_action('genesis_before_loop', [$this, 'themeprefix_category_header']);
+        // add_action('genesis_before_loop', [$this, 'themeprefix_category_header']);
 
         // Hide Sharing buttons on protected pages
         // @todo: Need to update this for Groups instead of wishlist member

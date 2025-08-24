@@ -2,7 +2,12 @@
 	margin-bottom: 20px;
 }
 
-.archive-description,
+.archive-description {
+	margin: 30px;
+	padding-bottom: 30px;
+	border-bottom: 1px solid #d3d3d3;
+}
+
 .author-box {
 	font-size: 16px;
 	margin: 40px 0;

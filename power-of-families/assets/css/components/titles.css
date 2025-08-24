@@ -13,12 +13,13 @@
 	font-weight: normal;
 }
 
-.page .entry-title {
+.page .entry-title, .archive .archive-title {
 	font-size: 42px;
 	font-family: var(--font-headings-light);
 }
 
 .entry-title a,
+.archive-title,
 .fl-post-feed-title a,
 .sidebar .widget-title a {
 	color: var(--color-primary);

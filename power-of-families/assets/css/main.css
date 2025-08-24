@@ -1,11 +1,3 @@
-/*
-- Media Queries
-	- Retina Display
-	- Max-width: 1200px
-	- Max-width: 960px
-	- Max-width: 800px
-*/
-
 /* Import normalize.css from node_modules */
 @import url("~normalize.css/normalize.css");
 
@@ -23,7 +15,6 @@
 @import "components/custom-reset.css";
 @import "components/gallery.css";
 @import "components/tables.css";
-/* @import "components/beaver-builder/_index.css"; */
 @import "components/avatar.css";
 @import "components/genesis.css";
 @import "components/search-form.css";
