@@ -155,4 +155,8 @@
         }
 
 	}
+
+    h2.wp-block-post-title a {
+        color: var(--color-primary);
+    }
 }

@@ -1,4 +1,4 @@
-.entry {
+.entry:not(.wp-block-post) {
 	margin-bottom: 40px;
 	padding: 50px 60px;
 }
