@@ -1,0 +1,9 @@
+.wp-block-woocommerce-product-collection {
+    li.wc-block-product {
+        list-style-type: none;
+
+        &.entry {
+            padding: 0;
+        }
+    }
+}

@@ -2,8 +2,7 @@
 
 ## Contents
 
-- [Power of Families Theme](power-of-families-theme)
-- [Power of Families Programs](pof-programs-plugin)
+- [Power of Families Theme](power-of-families)
 - [Power of Families Bloom](pof-bloom-plugin)
 
 ## First Time Setup
@@ -65,3 +64,22 @@ This theme is a child theme of the [https://www.studiopress.com/themes/genesis/]
 
 Cursor AI helps:
 https://github.com/snarktank/ai-dev-tasks
+
+
+### Redirection 
+
+Add the following to .htaccess above the wordpress:
+
+```
+# Redirect missing uploads to server2.com
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# Only apply to requests under /wp-content/uploads/
+RewriteCond %{REQUEST_URI} ^/wp-content/uploads/
+# If the requested file does not exist
+RewriteCond %{REQUEST_FILENAME} !-f
+# Redirect to the same path on poweroffamilies.com
+RewriteRule ^wp-content/uploads/(.*)$ https://poweroffamilies.com/wp-content/uploads/$1 [R=302,L]
+</IfModule>
+```

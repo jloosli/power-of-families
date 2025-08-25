@@ -2,4 +2,5 @@
 @import "gravity-forms.css";
 @import "jetpack.css";
 @import "essb.css";
-@import "woocommerce.css";
+/* @import "woocommerce.css"; */
+@import "woocommerce-new.css";
