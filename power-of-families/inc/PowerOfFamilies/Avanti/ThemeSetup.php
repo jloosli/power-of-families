@@ -93,6 +93,13 @@ class ThemeSetup
         add_filter('get_post_metadata', [$this, 'hide_on_protected_pages'], 10, 4);
         add_filter('get_page_metadata', [$this, 'hide_on_protected_pages'], 10, 4);
 
+        // Remove sidebar on single product pages
+        add_action('wp', function () {
+            if (is_product()) {
+                add_filter('genesis_pre_get_option_site_layout', '__genesis_return_full_width_content');
+            }
+        });
+
         // Add Javascript and stylesheets
         add_action('wp_enqueue_scripts', [$this, 'custom_load_styles_and_scripts'], 0);
     }
