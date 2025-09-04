@@ -3,7 +3,7 @@
 	padding: 50px 60px 0 60px;
 }
 
-.entry-title,
+.entry-title, .wp-block-post-title,
 .fl-post-feed-title {
 	font-size: 30px;
 	color: var(--color-primary);
