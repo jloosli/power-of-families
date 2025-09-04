@@ -110,6 +110,7 @@
         flex-flow: column;
         align-items: center;
         padding: 2rem 0;
+		font-size: 1.2em;
 
         .home-cta-wrapper {
             max-width: var(--site-width);
@@ -123,7 +124,7 @@
             }
 
             .cta-img {
-            flex: 1 1 auto;
+            flex: 1 1 400px;
             max-width: none;
             width: auto;
             display: flex;
@@ -139,9 +140,13 @@
 
             h4 {
             color: var(--color-white);
-            font-size: 1.5em;
+            font-size: 2em;
             font-weight: 400;
             }
+
+			.button {
+				font-size: 0.9em;
+			}
         }
 
         @media (--breakpoint-medium) {
