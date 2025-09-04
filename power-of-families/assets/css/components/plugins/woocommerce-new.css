@@ -7,3 +7,9 @@
         }
     }
 }
+
+/* Hide tabs on product page */
+.woocommerce-page
+ul.tabs.wc-tabs {
+    display: none;
+}

@@ -1,11 +1,13 @@
-FROM wordpress:php7.4
+FROM wordpress:php8.4
 
 ENV XDEBUG_PORT=9003
 ENV XDEBUG_IDEKEY=docker
 
+ # Line 3 for EWWW plugin 
 RUN apt-get update && apt-get install -y \
-    subversion default-mysql-client && \
-    pecl install xdebug-3.1.6 \
+    subversion default-mysql-client \
+    gifsicle optipng pngquant libwebp7 libjpeg-progs optipng && \
+    pecl install xdebug \
     && docker-php-ext-enable xdebug
 
 COPY docker/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini

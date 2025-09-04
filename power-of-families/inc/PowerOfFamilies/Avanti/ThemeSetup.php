@@ -141,7 +141,6 @@ class ThemeSetup
 
     function power_of_families_footer_menu()
     {
-        echo '<div class="footer-menu-container">';
         $args = array(
             'theme_location' => 'tertiary',
             'container' => 'nav',
@@ -149,6 +148,7 @@ class ThemeSetup
             'menu_class' => 'menu genesis-nav-menu menu-tertiary',
             'depth' => 1,
         );
+        echo '<div class="footer-menu-container">';
         wp_nav_menu($args);
         echo '</div>';
     }
