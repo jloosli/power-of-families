@@ -1,15 +1,22 @@
 .wp-block-woocommerce-product-collection {
-    li.wc-block-product {
-        list-style-type: none;
+	li.wc-block-product {
+		list-style-type: none;
 
-        &.entry {
-            padding: 0;
-        }
-    }
+		&.entry {
+			padding: 0;
+		}
+	}
+
+	h2 a {
+		color: var(--color-primary-text);
+
+		&:hover {
+            color: color-mix(in srgb, var(--color-primary-text), #fff 30%);
+		}
+	}
 }
 
 /* Hide tabs on product page */
-.woocommerce-page
-ul.tabs.wc-tabs {
-    display: none;
+.woocommerce-page ul.tabs.wc-tabs {
+	display: none;
 }
