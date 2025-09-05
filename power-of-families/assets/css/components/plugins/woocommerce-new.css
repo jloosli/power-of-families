@@ -11,8 +11,21 @@
 		color: var(--color-primary-text);
 
 		&:hover {
-            color: color-mix(in srgb, var(--color-primary-text), #fff 30%);
+			color: color-mix(in srgb, var(--color-primary-text), #fff 30%);
 		}
+	}
+
+	.wp-block-button__link {
+		background-color: var(--background-color-5);
+		--wp--preset--font-size--medium: .8em;
+		text-transform: uppercase;
+	}
+
+	li.wc-block-product div.wp-block-group {
+		background-color: var(--background-color-1);
+		margin: 0.1rem;
+		padding: 0.5rem;
+		border-radius: 8px;
 	}
 }
 

@@ -4,9 +4,11 @@
 			font-family: var(--font-headings-light);
 			color: var(--color-white);
 			letter-spacing: 1px;
-			font-size: 2em;
+			font-size: 2.5em;
 			font-weight: 400;
 			z-index: 2;
+			text-transform: none;
+			margin-top: 13rem;
 		}
 		width: 100%;
 
@@ -17,7 +19,7 @@
 			display: flex;
 			justify-content: center;
 			align-items: center;
-			height: clamp(200px, 20vh, 500px);
+			height: clamp(500px, 20vh, 800px);
 			position: relative;
 
 			&::before {
@@ -134,8 +136,8 @@
 
             .cta-img img {
             display: block;
-            max-width: 100%;
-            height: auto;
+            max-width: 284px;
+            height: 387px;
             }
 
             h4 {
@@ -145,6 +147,7 @@
             }
 
 			.button {
+				margin-top: 2rem;
 				font-size: 0.9em;
 			}
         }
