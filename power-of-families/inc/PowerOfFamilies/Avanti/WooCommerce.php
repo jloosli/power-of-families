@@ -18,8 +18,10 @@ class WooCommerce
     {
 
         add_action('woocommerce_after_shop_loop_item_title', [$this, 'woocommerce_after_shop_loop_item_title_short_description'], 5);
-        add_action('woocommerce_after_main_content', function () {
-            if(is_product()) {
+
+        // Add "Add to Cart" button to the bottom of the page summary
+        add_action('woocommerce_after_single_product_summary', function () {
+            if (is_product()) {
                 woocommerce_simple_add_to_cart();
             }
         });

@@ -9,26 +9,57 @@ class ResponsiveMenu {
 	}
 
 	attachMenus() {
-		jQuery('nav.nav-primary').before(
-			'<div class="sub-menu-toggle-container"><button class="menu-toggle" role="button" aria-pressed="false"><span class="hide-activated">Open Navigation</span><span class="hide-deactivated">Close Navigation</span></button></div>'
-		); // Add toggles to menus
-		// jQuery( 'nav:not(.nav-secondary):not(.ubermenu) .sub-menu' ).before( '<div class="sub-menu-toggle-container"><button class="sub-menu-toggle" role="button" aria-pressed="false"><span class="hide-activated">Open Navigation</span><span class="hide-deactivated">Close Navigation</span></button></div>' ); // Add toggles to sub menus
+		// Add toggles to primary menu
+		const navPrimary = document.querySelector('nav.nav-primary');
+		if (navPrimary && navPrimary.parentNode) {
+			const container = document.createElement('div');
+			container.className = 'sub-menu-toggle-container';
+
+			const button = document.createElement('button');
+			button.className = 'menu-toggle';
+			button.setAttribute('role', 'button');
+			button.setAttribute('aria-pressed', 'false');
+
+			const spanOpen = document.createElement('span');
+			spanOpen.className = 'hide-activated';
+			spanOpen.textContent = 'Open Navigation';
+
+			const spanClose = document.createElement('span');
+			spanClose.className = 'hide-deactivated';
+			spanClose.textContent = 'Close Navigation';
+
+			button.appendChild(spanOpen);
+			button.appendChild(spanClose);
+			container.appendChild(button);
+
+			navPrimary.parentNode.insertBefore(container, navPrimary);
+		}
 	}
 
 	addListeners() {
 		// Show/hide the navigation
-		jQuery('.menu-toggle, .sub-menu-toggle').on('click', function () {
-			const $this = jQuery(this);
-			$this.attr('aria-pressed', function (index, value) {
-				return 'false' === value ? 'true' : 'false';
+		const toggles = document.querySelectorAll(
+			'.menu-toggle, .sub-menu-toggle'
+		);
+		toggles.forEach((toggle) => {
+			toggle.addEventListener('click', () => {
+				toggle.classList.toggle('activated');
+				toggle.setAttribute('aria-pressed', toggle.classList.contains('activated').toString());
+				toggle?.parentElement?.parentElement?.querySelector('nav, .sub-menu')?.classList.toggle('activated');
 			});
-
-			$this.toggleClass('activated');
-			$this
-				.parent()
-				.next('nav:not(.nav-secondary):not(.ubermenu), .sub-menu')
-				.slideToggle('fast');
 		});
+		// jQuery('.menu-toggle, .sub-menu-toggle').on('click', function () {
+		// 	const $this = jQuery(this);
+		// 	$this.attr('aria-pressed', function (index, value) {
+		// 		return 'false' === value ? 'true' : 'false';
+		// 	});
+
+		// 	$this.toggleClass('activated');
+		// 	$this
+		// 		.parent()
+		// 		.next('nav:not(.nav-secondary), .sub-menu')
+		// 		.slideToggle('fast');
+		// });
 	}
 }
 

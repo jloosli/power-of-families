@@ -18,10 +18,11 @@ services:
       WORDPRESS_HOME: http://localhost:8080
       WORDPRESS_SITEURL: http://localhost:8080
       # WORDPRESS_DEBUG: true
-      # WP_TESTS_DIR: /tmp
+      WORDPRESS_SCRIPT_DEBUG: true
       WORDPRESS_CONFIG_EXTRA: |
         define('WP_HOME', getenv('WORDPRESS_HOME', ''));
         define('WP_SITEURL', getenv('WORDPRESS_SITEURL', ''));
+        define('SCRIPT_DEBUG', getenv('WORDPRESS_SCRIPT_DEBUG', ''));
     volumes:
       - ./wordpress:/var/www/html
       - type: bind

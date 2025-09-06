@@ -42,6 +42,7 @@ The main purpose is to provide a modern, maintainable, and extensible WordPress 
 ### CI/CD and Deployment
 
 - GitHub Actions workflow (`.github/workflows/deploy.yml`) builds with Node.js 20, runs `npm install` and `npm run build`, then deploys via rsync over SSH.
+- GitHub Actions workflow (`.github/workflows/test.yml`) builds with Node.js 20, runs `npm install` and `npm run build`, then tests PHP and Typescript.
 - Always ensure the build passes locally before pushing changes.
 - The workflow expects secrets for SSH deployment; see workflow file for details.
 
@@ -49,6 +50,9 @@ The main purpose is to provide a modern, maintainable, and extensible WordPress 
 
 - **Root:** `README.md`, `docker-compose.yml`, `package.json`, `tsconfig.json`, `prettier.config.js`
 - **Theme:** `power-of-families/` (main theme code, build scripts, config, linting)
+- **Parent Theme:** `wordpress/wp-content/themes/genesis/` (Genesis Framework files - parent theme)
+- **CSS:** `power-of-families/assets/css/` (CSS files for the theme)
+- **PHP:** `power-of-families/assets/inc/` (PHP files for the theme)
 - **Wordpress:** `wordpress/` (core files, `wp-content/themes/`, `wp-content/plugins/`)
 - **Database:** `db_data/`, `db-backups/`
 - **Tasks:** `tasks/` (project requirements and task lists)
@@ -58,6 +62,10 @@ The main purpose is to provide a modern, maintainable, and extensible WordPress 
 
 - **Linting:** `prettier.config.js` (theme)
 - **Docker:** `docker-compose.yml`
+- **PostCSS:** `postcss.config.js`
+- **PHPUnit:** `phpunit.xml.dist` and `.phpcs.xml.dist`
+- **Composer:** `composer.json` and `composer.lock`
+- **Node:** `package.json` and `package-lock.json`
 
 ## Validation and Checks Before Commit
 

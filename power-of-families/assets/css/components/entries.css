@@ -1,10 +1,10 @@
-.entry {
+.entry:not(.wp-block-post) {
 	margin-bottom: 40px;
 	padding: 50px 60px;
 }
 
 .content .entry {
-	background-color: var(--color-2);
+	background-color: var(--color-background-white);
 }
 
 .entry-content ol,
@@ -64,4 +64,37 @@ p.entry-meta {
 .entry-comments-link::before {
 	content: "\2014";
 	margin: 0 6px 0 2px;
+}
+
+@media only screen and (max-width: 800px) {
+	.single-post .entry-header,
+	.page .entry-header {
+		margin: 20px 0;
+	}
+
+	.sidebar .entry-header {
+		margin: 0;
+	}
+
+	.author-box {
+		padding: 30px;
+	}
+	.comment-respond input[type="email"],
+	.comment-respond input[type="text"],
+	.comment-respond input[type="url"] {
+		width: 100%;
+	}
+}
+
+@media only screen and (max-width: 480px) {
+	.entry-title {
+		font-size: 22px;
+	}
+
+	.entry-header .avatar {
+		display: none;
+	}
+	.entry-title {
+		font-size: 32px;
+	}
 }

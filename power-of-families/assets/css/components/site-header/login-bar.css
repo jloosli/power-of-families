@@ -1,5 +1,5 @@
 .login-bar {
-    display: none;
+	display: none;
 }
 
 .login-bar {
@@ -28,7 +28,7 @@
 	clear: left;
 	width: 40%;
 	padding: 20px !important;
-	color: var(--color-2);
+	color: var(--color-background-white);
 }
 
 #loginform .login-username label,
@@ -55,18 +55,18 @@
 	display: inline-block;
 	float: left;
 	padding-top: 60px;
-	color: var(--color-2);
+	color: var(--color-background-white);
 	margin-right: 20px;
 }
 
 .login-bar .close {
-	color: var(--color-2);
+	color: var(--color-background-white);
 	margin: 0;
 	position: absolute;
 	top: 10px;
 	right: 10px;
 	opacity: 1;
-	border: 1px solid var(--color-2);
+	border: 1px solid var(--color-background-white);
 	width: 27px;
 	height: 27px;
 	line-height: 24px;
@@ -91,7 +91,7 @@
 }
 
 .login-bar #loginform + div.register {
-	color: var(--color-2);
+	color: var(--color-background-white);
 	padding-top: 49px;
 	display: inline-block;
 }
@@ -109,7 +109,7 @@
 }
 
 .login-bar div.lost_password a {
-	color: var(--color-2);
+	color: var(--color-background-white);
 }
 
 @media screen and (min-width: 961px) and (max-width: 1500px) {
@@ -118,5 +118,75 @@
 		margin: 16px 0;
 		left: 630px;
 		width: auto;
+	}
+}
+
+@media only screen and (max-width: 959px) {
+	#loginform p {
+		position: relative;
+	}
+}
+
+@media only screen and (min-width: 961px) and (max-width: var(--site-width)) {
+	.login-bar #loginform {
+		width: 60%;
+		margin-right: 7px;
+	}
+}
+
+@media only screen and (max-width: 960px) {
+	.login-bar #loginform,
+	.login-bar h3 {
+		display: block;
+		float: none;
+	}
+
+	.login-bar #loginform {
+		padding-top: 0;
+		display: block;
+	}
+
+	.login-bar #loginform .login-submit {
+		/*margin-top:10px;*/
+	}
+
+	.login-bar h3 {
+		padding-top: 10px;
+	}
+
+	.login-bar #loginform p {
+		width: 100%;
+		float: none;
+		padding: 0;
+	}
+
+	.login-bar #loginform .login-username,
+	.login-bar #loginform .login-password {
+		width: 100%;
+	}
+
+	.login-bar #loginform + div.register {
+		padding: 0;
+		clear: left;
+	}
+
+	.login-bar #loginform .login-submit {
+		position: relative;
+		display: block;
+		top: 0;
+	}
+
+	.login-bar .wrap {
+		position: relative;
+	}
+
+	.login-bar .close {
+		right: 0;
+	}
+}
+
+@media only screen and (max-width: 800px) {
+	.login-bar .close {
+		right: 5%;
 	}
 }

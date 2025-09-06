@@ -86,12 +86,19 @@ class ThemeSetup
         //        add_filter( 'wp_nav_menu_items', [$this, 'genesis_search_secondary_nav_menu'], 10, 2 );
 
         // Update category header
-        add_action('genesis_before_loop', [$this, 'themeprefix_category_header']);
+        // add_action('genesis_before_loop', [$this, 'themeprefix_category_header']);
 
         // Hide Sharing buttons on protected pages
         // @todo: Need to update this for Groups instead of wishlist member
         add_filter('get_post_metadata', [$this, 'hide_on_protected_pages'], 10, 4);
         add_filter('get_page_metadata', [$this, 'hide_on_protected_pages'], 10, 4);
+
+        // Remove sidebar on single product pages
+        add_action('wp', function () {
+            if (is_product()) {
+                add_filter('genesis_pre_get_option_site_layout', '__genesis_return_full_width_content');
+            }
+        });
 
         // Add Javascript and stylesheets
         add_action('wp_enqueue_scripts', [$this, 'custom_load_styles_and_scripts'], 0);
@@ -134,7 +141,6 @@ class ThemeSetup
 
     function power_of_families_footer_menu()
     {
-        echo '<div class="footer-menu-container">';
         $args = array(
             'theme_location' => 'tertiary',
             'container' => 'nav',
@@ -142,6 +148,7 @@ class ThemeSetup
             'menu_class' => 'menu genesis-nav-menu menu-tertiary',
             'depth' => 1,
         );
+        echo '<div class="footer-menu-container">';
         wp_nav_menu($args);
         echo '</div>';
     }

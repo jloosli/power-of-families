@@ -15,7 +15,7 @@
 
 .footer-widgets a.button,
 .footer-widgets a:hover {
-	color: var(--color-2);
+	color: var(--color-background-white);
 }
 
 .footer-widgets li {
@@ -49,4 +49,28 @@
 
 .footer-widgets-3 {
 	float: right;
+}
+
+@media only screen and (max-width: var(--site-width)) {
+	.footer-widgets-1,
+	.footer-widgets-2,
+	.footer-widgets-3 {
+		width: 300px;
+	}
+
+	.footer-widgets-1 {
+		margin-right: 30px;
+	}
+}
+
+@media only screen and (max-width: 960px) {
+	.footer-widgets-1,
+	.footer-widgets-2,
+	.footer-widgets-3 {
+		width: 100%;
+	}
+
+	.footer-widgets-1 {
+		margin-right: 0;
+	}
 }

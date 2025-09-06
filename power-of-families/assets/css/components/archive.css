@@ -32,7 +32,7 @@
 .home.blog .entry-title a,
 .search-results .entry-title a,
 .page-template-pagewithcategory-php .type-post .entry-title a {
-	color:var(--color-3);
+	color:var(--color-secondary);
 }*/
 
 .archive .entry-footer,
@@ -100,4 +100,81 @@ body .wpv_pagination_dots li a {
 
 .page-template-pagewithcategory-php .pagination-prev {
 	margin-right: 5px;
+}
+
+@media only screen and (max-width: 800px) {
+	.archive-description,
+	.author-box,
+	.comment-respond,
+	.entry,
+	.entry-comments,
+	.entry-pings {
+		padding: 0;
+	}
+
+	.archive-pagination li a {
+		margin-bottom: 4px;
+	}
+
+	.archive .entry,
+	.home.blog .entry,
+	.archive-title,
+	.page-template-pagewithcategory-php .entry {
+		margin-bottom: 0;
+		padding: 30px 0 0 0;
+	}
+
+	.archive .entry-footer,
+	.home.blog .entry-footer,
+	.page-template-pagewithcategory-php .type-post .entry-footer,
+	.pagination {
+		padding: 0;
+	}
+}
+
+@media only screen and (max-width: 480px) {
+	.page-template-pagewithcategory-php .has-post-thumbnail .entry-header {
+		margin: 0;
+	}
+
+	.page-template-pagewithcategory-php .entry.type-post {
+		padding: 30px 0 0 0;
+	}
+
+	.archive .entry-title,
+	.home.blog .entry-title,
+	.page-template-pagewithcategory-php .type-post .entry-title,
+	.search-results .type-post .entry-title {
+		font-size: 20px;
+	}
+	.archive .has-post-thumbnail .entry-header,
+	.archive .has-t-thumbnail .entry-content,
+	.home.blog .has-post-thumbnail .entry-header,
+	.home.blog .has-post-thumbnail .entry-content,
+	.page-template-pagewithcategory-php
+		.has-post-thumbnail.type-post
+		.entry-header,
+	.page-template-pagewithcategory-php
+		.has-post-thumbnail.type-post
+		.entry-content {
+		float: none;
+		width: 100%;
+	}
+
+	.home.blog .has-post-thumbnail .entry-header h1,
+	.page-template-pagewithcategory-php .has-post-thumbnail .entry-header h1 {
+		width: 70%;
+		float: left;
+		font-size: 20px;
+		margin-top: 0;
+	}
+
+	.home.blog .has-post-thumbnail .entry-meta,
+	.page-template-pagewithcategory-php .has-post-thumbnail .entry-meta,
+	.archive .has-post-thumbnail .entry-meta {
+		margin-top: 7px;
+		float: none;
+		clear: both;
+		padding-top: 10px;
+	}
 }

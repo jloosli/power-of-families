@@ -3,20 +3,20 @@
 }
 
 .woocommerce.single form {
-    margin: 2rem;
+	margin: 2rem;
 }
 .woocommerce.single .site-main p {
-    margin: 2rem;
+	margin: 2rem;
 }
 .woocommerce.single .site-main h5 {
 	margin-left: 2rem;
 }
 .woocommerce form .quantity {
-    display: none;
+	display: none;
 }
 
 .product-template-default .site-main {
-    padding: 2em;
+	padding: 2em;
 
 	ul {
 		display: block;
@@ -26,8 +26,8 @@
 
 		li {
 			display: list-item;
-			  list-style-type: disc;
-			  line-height: inherit;
+			list-style-type: disc;
+			line-height: inherit;
 		}
 	}
 }
@@ -37,7 +37,7 @@ div .woocommerce a.button,
 div .woocommerce button.button,
 div .woocommerce input.button {
 	background-color: var(--background-color-5);
-	color: var(--color-2);
+	color: var(--color-background-white);
 }
 
 .woocommerce-page .checkout .col2-set .col-1 {
@@ -76,7 +76,7 @@ div .woocommerce input.button {
 		a.woocommerce-LoopProduct-link.woocommerce-loop-product__link
 		> div
 		> p {
-		color: var(--color-1) !important;
+		color: var(--color-primary-text) !important;
 		font-size: 17px;
 	}
 

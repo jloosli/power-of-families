@@ -1,11 +1,3 @@
-/*
-- Media Queries
-	- Retina Display
-	- Max-width: 1200px
-	- Max-width: 960px
-	- Max-width: 800px
-*/
-
 /* Import normalize.css from node_modules */
 @import url("~normalize.css/normalize.css");
 
@@ -23,7 +15,6 @@
 @import "components/custom-reset.css";
 @import "components/gallery.css";
 @import "components/tables.css";
-@import "components/beaver-builder/_index.css";
 @import "components/avatar.css";
 @import "components/genesis.css";
 @import "components/search-form.css";
@@ -31,8 +22,7 @@
 @import "components/featured-content.css";
 @import "components/plugins/_index.css";
 @import "components/site-header/_index.css";
-@import "components/site-nav.css";
-@import "components/nav/_index.css";
+@import "components/nav.css";
 @import "components/entries.css";
 @import "components/pagination.css";
 @import "components/comments.css";
@@ -40,6 +30,5 @@
 @import "components/archive.css";
 @import "components/footer.css";
 @import "components/footer-menu.css";
-@import "components/header-opt-in.css";
-@import "components/media-queries.css";
 @import "components/pof-programs.css";
+@import "components/home-page.css";

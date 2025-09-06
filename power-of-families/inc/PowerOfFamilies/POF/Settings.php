@@ -221,7 +221,7 @@ class Settings
 
         foreach ($this->getActivePrograms() as $program) {
             $programs = $this->getAvailablePrograms();
-            if ($programs[$program]['has-settings']) {
+            if (isset($programs[$program]) && $programs[$program]['has-settings']) {
                 $theProgramSettings = $this->programs[$program]->getSettingsInstance();
                 $settings[$program] = $theProgramSettings->getSettings();
             }

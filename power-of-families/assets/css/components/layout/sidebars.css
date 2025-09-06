@@ -15,12 +15,30 @@
 
 .sidebar .widget,
 .fl-module-sidebar .widget {
-	background-color: var(--color-2);
+	background-color: var(--color-background-white);
 	margin-bottom: 50px;
 	/*padding: 40px;*/
 }
 
 div .fl-post-feed-post {
-	/*border-bottom: 2px solid var(--color-6);*/
 	border-bottom-width: 2px;
+}
+
+@media only screen and (max-width: 960px) {
+	.sidebar-primary,
+	.sidebar-secondary {
+		width: 100%;
+	}
+}
+
+@media only screen and (max-width: 800px) {
+	.sidebar .widget {
+		padding: 0;
+	}
+	.sidebar .widget.enews-widget {
+		padding: 40px;
+	}
+	.sidebar-primary {
+		padding: 0;
+	}
 }
