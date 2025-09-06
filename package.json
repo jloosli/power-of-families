@@ -11,6 +11,8 @@
     "test:php": "docker compose exec --workdir=/var/www/html/wp-content/themes/power-of-families/ wordpress vendor/bin/phpunit"
   },
   "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^24.3.1",
     "@wordpress/prettier-config": "^4.27.0",
     "@wordpress/scripts": "^30.20.0",
     "normalize.css": "^8.0.1",
