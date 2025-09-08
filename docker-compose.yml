@@ -58,7 +58,7 @@ services:
       memory_limit: 4096M
 
   db:
-    image: mariadb:10.5.21 # TT version as of 2/2024: https://support.tigertech.net/mysql-version
+    image: mariadb:10.11.13 # TT version as of 9/2025: https://support.tigertech.net/mysql-version
     container_name: pof_db
     restart: always
     environment:
@@ -67,7 +67,8 @@ services:
       MYSQL_PASSWORD: pofpass
       MYSQL_ROOT_PASSWORD: password
     volumes:
-      - ./db_data:/var/lib/mysql
+      - ./db-data:/var/lib/mysql
+      - ./db-backups:/tmp/backups
 
   phpmyadmin:
     depends_on:
