@@ -5,12 +5,20 @@
   "author": "Jared Loosli",
   "license": "UNLICENSED",
   "scripts": {
+    "setup:db-download": "rsync -avzh pof:backups-tigertech/current/mysql/poweroffamilies/poweroffamilies.dump db-backups/",
+    "setup:db-import": "docker compose exec -it db sh -c \"mariadb -u pofuser -ppofpass poweroffamilies < /tmp/backups/poweroffamilies.dump\"",
+    "setup:sync-themes": "rsync -avzh pof:backups-tigertech/current/www/wp-content/themes/genesis ./wordpress/wp-content/themes",
+    "setup:sync-plugins": "rsync -avzh --exclude=pof-programs --exclude=pom-bloom --exclude=pof-bloom pof:~/backups-tigertech/current/www/wp-content/plugins ./wordpress/wp-content/",
+    "setup:composer-install": "docker-compose run --rm composer install",
+    "setup": "npm run setup:db-download && npm run setup:db-import && npm run setup:sync-themes && npm run setup:sync-plugins && npm run setup:composer-install",
     "start": "wp-scripts start power-of-families/src/admin.ts power-of-families/src/main.ts --output-path=power-of-families/dist",
     "build": "wp-scripts build power-of-families/src/admin.ts power-of-families/src/main.ts --output-path=power-of-families/dist",
     "test:php-setup": "docker compose exec wordpress bash bin/install-wp-tests.sh wordpress_test root 'password' db latest",
     "test:php": "docker compose exec --workdir=/var/www/html/wp-content/themes/power-of-families/ wordpress vendor/bin/phpunit"
   },
   "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^24.3.1",
     "@wordpress/prettier-config": "^4.27.0",
     "@wordpress/scripts": "^30.20.0",
     "normalize.css": "^8.0.1",

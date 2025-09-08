@@ -8,36 +8,16 @@
 ## First Time Setup
 
 1. Run `docker-compose up -d wordpress` to start the containers.
-1. Set up the admin user
+1. Visit [http://localhost:8080](http://localhost:8080) to set up Wordpress.
+1. Set up the admin user. It will be overwritten later.
 1. Update Wordpress and database to the latest version
-1. Import the database backup:
-
-    - ```shell
-      rsync -avzh pof:backups-tigertech/current/mysql/poweroffamilies/poweroffamilies.dump db-backups/
-      ```
-
-    - Use [phpMyAdmin](http://localhost:8180) to upload database. See [docker-compose.yml](docker-compose.yml) for password.
-1. Import the themes and plugins
-
-    ```shell
-    rsync -avzh \
-    --exclude=power-of-families \
-    pof:backups-tigertech/current/www/wp-content/themes ./wordpress/wp-content/
-
-    rsync -avzh \
-    --exclude=pof-programs \
-    --exclude=pom-bloom \
-    --exclude=pof-bloom \
-    pof:~/backups-tigertech/current/www/wp-content/plugins ./wordpress/wp-content/
-    ```
-
-1. Install composer
-
-    ```shell
-    docker-compose run --rm composer install
-    ```
-
-1. Update local password `docker-compose run --rm wpcli user update <user> --user_pass='pass'`
+1. Download the database backup: `npm run setup:db-download`
+1. Import the database: `npm run setup:db-import`
+   - You can also use [phpMyAdmin](http://localhost:8180) to upload database. See [docker-compose.yml](docker-compose.yml) for password.
+1. Sync the genesis theme: `npm run setup:sync-themes`
+1. Sync the plugins: `npm run setup:sync-plugins`
+1. Install composer `npm run setup:composer-install`
+1. Update local user password `docker-compose run --rm wpcli user update <user> --user_pass='pass'`
 1. Setup PHP testing environment
 
     ```shell
