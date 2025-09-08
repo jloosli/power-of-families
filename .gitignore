@@ -15,7 +15,7 @@ db-backups
 logs
 *.log
 
-db_data
+db-data
 wordpress
 site-backup
 docker/ZscalerRootCA.crt
