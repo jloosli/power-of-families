@@ -16,13 +16,8 @@
    - You can also use [phpMyAdmin](http://localhost:8180) to upload database. See [docker-compose.yml](docker-compose.yml) for password.
 1. Sync the genesis theme: `npm run setup:sync-themes`
 1. Sync the plugins: `npm run setup:sync-plugins`
-1. Install composer
-
-    ```shell
-    docker-compose run --rm composer install
-    ```
-
-1. Update local password `docker-compose run --rm wpcli user update <user> --user_pass='pass'`
+1. Install composer `npm run setup:composer-install`
+1. Update local user password `docker-compose run --rm wpcli user update <user> --user_pass='pass'`
 1. Setup PHP testing environment
 
     ```shell
