@@ -86,7 +86,7 @@ p.entry-meta {
 	width: 100%;
 }
 
-@media only screen and (--breakpoint-small) {
+@media only screen and (--breakpoint-medium) {
 	.entry:not(.wp-block-post) {
 		margin-bottom: 40px;
 		padding: 50px 60px;
