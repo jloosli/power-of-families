@@ -62,13 +62,23 @@ class WooCommerce
         $product = wc_get_product();
         if (is_product() && $product && in_array($product->get_id(), $ids)) {
             remove_action('woocommerce_before_single_product_summary', 'woocommerce_show_product_images', 20);
-            remove_action('woocommerce_product_thumbnails', 'woocommerce_show_product_thumbnails', 20);
+            add_action('woocommerce_before_single_product_summary', 'woocommerce_template_single_title', 20);
             remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_title', 5);
+            remove_action('woocommerce_product_thumbnails', 'woocommerce_show_product_thumbnails', 20);
             remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_price', 10);
             remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_excerpt', 20);
             remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30);
             add_filter('woocommerce_product_description_heading', '__return_false', 90, 1);
             remove_action('woocommerce_before_single_product_summary', 'woocommerce_show_product_sale_flash', 10);
+            add_action('woocommerce_before_single_product_summary', function() {
+                // Hide the whole summary div (throws off spacing)
+                ?><style>
+                    .woocommerce div.product div.summary {
+                        display: none;
+                    }
+                </style><?php
+
+            }, 25);
         }
     }
 

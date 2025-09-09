@@ -10,6 +10,10 @@ span {
 	-o-box-sizing: content-box;
 }
 
+.extra-right {
+	margin-right: 40px;
+}
+
 .socialmedia-buttons img {
 	max-width: 24px;
 }
