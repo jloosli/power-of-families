@@ -58,7 +58,9 @@ class WooCommerce
     function remove_elements_from_header_of_family_coaching_group_product_page()
     {
         $ids = array(62545);
-        if (is_product() && in_array(wc_get_product()->get_id(), $ids)) {
+        if (!function_exists('is_product') || !function_exists('wc_get_product')) return;
+        $product = wc_get_product();
+        if (is_product() && $product && in_array($product->get_id(), $ids)) {
             remove_action('woocommerce_before_single_product_summary', 'woocommerce_show_product_images', 20);
             remove_action('woocommerce_product_thumbnails', 'woocommerce_show_product_thumbnails', 20);
             remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_title', 5);
