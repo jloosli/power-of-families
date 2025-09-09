@@ -53,6 +53,11 @@ class WooCommerce
 
         // Remove elements from single product page for the Family Coaching Group
         add_action('wp', [$this, 'remove_elements_from_header_of_family_coaching_group_product_page']);
+
+        /**
+         * Remove related products output
+         */
+        remove_action('woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20);
     }
 
     function remove_elements_from_header_of_family_coaching_group_product_page()
@@ -70,124 +75,124 @@ class WooCommerce
             remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30);
             add_filter('woocommerce_product_description_heading', '__return_false', 90, 1);
             remove_action('woocommerce_before_single_product_summary', 'woocommerce_show_product_sale_flash', 10);
-            add_action('woocommerce_before_single_product_summary', function() {
+            add_action('woocommerce_before_single_product_summary', function () {
                 // Hide the whole summary div (throws off spacing)
-                ?><style>
+?><style>
                     .woocommerce div.product div.summary {
                         display: none;
                     }
                 </style><?php
 
-            }, 25);
-        }
-    }
+                    }, 25);
+                }
+            }
 
-    function woocommerce_after_shop_loop_item_title_short_description()
-    {
-        global $product;
-        $excerpt = $product->get_short_description();
-        if (!$excerpt) return;
-?>
+            function woocommerce_after_shop_loop_item_title_short_description()
+            {
+                global $product;
+                $excerpt = $product->get_short_description();
+                if (!$excerpt) return;
+                        ?>
         <div itemprop="description">
             <?php echo apply_filters('woocommerce_short_description', $excerpt); ?>
         </div>
     <?php
-    }
+            }
 
-    function remove_loop_button()
-    {
-        remove_action('woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10);
-    }
+            function remove_loop_button()
+            {
+                remove_action('woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10);
+            }
 
-    function replace_add_to_cart()
-    {
-        global $product;
-        $link = $product->get_permalink();
-        echo do_shortcode('<br><a class="button" href="' . esc_attr($link) . '">Learn More</a>');
-    }
+            function replace_add_to_cart()
+            {
+                global $product;
+                $link = $product->get_permalink();
+                echo do_shortcode('<br><a class="button" href="' . esc_attr($link) . '">Learn More</a>');
+            }
 
-    function change_billing_details_to_your_details($translated_text, $text = '', $domain = '')
-    {
-        remove_filter(current_filter(), __FUNCTION__);
-        switch (strtolower($translated_text)) {
-            case 'billing details':
-                $translated_text = is_user_logged_in() ? '' : __('Your details', 'woocommerce');
-                break;
-        }
-        return $translated_text;
-    }
+            function change_billing_details_to_your_details($translated_text, $text = '', $domain = '')
+            {
+                remove_filter(current_filter(), __FUNCTION__);
+                switch (strtolower($translated_text)) {
+                    case 'billing details':
+                        $translated_text = is_user_logged_in() ? '' : __('Your details', 'woocommerce');
+                        break;
+                }
+                return $translated_text;
+            }
 
-    function returning_customer_to_returning_member()
-    {
-        return 'Returning Member?';
-    }
+            function returning_customer_to_returning_member()
+            {
+                return 'Returning Member?';
+            }
 
-    function remove_unnecessary_billing_fields($fields = [])
-    {
-        if (is_user_logged_in()) {
-            unset($fields['billing_first_name']);
-            unset($fields['billing_last_name']);
-            unset($fields['billing_email']);
-        }
-        unset($fields['billing_company']);
-        unset($fields['billing_address_1']);
-        unset($fields['billing_address_2']);
-        unset($fields['billing_state']);
-        unset($fields['billing_city']);
-        unset($fields['billing_phone']);
-        unset($fields['billing_postcode']);
-        unset($fields['billing_country']);
-        return $fields;
-    }
+            function remove_unnecessary_billing_fields($fields = [])
+            {
+                if (is_user_logged_in()) {
+                    unset($fields['billing_first_name']);
+                    unset($fields['billing_last_name']);
+                    unset($fields['billing_email']);
+                }
+                unset($fields['billing_company']);
+                unset($fields['billing_address_1']);
+                unset($fields['billing_address_2']);
+                unset($fields['billing_state']);
+                unset($fields['billing_city']);
+                unset($fields['billing_phone']);
+                unset($fields['billing_postcode']);
+                unset($fields['billing_country']);
+                return $fields;
+            }
 
 
-    function alter_woocommerce_checkout_fields($fields)
-    {
-        unset($fields['order']['order_comments']);
-        return $fields;
-    }
+            function alter_woocommerce_checkout_fields($fields)
+            {
+                unset($fields['order']['order_comments']);
+                return $fields;
+            }
 
-    function remove_order_notes($fields)
-    {
-        unset($fields['order']['order_comments']);
-        return $fields;
-    }
+            function remove_order_notes($fields)
+            {
+                unset($fields['order']['order_comments']);
+                return $fields;
+            }
 
-    function add_text_to_checkout()
-    {
-        if (is_user_logged_in()) return;
-        echo "If you already have an account on Power of Families, use the link at the top of this page to log in before continuing. Otherwise, we'll 
+            function add_text_to_checkout()
+            {
+                if (is_user_logged_in()) return;
+                echo "If you already have an account on Power of Families, use the link at the top of this page to log in before continuing. Otherwise, we'll 
 need to quickly create an account for you. Your email will be your username and you choose your password. You will use your username/email 
 and password to log in and access your materials whenever you wish.";
-    }
+            }
 
-    function custom_woocommerce_auto_complete_order($order_id)
-    {
-        if (!$order_id) {
-            return;
-        }
+            function custom_woocommerce_auto_complete_order($order_id)
+            {
+                if (!$order_id) {
+                    return;
+                }
 
-        $order = wc_get_order($order_id);
-        $order->update_status('completed');
-    }
+                $order = wc_get_order($order_id);
+                $order->update_status('completed');
+            }
 
-    function change_billing_field_strings($translated_text, $text, $domain)
-    {
-        switch ($translated_text) {
-            case 'Billing details':
-                $translated_text = is_user_logged_in() ? '' : __('Your Details', 'woocommerce');
-                break;
-        }
-        return $translated_text;
-    }
+            function change_billing_field_strings($translated_text, $text, $domain)
+            {
+                switch ($translated_text) {
+                    case 'Billing details':
+                        $translated_text = is_user_logged_in() ? '' : __('Your Details', 'woocommerce');
+                        break;
+                }
+                return $translated_text;
+            }
 
-    function change_return_customer_message()
-    {
-        return 'Returning Member?';
-    }
+            function change_return_customer_message()
+            {
+                return 'Returning Member?';
+            }
 
-    function add_my_programs_message()
-    {
+            function add_my_programs_message()
+            {
     ?>
         <div class="my-programs-after-order-message">
             To access your new program now and in the future, be sure you are logged (in upper right corner
@@ -195,5 +200,5 @@ and password to log in and access your materials whenever you wish.";
             then see an icon for your new program. Click on that icon to access your materials.
         </div>
 <?php
-    }
-}
+            }
+        }
