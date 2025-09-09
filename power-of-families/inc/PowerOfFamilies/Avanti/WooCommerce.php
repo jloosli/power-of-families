@@ -50,6 +50,26 @@ class WooCommerce
         add_action('woocommerce_thankyou', [$this, 'custom_woocommerce_auto_complete_order']);
         add_filter('gettext', [$this, 'change_billing_field_strings'], 20, 3);
         add_filter('woocommerce_checkout_login_message', [$this, 'change_return_customer_message']);
+
+        // Remove elements from single product page for the Family Coaching Group
+        add_action('wp', [$this, 'remove_elements_from_header_of_family_coaching_group_product_page']);
+    }
+
+    function remove_elements_from_header_of_family_coaching_group_product_page()
+    {
+        $ids = array(62545);
+        if (!function_exists('is_product') || !function_exists('wc_get_product')) return;
+        $product = wc_get_product();
+        if (is_product() && $product && in_array($product->get_id(), $ids)) {
+            remove_action('woocommerce_before_single_product_summary', 'woocommerce_show_product_images', 20);
+            remove_action('woocommerce_product_thumbnails', 'woocommerce_show_product_thumbnails', 20);
+            remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_title', 5);
+            remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_price', 10);
+            remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_excerpt', 20);
+            remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30);
+            add_filter('woocommerce_product_description_heading', '__return_false', 90, 1);
+            remove_action('woocommerce_before_single_product_summary', 'woocommerce_show_product_sale_flash', 10);
+        }
     }
 
     function woocommerce_after_shop_loop_item_title_short_description()
