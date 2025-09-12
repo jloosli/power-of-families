@@ -3,12 +3,15 @@ services:
     build:
       context: .
       dockerfile: docker/wordpress.dockerfile
+      args:
+        PHP_VERSION: ${PHP_VERSION:-8.4}
     container_name: pof_wordpress
     depends_on:
       - db
       - phpmyadmin
     ports: 
       - 8080:80
+
     environment:
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: pofuser
@@ -17,8 +20,8 @@ services:
       WORDPRESS_TABLE_PREFIX: wp_
       WORDPRESS_HOME: http://localhost:8080
       WORDPRESS_SITEURL: http://localhost:8080
-      # WORDPRESS_DEBUG: true
-      WORDPRESS_SCRIPT_DEBUG: true
+      WORDPRESS_DEBUG: ${WORDPRESS_DEBUG:-false}
+      WORDPRESS_SCRIPT_DEBUG: ${WORDPRESS_DEBUG:-false}
       WORDPRESS_CONFIG_EXTRA: |
         define('WP_HOME', getenv('WORDPRESS_HOME', ''));
         define('WP_SITEURL', getenv('WORDPRESS_SITEURL', ''));
@@ -55,10 +58,12 @@ services:
       WORDPRESS_DB_USER: pofuser
       WORDPRESS_DB_PASSWORD: pofpass
       WORDPRESS_DB_NAME: poweroffamilies
-      memory_limit: 4096M
+      PHP_MEMORY_LIMIT: 20G
+      WP_MEMORY_LIMIT: 20G
+      WP_CLI_PHP_MEMORY_LIMIT: 4G
 
   db:
-    image: mariadb:10.11.13 # TT version as of 9/2025: https://support.tigertech.net/mysql-version
+    image: mariadb:${MARIA_DB_VERSION:-10.11.13}
     container_name: pof_db
     restart: always
     environment:

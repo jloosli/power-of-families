@@ -1,5 +1,5 @@
-FROM wordpress:php8.4 
-# PHP version as of 9/2025: https://support.tigertech.net/php-version
+ARG PHP_VERSION=8.4
+FROM wordpress:php${PHP_VERSION}-fpm 
 
 ENV XDEBUG_PORT=9003
 ENV XDEBUG_IDEKEY=docker
