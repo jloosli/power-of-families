@@ -3,7 +3,6 @@
 ## Contents
 
 - [Power of Families Theme](power-of-families)
-- [Power of Families Bloom](pof-bloom-plugin)
 
 ## First Time Setup
 
@@ -45,13 +44,12 @@ This theme is a child theme of the [https://www.studiopress.com/themes/genesis/]
 Cursor AI helps:
 https://github.com/snarktank/ai-dev-tasks
 
+### Redirection
 
-### Redirection 
+Add the following to .htaccess above the wordpress to grab images and other uploads from the server instead of the local server if they are missing.:
 
-Add the following to .htaccess above the wordpress:
-
-```
-# Redirect missing uploads to server2.com
+```apacheconf
+# Redirect missing uploads to poweroffamilies.com
 <IfModule mod_rewrite.c>
 RewriteEngine On
 
