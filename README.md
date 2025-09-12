@@ -46,7 +46,7 @@ https://github.com/snarktank/ai-dev-tasks
 
 ### Redirection
 
-Add the following to .htaccess above the wordpress to grab images and other uploads from the server instead of the local server if they are missing.:
+Add the following to .htaccess above the wordpress to grab images and other uploads from the server instead of the local server if they are missing:
 
 ```apacheconf
 # Redirect missing uploads to poweroffamilies.com
