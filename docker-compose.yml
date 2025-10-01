@@ -20,7 +20,7 @@ services:
       WORDPRESS_TABLE_PREFIX: wp_
       WORDPRESS_HOME: http://localhost:8080
       WORDPRESS_SITEURL: http://localhost:8080
-      WORDPRESS_DEBUG: ${WORDPRESS_DEBUG:-false}
+      # WORDPRESS_DEBUG: ${WORDPRESS_DEBUG:-false}
       WORDPRESS_SCRIPT_DEBUG: ${WORDPRESS_DEBUG:-false}
       WORDPRESS_CONFIG_EXTRA: |
         define('WP_HOME', getenv('WORDPRESS_HOME', ''));
@@ -31,9 +31,9 @@ services:
       - type: bind
         source: ./power-of-families
         target: /var/www/html/wp-content/themes/power-of-families
-      - type: bind
-        source: ./pof-bloom-plugin
-        target: /var/www/html/wp-content/plugins/pof-bloom
+      # - type: bind
+      #   source: ./pof-bloom-plugin
+      #   target: /var/www/html/wp-content/plugins/pof-bloom
       - ./phpunit.xml.dist:/var/www/html/wp-content/themes/power-of-families/phpunit.xml
       - ./.phpcs.xml.dist:/var/www/html/wp-content/themes/power-of-families/.phpcs.xml
       - ./bin:/var/www/html/bin
