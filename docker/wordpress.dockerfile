@@ -4,7 +4,10 @@ FROM wordpress:php${PHP_VERSION}-apache
 ENV XDEBUG_PORT=9003
 ENV XDEBUG_IDEKEY=docker
 
- # Line 3 for EWWW plugin 
+# Install xDebug
+RUN pecl install xdebug && docker-php-ext-enable xdebug
+
+# Line 3 for EWWW plugin 
 RUN apt-get update && apt-get install -y \
     gifsicle optipng pngquant libwebp7 libjpeg-progs optipng
 
