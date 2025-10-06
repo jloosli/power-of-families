@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Class SampleTest
  *
@@ -9,15 +8,13 @@
 /**
  * Sample test case.
  */
-class test_sample extends WP_UnitTestCase
-{
+class test_sample extends WP_UnitTestCase {
 
 	/**
 	 * A single example test.
 	 */
-	public function test_sample()
-	{
+	public function test_sample() {
 		// Replace this with some actual testing code.
-		$this->assertTrue(true);
+		$this->assertTrue( true );
 	}
 }

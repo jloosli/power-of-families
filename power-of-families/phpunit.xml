@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<phpunit
+    bootstrap="tests/bootstrap.php"
+    backupGlobals="false"
+    colors="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    >
+
+    <php>
+        <const name="PHPUNIT_RUNNING" value="true"/>
+    </php>
+    <testsuites>
+        <testsuite name="Theme Test Suite">
+            <file>./tests/test_sample.php</file>
+            <file>./tests/test_ThemeSetup.php</file>
+        </testsuite>
+    </testsuites>
+</phpunit>

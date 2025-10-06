@@ -13,7 +13,8 @@
     </php>
     <testsuites>
         <testsuite name="Theme Test Suite">
-            <directory prefix="test-" suffix=".php">./tests/</directory>
+            <file>./tests/test_sample.php</file>
+            <file>./tests/test_ThemeSetup.php</file>
         </testsuite>
     </testsuites>
 </phpunit>
