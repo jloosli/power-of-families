@@ -72,3 +72,11 @@ require "{$_tests_dir}/includes/bootstrap.php";
 
 // Load theme functions after WordPress is loaded
 require_once dirname(dirname(__FILE__)) . '/functions.php';
+
+// Load test data factories and fixtures
+require_once __DIR__ . '/factories/TestDataFactory.php';
+require_once __DIR__ . '/fixtures/TestFixtures.php';
+require_once __DIR__ . '/seeders/TestDataSeeder.php';
+require_once __DIR__ . '/seeders/TestSeederConfig.php';
+require_once __DIR__ . '/seeders/EnhancedTestDataSeeder.php';
+require_once __DIR__ . '/verification/DatabaseIsolationVerifier.php';
