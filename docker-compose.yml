@@ -128,7 +128,7 @@ services:
             - type: bind
               source: ./power-of-families
               target: /var/www/html/wp-content/themes/power-of-families
-            - ./phpunit.xml.dist:/var/www/html/wp-content/themes/power-of-families/phpunit.xml
+            - ./power-of-families/phpunit.xml:/var/www/html/wp-content/themes/power-of-families/phpunit.xml
             - ./.phpcs.xml.dist:/var/www/html/wp-content/themes/power-of-families/.phpcs.xml
             - ./bin:/var/www/html/bin
             - ./coverage:/var/www/html/coverage

@@ -37,66 +37,67 @@
     <!-- Test Suites -->
     <testsuites>
         <testsuite name="Theme Test Suite">
-            <directory>power-of-families/tests</directory>
+            <file>./tests/test_sample.php</file>
+            <file>./tests/test_ThemeSetup.php</file>
         </testsuite>
     </testsuites>
 
     <!-- Code Coverage Configuration -->
     <coverage>
         <include>
-            <directory suffix=".php">power-of-families/inc</directory>
-            <directory suffix=".php">power-of-families/functions.php</directory>
-            <file>power-of-families/style.css</file>
+            <directory suffix=".php">inc</directory>
+            <file>functions.php</file>
+            <file>style.css</file>
         </include>
         <exclude>
-            <directory>power-of-families/tests</directory>
-            <directory>power-of-families/vendor</directory>
-            <directory>power-of-families/node_modules</directory>
-            <directory>power-of-families/dist</directory>
-            <directory>power-of-families/src</directory>
-            <file>power-of-families/composer.json</file>
-            <file>power-of-families/composer.lock</file>
-            <file>power-of-families/package.json</file>
-            <file>power-of-families/package-lock.json</file>
+            <directory>tests</directory>
+            <directory>vendor</directory>
+            <directory>node_modules</directory>
+            <directory>dist</directory>
+            <directory>src</directory>
+            <file>composer.json</file>
+            <file>composer.lock</file>
+            <file>package.json</file>
+            <file>package-lock.json</file>
         </exclude>
         <report>
             <!-- HTML Coverage Report -->
-            <html outputDirectory="coverage/html" lowUpperBound="50" highLowerBound="80"/>
+            <html outputDirectory="../coverage/html" lowUpperBound="50" highLowerBound="80"/>
             
             <!-- Clover XML Report for CI/CD -->
-            <clover outputFile="coverage/clover.xml"/>
+            <clover outputFile="../coverage/clover.xml"/>
             
             <!-- Cobertura XML Report -->
-            <cobertura outputFile="coverage/cobertura.xml"/>
+            <cobertura outputFile="../coverage/cobertura.xml"/>
             
             <!-- Text Coverage Report -->
-            <text outputFile="coverage/coverage.txt" showUncoveredFiles="true" showOnlySummary="false"/>
+            <text outputFile="../coverage/coverage.txt" showUncoveredFiles="true" showOnlySummary="false"/>
             
             <!-- PHP Coverage Report -->
-            <php outputFile="coverage/coverage.php"/>
+            <php outputFile="../coverage/coverage.php"/>
         </report>
     </coverage>
 
     <!-- Logging Configuration -->
     <logging>
         <!-- JUnit XML for CI/CD -->
-        <junit outputFile="test-reports/junit.xml"/>
+        <junit outputFile="../test-reports/junit.xml"/>
         
         <!-- TestDox Text Output -->
-        <testdoxText outputFile="test-reports/testdox.txt"/>
+        <testdoxText outputFile="../test-reports/testdox.txt"/>
         
         <!-- TestDox HTML Output -->
-        <testdoxHtml outputFile="test-reports/testdox.html"/>
+        <testdoxHtml outputFile="../test-reports/testdox.html"/>
         
         <!-- TeamCity Output -->
-        <teamcity outputFile="test-reports/teamcity.txt"/>
+        <teamcity outputFile="../test-reports/teamcity.txt"/>
     </logging>
 
     <!-- Filter Configuration -->
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">power-of-families/inc</directory>
-            <file>power-of-families/functions.php</file>
+            <directory suffix=".php">inc</directory>
+            <file>functions.php</file>
         </whitelist>
     </filter>
 

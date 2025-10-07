@@ -17,6 +17,11 @@ if (! file_exists($_tests_dir . '/includes/functions.php')) {
 	exit(1);
 }
 
+// Load PHPUnit autoloader first (required for WordPress test bootstrap to detect PHPUnit version)
+if ( file_exists( dirname( __DIR__ ) . '/vendor/autoload.php' ) ) {
+	require_once dirname( __DIR__ ) . '/vendor/autoload.php';
+}
+
 // Give access to tests_add_filter() function.
 require_once "{$_tests_dir}/includes/functions.php";
 

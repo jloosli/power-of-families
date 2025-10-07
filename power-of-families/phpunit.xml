@@ -32,6 +32,11 @@
         <const name="SCRIPT_DEBUG" value="true"/>
         <const name="WP_HTTP_BLOCK_EXTERNAL" value="true"/>
         <const name="WP_ACCESSIBLE_HOSTS" value="api.wordpress.org,*.wordpress.org,*.github.com"/>
+        <env name="TEST_DB_NAME" value="wordpress_tests"/>
+        <env name="TEST_DB_USER" value="root"/>
+        <env name="TEST_DB_PASSWORD" value="password"/>
+        <env name="TEST_DB_HOST" value="db"/>
+        <env name="XDEBUG_MODE" value="coverage"/>
     </php>
 
     <!-- Test Suites -->
@@ -93,32 +98,5 @@
         <teamcity outputFile="../test-reports/teamcity.txt"/>
     </logging>
 
-    <!-- Filter Configuration -->
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">inc</directory>
-            <file>functions.php</file>
-        </whitelist>
-    </filter>
 
-    <!-- Groups Configuration -->
-    <groups>
-        <include>
-            <group>unit</group>
-            <group>integration</group>
-        </include>
-        <exclude>
-            <group>slow</group>
-            <group>external</group>
-        </exclude>
-    </groups>
-
-    <!-- Environment Variables -->
-    <php>
-        <env name="TEST_DB_NAME" value="wordpress_tests"/>
-        <env name="TEST_DB_USER" value="root"/>
-        <env name="TEST_DB_PASSWORD" value="password"/>
-        <env name="TEST_DB_HOST" value="db"/>
-        <env name="XDEBUG_MODE" value="coverage"/>
-    </php>
 </phpunit>

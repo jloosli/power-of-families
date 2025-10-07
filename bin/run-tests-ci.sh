@@ -177,11 +177,12 @@ initialize_ci_environment() {
 execute_ci_tests() {
     log_info "Executing tests for CI/CD..."
     
-    local phpunit_cmd="docker-compose run --rm test phpunit --configuration phpunit.xml"
-    phpunit_cmd="$phpunit_cmd --coverage-clover=$COVERAGE_DIR/clover.xml"
-    phpunit_cmd="$phpunit_cmd --coverage-html=$COVERAGE_DIR/html"
-    phpunit_cmd="$phpunit_cmd --coverage-text"
-    phpunit_cmd="$phpunit_cmd --log-junit=$TEST_REPORTS_DIR/junit.xml"
+    # Use the container's built-in test execution with coverage enabled
+    local phpunit_cmd="docker-compose run --rm test ci"
+    phpunit_cmd="$phpunit_cmd --coverage-enabled"
+    phpunit_cmd="$phpunit_cmd --generate-reports"
+    phpunit_cmd="$phpunit_cmd --coverage-dir $COVERAGE_DIR"
+    phpunit_cmd="$phpunit_cmd --test-reports-dir $TEST_REPORTS_DIR"
     
     local start_time=$(date +%s)
     
@@ -203,6 +204,11 @@ execute_ci_tests() {
 run_coverage_checks() {
     log_info "Running coverage threshold checks..."
     
+    local pr_flag=""
+    if [ "$CI_PULL_REQUEST" = "true" ]; then
+        pr_flag="--ci-pull-request"
+    fi
+
     if bin/ci-coverage-integration.sh check \
         --coverage-dir "$COVERAGE_DIR" \
         --thresholds-file "$THRESHOLDS_FILE" \
@@ -211,7 +217,7 @@ run_coverage_checks() {
         --ci-build-number "$CI_BUILD_NUMBER" \
         --ci-commit-sha "$CI_COMMIT_SHA" \
         --ci-branch "$CI_BRANCH" \
-        --ci-pull-request="$CI_PULL_REQUEST"; then
+        $pr_flag; then
         log_success "Coverage threshold checks passed"
         return 0
     else
@@ -237,7 +243,7 @@ run_quality_gates() {
         --ci-build-number "$CI_BUILD_NUMBER" \
         --ci-commit-sha "$CI_COMMIT_SHA" \
         --ci-branch "$CI_BRANCH" \
-        --ci-pull-request="$CI_PULL_REQUEST"; then
+        $pr_flag; then
         log_success "Quality gates validation passed"
         return 0
     else

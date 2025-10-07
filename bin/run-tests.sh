@@ -131,7 +131,41 @@ execute_full_tests() {
 # Execute CI tests
 execute_ci_tests() {
     log_step "Executing CI/CD optimized tests..."
-    bin/run-tests-ci.sh $COMMON_OPTIONS
+    
+    # Set up WordPress test environment
+    echo "Setting up WordPress test environment..."
+    bash /usr/local/bin/install-wp-tests.sh \
+        "${TEST_DB_NAME:-wordpress_tests}" \
+        "${TEST_DB_USER:-root}" \
+        "${TEST_DB_PASSWORD:-password}" \
+        "${TEST_DB_HOST:-db}" \
+        "${WP_VERSION:-latest}" \
+        false
+    
+    # Change to theme directory
+    cd /var/www/html/wp-content/themes/power-of-families
+    
+    # Install dependencies
+    echo "Installing Composer dependencies..."
+    composer install --no-dev --optimize-autoloader
+    
+    # Run PHPUnit with coverage and reporting for CI/CD
+    local phpunit_cmd="phpunit --configuration phpunit.xml"
+    
+    # Add coverage flags if coverage is enabled
+    if [[ "$COMMON_OPTIONS" == *"--coverage-enabled"* ]]; then
+        phpunit_cmd="$phpunit_cmd --coverage-clover=coverage/clover.xml"
+        phpunit_cmd="$phpunit_cmd --coverage-html=coverage/html"
+        phpunit_cmd="$phpunit_cmd --coverage-text"
+    fi
+    
+    # Add reporting flags if reports are enabled
+    if [[ "$COMMON_OPTIONS" == *"--generate-reports"* ]]; then
+        phpunit_cmd="$phpunit_cmd --log-junit=test-reports/junit.xml"
+    fi
+    
+    # Execute the command
+    eval $phpunit_cmd
 }
 
 # Execute coverage tests
