@@ -40,6 +40,11 @@
     - [x] 3.3 Create database cleanup and reset scripts
     - [x] 3.4 Configure test database seeding
     - [x] 3.5 Verify test database isolation
-- [ ] 4.0 Update PHPUnit Configuration for Coverage and Reporting
-- [ ] 5.0 Create Developer-Friendly Test Execution Scripts (`test` container)
-- [ ] 6.0 Update GitHub Actions Workflow for Docker-Based Testing
+- [x] 4.0 Update PHPUnit Configuration for Coverage and Reporting
+    - [x] 4.1 Configure PHPUnit for code coverage reporting
+    - [x] 4.2 Set up JUnit XML test reporting
+    - [x] 4.3 Configure HTML coverage reports
+    - [x] 4.4 Add coverage thresholds and quality gates
+    - [x] 4.5 Update test execution scripts for reporting
+- [x] 5.0 Create Developer-Friendly Test Execution Scripts (`test` container)
+- [x] 6.0 Update GitHub Actions Workflow for Docker-Based Testing

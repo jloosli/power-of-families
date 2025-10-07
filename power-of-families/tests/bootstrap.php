@@ -80,3 +80,6 @@ require_once __DIR__ . '/seeders/TestDataSeeder.php';
 require_once __DIR__ . '/seeders/TestSeederConfig.php';
 require_once __DIR__ . '/seeders/EnhancedTestDataSeeder.php';
 require_once __DIR__ . '/verification/DatabaseIsolationVerifier.php';
+require_once __DIR__ . '/reporting/JUnitReportParser.php';
+require_once __DIR__ . '/reporting/CoverageAnalyzer.php';
+require_once __DIR__ . '/reporting/CoverageThresholdManager.php';

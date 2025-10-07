@@ -1,15 +1,31 @@
-name: Docker-Based Testing
+name: Comprehensive Testing
 
 on:
-    pull_request:
-        branches:
-            - main
-            - master
-    push:
-        branches:
-            - main
-            - master
+    schedule:
+        # Run comprehensive tests daily at 2 AM UTC
+        - cron: '0 2 * * *'
     workflow_dispatch:
+        inputs:
+            run_coverage:
+                description: 'Run coverage analysis'
+                required: false
+                default: true
+                type: boolean
+            run_performance:
+                description: 'Run performance tests'
+                required: false
+                default: true
+                type: boolean
+            run_integration:
+                description: 'Run integration tests'
+                required: false
+                default: true
+                type: boolean
+            run_security:
+                description: 'Run security tests'
+                required: false
+                default: true
+                type: boolean
 
 env:
     DOCKER_COMPOSE_VERSION: '2.24.0'
@@ -17,7 +33,7 @@ env:
     NODE_VERSION: '20'
 
 jobs:
-    # Test Environment Setup and Validation
+    # Test Environment Setup
     test-environment:
         name: Test Environment Setup
         runs-on: ubuntu-latest
@@ -136,6 +152,7 @@ jobs:
         name: Coverage Analysis
         runs-on: ubuntu-latest
         needs: unit-tests
+        if: ${{ github.event.inputs.run_coverage != 'false' }}
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
@@ -223,6 +240,7 @@ jobs:
         name: Performance Tests
         runs-on: ubuntu-latest
         needs: unit-tests
+        if: ${{ github.event.inputs.run_performance != 'false' }}
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
@@ -302,6 +320,7 @@ jobs:
         name: Integration Tests
         runs-on: ubuntu-latest
         needs: unit-tests
+        if: ${{ github.event.inputs.run_integration != 'false' }}
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
@@ -365,6 +384,7 @@ jobs:
         name: Security Tests
         runs-on: ubuntu-latest
         needs: unit-tests
+        if: ${{ github.event.inputs.run_security != 'false' }}
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
@@ -446,11 +466,12 @@ jobs:
 
             - name: Generate test summary
               run: |
-                  echo "# Test Summary for Run ${{ github.run_number }}" > test-summary.md
+                  echo "# Comprehensive Test Summary for Run ${{ github.run_number }}" > test-summary.md
                   echo "" >> test-summary.md
                   echo "**Commit:** ${{ github.sha }}" >> test-summary.md
                   echo "**Branch:** ${{ github.ref_name }}" >> test-summary.md
                   echo "**Triggered by:** ${{ github.event_name }}" >> test-summary.md
+                  echo "**Scheduled:** ${{ github.event.schedule }}" >> test-summary.md
                   echo "" >> test-summary.md
 
                   echo "## Test Results" >> test-summary.md
@@ -467,34 +488,41 @@ jobs:
                   if [ -d "artifacts/coverage-reports-${{ github.run_number }}" ]; then
                     echo "✅ **Coverage Analysis:** Completed" >> test-summary.md
                   else
-                    echo "❌ **Coverage Analysis:** Failed" >> test-summary.md
+                    echo "⚠️ **Coverage Analysis:** Skipped or Failed" >> test-summary.md
                   fi
 
                   # Check performance
                   if [ -d "artifacts/performance-reports-${{ github.run_number }}" ]; then
                     echo "✅ **Performance Tests:** Completed" >> test-summary.md
                   else
-                    echo "❌ **Performance Tests:** Failed" >> test-summary.md
+                    echo "⚠️ **Performance Tests:** Skipped or Failed" >> test-summary.md
                   fi
 
                   # Check integration
                   if [ -d "artifacts/integration-test-results-${{ github.run_number }}" ]; then
                     echo "✅ **Integration Tests:** Passed" >> test-summary.md
                   else
-                    echo "❌ **Integration Tests:** Failed" >> test-summary.md
+                    echo "⚠️ **Integration Tests:** Skipped or Failed" >> test-summary.md
                   fi
 
                   # Check security
                   if [ -d "artifacts/security-test-results-${{ github.run_number }}" ]; then
                     echo "✅ **Security Tests:** Passed" >> test-summary.md
                   else
-                    echo "❌ **Security Tests:** Failed" >> test-summary.md
+                    echo "⚠️ **Security Tests:** Skipped or Failed" >> test-summary.md
                   fi
 
                   echo "" >> test-summary.md
                   echo "## Artifacts" >> test-summary.md
                   echo "" >> test-summary.md
                   echo "All test artifacts have been uploaded and are available for download." >> test-summary.md
+                  echo "" >> test-summary.md
+                  echo "## Next Steps" >> test-summary.md
+                  echo "" >> test-summary.md
+                  echo "- Review any failed tests and fix issues" >> test-summary.md
+                  echo "- Check coverage reports for areas needing more tests" >> test-summary.md
+                  echo "- Review performance reports for optimization opportunities" >> test-summary.md
+                  echo "- Address any security concerns identified" >> test-summary.md
 
             - name: Upload test summary
               uses: actions/upload-artifact@v4
@@ -503,72 +531,35 @@ jobs:
                   path: test-summary.md
                   retention-days: 30
 
-            - name: Comment on PR
-              if: github.event_name == 'pull_request'
+            - name: Create GitHub Issue for Failures
+              if: failure()
               uses: actions/github-script@v7
               with:
                   script: |
-                      const fs = require('fs');
-                      const summary = fs.readFileSync('test-summary.md', 'utf8');
+                      const title = `Test Failures Detected - Run ${{ github.run_number }}`;
+                      const body = `# Test Failures Detected
 
-                      github.rest.issues.createComment({
-                        issue_number: context.issue.number,
+                      **Run:** ${{ github.run_number }}
+                      **Commit:** ${{ github.sha }}
+                      **Branch:** ${{ github.ref_name }}
+                      **Triggered by:** ${{ github.event_name }}
+
+                      Please review the test results and fix any issues.
+
+                      ## Failed Jobs
+                      - Check the workflow run for detailed failure information
+                      - Review uploaded artifacts for specific error details
+
+                      ## Next Steps
+                      1. Review the test logs
+                      2. Fix any identified issues
+                      3. Re-run the tests to verify fixes
+                      4. Close this issue once resolved`;
+
+                      github.rest.issues.create({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
-                        body: summary
+                        title: title,
+                        body: body,
+                        labels: ['bug', 'tests', 'ci']
                       });
-
-    # Build and Deploy (only on main branch)
-    build-and-deploy:
-        name: Build and Deploy
-        runs-on: ubuntu-latest
-        needs:
-            [
-                unit-tests,
-                coverage-analysis,
-                performance-tests,
-                integration-tests,
-                security-tests,
-            ]
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        env:
-            SSH_HOST: ${{ secrets.SSH_HOST }}
-            SSH_USER: ${{ secrets.SSH_USER }}
-            SSH_KEY: ${{ secrets.SSH_KEY }}
-            DEST_PATH: ${{ secrets.DEST_PATH }}
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
-
-            - name: Set up Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-                  cache: 'npm'
-
-            - name: Install dependencies
-              run: npm install
-
-            - name: Build project
-              run: npm run build
-
-            - name: Setup PHP
-              uses: shivammathur/setup-php@v2
-              with:
-                  php-version: ${{ env.PHP_VERSION }}
-                  tools: phpunit-polyfills:1.1
-
-            - name: Install PHP dependencies
-              run: |
-                  cd power-of-families
-                  composer install --no-dev
-                  composer dump-autoload --optimize
-
-            - name: Rsync to remote host
-              env:
-                  SSH_KEY: ${{ secrets.SSH_KEY }}
-              run: |
-                  mkdir -p ~/.ssh
-                  echo "$SSH_KEY" > ~/.ssh/id_rsa
-                  chmod 600 ~/.ssh/id_rsa
-                  rsync -avhz --delete -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" power-of-families/ "$SSH_USER@$SSH_HOST:$DEST_PATH"

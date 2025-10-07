@@ -1,20 +1,123 @@
 <?xml version="1.0"?>
 <phpunit
-    bootstrap="tests/bootstrap.php"
+    bootstrap="power-of-families/tests/bootstrap.php"
     backupGlobals="false"
     colors="true"
     convertErrorsToExceptions="true"
     convertNoticesToExceptions="true"
     convertWarningsToExceptions="true"
+    processIsolation="false"
+    stopOnFailure="false"
+    stopOnError="false"
+    stopOnIncomplete="false"
+    stopOnSkipped="false"
+    timeoutForSmallTests="1"
+    timeoutForMediumTests="10"
+    timeoutForLargeTests="60"
+    verbose="true"
     >
 
     <php>
         <const name="PHPUNIT_RUNNING" value="true"/>
+        <const name="WP_TESTS_DIR" value="/tmp/wordpress-tests-lib"/>
+        <const name="WP_CORE_DIR" value="/tmp/wordpress"/>
+        <const name="WP_TESTS_DOMAIN" value="example.org"/>
+        <const name="WP_TESTS_EMAIL" value="admin@example.org"/>
+        <const name="WP_TESTS_TITLE" value="Test Blog"/>
+        <const name="WP_TESTS_URL" value="http://example.org"/>
+        <const name="WP_TESTS_TABLE_PREFIX" value="wptests_"/>
+        <const name="WP_DEBUG" value="true"/>
+        <const name="WP_DEBUG_LOG" value="true"/>
+        <const name="WP_DEBUG_DISPLAY" value="false"/>
+        <const name="SCRIPT_DEBUG" value="true"/>
+        <const name="WP_HTTP_BLOCK_EXTERNAL" value="true"/>
+        <const name="WP_ACCESSIBLE_HOSTS" value="api.wordpress.org,*.wordpress.org,*.github.com"/>
     </php>
+
+    <!-- Test Suites -->
     <testsuites>
         <testsuite name="Theme Test Suite">
-            <file>./tests/test_sample.php</file>
-            <file>./tests/test_ThemeSetup.php</file>
+            <directory>power-of-families/tests</directory>
         </testsuite>
     </testsuites>
+
+    <!-- Code Coverage Configuration -->
+    <coverage>
+        <include>
+            <directory suffix=".php">power-of-families/inc</directory>
+            <directory suffix=".php">power-of-families/functions.php</directory>
+            <file>power-of-families/style.css</file>
+        </include>
+        <exclude>
+            <directory>power-of-families/tests</directory>
+            <directory>power-of-families/vendor</directory>
+            <directory>power-of-families/node_modules</directory>
+            <directory>power-of-families/dist</directory>
+            <directory>power-of-families/src</directory>
+            <file>power-of-families/composer.json</file>
+            <file>power-of-families/composer.lock</file>
+            <file>power-of-families/package.json</file>
+            <file>power-of-families/package-lock.json</file>
+        </exclude>
+        <report>
+            <!-- HTML Coverage Report -->
+            <html outputDirectory="coverage/html" lowUpperBound="50" highLowerBound="80"/>
+            
+            <!-- Clover XML Report for CI/CD -->
+            <clover outputFile="coverage/clover.xml"/>
+            
+            <!-- Cobertura XML Report -->
+            <cobertura outputFile="coverage/cobertura.xml"/>
+            
+            <!-- Text Coverage Report -->
+            <text outputFile="coverage/coverage.txt" showUncoveredFiles="true" showOnlySummary="false"/>
+            
+            <!-- PHP Coverage Report -->
+            <php outputFile="coverage/coverage.php"/>
+        </report>
+    </coverage>
+
+    <!-- Logging Configuration -->
+    <logging>
+        <!-- JUnit XML for CI/CD -->
+        <junit outputFile="test-reports/junit.xml"/>
+        
+        <!-- TestDox Text Output -->
+        <testdoxText outputFile="test-reports/testdox.txt"/>
+        
+        <!-- TestDox HTML Output -->
+        <testdoxHtml outputFile="test-reports/testdox.html"/>
+        
+        <!-- TeamCity Output -->
+        <teamcity outputFile="test-reports/teamcity.txt"/>
+    </logging>
+
+    <!-- Filter Configuration -->
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">power-of-families/inc</directory>
+            <file>power-of-families/functions.php</file>
+        </whitelist>
+    </filter>
+
+    <!-- Groups Configuration -->
+    <groups>
+        <include>
+            <group>unit</group>
+            <group>integration</group>
+        </include>
+        <exclude>
+            <group>slow</group>
+            <group>external</group>
+        </exclude>
+    </groups>
+
+    <!-- Environment Variables -->
+    <php>
+        <env name="TEST_DB_NAME" value="wordpress_tests"/>
+        <env name="TEST_DB_USER" value="root"/>
+        <env name="TEST_DB_PASSWORD" value="password"/>
+        <env name="TEST_DB_HOST" value="db"/>
+        <env name="XDEBUG_MODE" value="coverage"/>
+    </php>
 </phpunit>
