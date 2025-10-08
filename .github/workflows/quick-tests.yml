@@ -53,15 +53,9 @@ jobs:
                   timeout 60 bash -c 'until docker-compose exec -T db mysqladmin ping -h"localhost" -u"root" -p"password" --silent; do sleep 2; done'
                   timeout 60 bash -c 'until curl -f http://localhost:8080 >/dev/null 2>&1; do sleep 2; done'
 
-            - name: Setup test environment
-              run: |
-                  chmod +x bin/test-env-manager.sh
-                  bin/test-env-manager.sh setup --force
-
             - name: Run quick tests
               run: |
-                  chmod +x bin/run-tests-quick.sh
-                  bin/run-tests-quick.sh --verbose
+                  docker-compose run --rm test ci --coverage-enabled --generate-reports --coverage-dir coverage --test-reports-dir test-reports
 
             - name: Stop services
               if: always()
