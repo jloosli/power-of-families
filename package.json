@@ -1,35 +1,53 @@
 {
-  "name": "power-of-families-theme",
-  "version": "3.0.0",
-  "description": "Custom wordpress theme for Power of Families",
-  "author": "Jared Loosli",
-  "license": "UNLICENSED",
-  "scripts": {
-    "setup:db-download": "rsync -avzh pof:backups-tigertech/current/mysql/poweroffamilies/poweroffamilies.dump db-backups/",
-    "setup:db-import": "docker compose exec -it db sh -c \"mariadb -u pofuser -ppofpass poweroffamilies < /tmp/backups/poweroffamilies.dump\"",
-    "setup:sync-themes": "rsync -avzh pof:backups-tigertech/current/www/wp-content/themes/genesis ./wordpress/wp-content/themes",
-    "setup:sync-plugins": "rsync -avzh --exclude=pof-programs --exclude=pom-bloom --exclude=pof-bloom pof:~/backups-tigertech/current/www/wp-content/plugins ./wordpress/wp-content/",
-    "setup:composer-install": "docker-compose run --rm composer install",
-    "setup": "npm run setup:db-download && npm run setup:db-import && npm run setup:sync-themes && npm run setup:sync-plugins && npm run setup:composer-install",
-    "start": "wp-scripts start power-of-families/src/admin.ts power-of-families/src/main.ts --output-path=power-of-families/dist",
-    "build": "wp-scripts build power-of-families/src/admin.ts power-of-families/src/main.ts --output-path=power-of-families/dist",
-    "test:php-setup": "docker compose exec wordpress bash bin/install-wp-tests.sh wordpress_test root 'password' db latest",
-    "test:php": "docker compose exec --workdir=/var/www/html/wp-content/themes/power-of-families/ wordpress vendor/bin/phpunit"
-  },
-  "devDependencies": {
-    "@playwright/test": "^1.55.0",
-    "@types/node": "^24.3.1",
-    "@wordpress/prettier-config": "^4.27.0",
-    "@wordpress/scripts": "^30.20.0",
-    "normalize.css": "^8.0.1",
-    "prettier": "^3.2.5",
-    "wp-types": "^4.68.1"
-  },
-  "dependencies": {
-    "@csstools/postcss-global-data": "^3.0.0",
-    "autoprefixer": "^10.4.21",
-    "postcss": "^8.5.6",
-    "postcss-custom-media": "^11.0.6",
-    "postcss-nested": "^7.0.2"
-  }
+	"name": "power-of-families-theme",
+	"version": "3.0.0",
+	"description": "Custom wordpress theme for Power of Families",
+	"author": "Jared Loosli",
+	"license": "UNLICENSED",
+	"scripts": {
+		"setup:db-download": "rsync -avzh pof:backups-tigertech/current/mysql/poweroffamilies/poweroffamilies.dump db-backups/",
+		"setup:db-import": "docker compose exec -it db sh -c \"mariadb -u pofuser -ppofpass poweroffamilies < /tmp/backups/poweroffamilies.dump\"",
+		"setup:sync-themes": "rsync -avzh pof:backups-tigertech/current/www/wp-content/themes/genesis ./wordpress/wp-content/themes",
+		"setup:sync-plugins": "rsync -avzh --exclude=pof-programs --exclude=pom-bloom --exclude=pof-bloom pof:~/backups-tigertech/current/www/wp-content/plugins ./wordpress/wp-content/",
+		"setup:composer-install": "docker-compose run --rm composer install --no-dev",
+		"setup": "npm run setup:db-download && npm run setup:db-import && npm run setup:sync-themes && npm run setup:sync-plugins && npm run setup:composer-install",
+		"start": "wp-scripts start power-of-families/src/admin.ts power-of-families/src/main.ts --output-path=power-of-families/dist",
+		"build": "wp-scripts build power-of-families/src/admin.ts power-of-families/src/main.ts --output-path=power-of-families/dist",
+		"test:php-setup": "docker compose exec wordpress bash bin/install-wp-tests.sh wordpress_test root 'password' db latest",
+		"test:php": "docker-compose run --rm test",
+		"test": "bin/run-tests.sh",
+		"test:quick": "bin/run-tests.sh quick",
+		"test:full": "bin/run-tests.sh full",
+		"test:ci": "bin/run-tests.sh ci",
+		"test:coverage": "bin/run-tests.sh coverage",
+		"test:thresholds": "bin/run-tests.sh thresholds",
+		"test:quality-gates": "bin/run-tests.sh quality-gates",
+		"test:reports": "bin/run-tests.sh reports",
+		"test:php-quick": "bin/run-tests-quick.sh",
+		"test:php-full": "bin/run-tests-with-reporting.sh",
+		"test:php-ci": "bin/run-tests-ci.sh",
+		"test:interactive": "bin/test-interactive.sh",
+		"test:debug": "bin/test-debug-profile.sh debug",
+		"test:profile": "bin/test-debug-profile.sh profile",
+		"test:dev-helper": "bin/test-dev-helper.sh",
+		"test:env-manager": "bin/test-env-manager.sh",
+		"test:performance": "bin/test-performance-monitor.sh",
+		"test:docs": "bin/test-docs.sh"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.55.0",
+		"@types/node": "^24.3.1",
+		"@wordpress/prettier-config": "^4.27.0",
+		"@wordpress/scripts": "^30.20.0",
+		"normalize.css": "^8.0.1",
+		"prettier": "^3.2.5",
+		"wp-types": "^4.68.1"
+	},
+	"dependencies": {
+		"@csstools/postcss-global-data": "^3.0.0",
+		"autoprefixer": "^10.4.21",
+		"postcss": "^8.5.6",
+		"postcss-custom-media": "^11.0.6",
+		"postcss-nested": "^7.0.2"
+	}
 }

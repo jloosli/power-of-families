@@ -1,0 +1,72 @@
+{
+    "project": "Power of Families Theme",
+    "version": "1.0.0",
+    "last_updated": "2025-10-07T02:04:01Z",
+    "thresholds": {
+        "overall_coverage": {
+            "minimum": 50,
+            "target": 80,
+            "high": 90,
+            "critical": 30
+        },
+        "file_coverage": {
+            "minimum": 40,
+            "target": 70,
+            "high": 85,
+            "critical": 20
+        },
+        "function_coverage": {
+            "minimum": 60,
+            "target": 80,
+            "high": 95,
+            "critical": 40
+        },
+        "class_coverage": {
+            "minimum": 70,
+            "target": 85,
+            "high": 95,
+            "critical": 50
+        },
+        "line_coverage": {
+            "minimum": 50,
+            "target": 80,
+            "high": 90,
+            "critical": 30
+        }
+    },
+    "quality_gates": {
+        "max_uncovered_lines": 100,
+        "max_low_coverage_files": 5,
+        "max_complexity": 10,
+        "max_cyclomatic_complexity": 15,
+        "min_test_count": 10,
+        "max_failure_rate": 5
+    },
+    "exclusions": {
+        "files": [
+            "vendor/**",
+            "node_modules/**",
+            "tests/**",
+            "**/*.min.js",
+            "**/*.min.css"
+        ],
+        "directories": [
+            "vendor",
+            "node_modules",
+            "tests",
+            "coverage",
+            "dist"
+        ],
+        "patterns": [
+            "**/test_*.php",
+            "**/*Test.php",
+            "**/*_test.php"
+        ]
+    },
+    "enforcement": {
+        "fail_on_threshold_breach": true,
+        "fail_on_quality_gate_failure": true,
+        "warn_on_threshold_breach": false,
+        "warn_on_quality_gate_failure": true
+    }
+}

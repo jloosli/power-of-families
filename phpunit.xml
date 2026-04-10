@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <phpunit
-    bootstrap="tests/bootstrap.php"
+    bootstrap="power-of-families/tests/bootstrap.php"
     backupGlobals="false"
     colors="true"
     convertErrorsToExceptions="true"
@@ -42,19 +42,19 @@
     <!-- Test Suites -->
     <testsuites>
         <testsuite name="Theme Test Suite">
-            <file>./tests/test-sample.php</file>
-            <file>./tests/test-ThemeSetup.php</file>
+            <file>./power-of-families/tests/test-sample.php</file>
+            <file>./power-of-families/tests/test-ThemeSetup.php</file>
         </testsuite>
     </testsuites>
 
     <!-- Code Coverage Configuration -->
     <coverage>
         <include>
-            <directory suffix=".php">inc</directory>
-            <file>functions.php</file>
+            <directory suffix=".php">power-of-families/inc</directory>
+            <file>power-of-families/functions.php</file>
         </include>
         <exclude>
-            <directory>tests</directory>
+            <directory>power-of-families/tests</directory>
             <directory>vendor</directory>
             <directory>node_modules</directory>
             <directory>dist</directory>
@@ -97,5 +97,24 @@
         <teamcity outputFile="../test-reports/teamcity.txt"/>
     </logging>
 
+    <!-- Filter Configuration -->
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">power-of-families/inc</directory>
+            <file>power-of-families/functions.php</file>
+        </whitelist>
+    </filter>
+
+    <!-- Groups Configuration -->
+    <groups>
+        <include>
+            <group>unit</group>
+            <group>integration</group>
+        </include>
+        <exclude>
+            <group>slow</group>
+            <group>external</group>
+        </exclude>
+    </groups>
 
 </phpunit>

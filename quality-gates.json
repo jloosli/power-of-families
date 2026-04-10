@@ -1,0 +1,81 @@
+{
+    "project": "Power of Families Theme",
+    "version": "1.0.0",
+    "last_updated": "2025-10-07T02:04:01Z",
+    "gates": [
+        {
+            "name": "Overall Coverage Gate",
+            "description": "Ensures overall code coverage meets minimum threshold",
+            "condition": "overall_coverage >= minimum_threshold",
+            "threshold": "overall_coverage",
+            "value": 50,
+            "severity": "error",
+            "enabled": true
+        },
+        {
+            "name": "File Coverage Gate",
+            "description": "Ensures no files have coverage below critical threshold",
+            "condition": "min_file_coverage >= critical_threshold",
+            "threshold": "file_coverage",
+            "value": 20,
+            "severity": "error",
+            "enabled": true
+        },
+        {
+            "name": "Function Coverage Gate",
+            "description": "Ensures function coverage meets target threshold",
+            "condition": "function_coverage >= target_threshold",
+            "threshold": "function_coverage",
+            "value": 80,
+            "severity": "warning",
+            "enabled": true
+        },
+        {
+            "name": "Uncovered Lines Gate",
+            "description": "Limits the number of uncovered lines",
+            "condition": "uncovered_lines <= max_uncovered_lines",
+            "threshold": "uncovered_lines",
+            "value": 100,
+            "severity": "warning",
+            "enabled": true
+        },
+        {
+            "name": "Low Coverage Files Gate",
+            "description": "Limits the number of files with low coverage",
+            "condition": "low_coverage_files <= max_low_coverage_files",
+            "threshold": "low_coverage_files",
+            "value": 5,
+            "severity": "warning",
+            "enabled": true
+        },
+        {
+            "name": "Complexity Gate",
+            "description": "Ensures code complexity is within acceptable limits",
+            "condition": "max_complexity <= max_complexity_threshold",
+            "threshold": "complexity",
+            "value": 10,
+            "severity": "warning",
+            "enabled": true
+        }
+    ],
+    "rules": [
+        {
+            "name": "New Code Coverage Rule",
+            "description": "New code must have coverage above target threshold",
+            "condition": "new_code_coverage >= target_threshold",
+            "threshold": "new_code_coverage",
+            "value": 80,
+            "severity": "error",
+            "enabled": true
+        },
+        {
+            "name": "Modified Code Coverage Rule",
+            "description": "Modified code must maintain or improve coverage",
+            "condition": "modified_code_coverage >= previous_coverage",
+            "threshold": "modified_code_coverage",
+            "value": "previous_coverage",
+            "severity": "warning",
+            "enabled": true
+        }
+    ]
+}

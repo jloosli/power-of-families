@@ -22,3 +22,11 @@ docker/ZscalerRootCA.crt
 vendor
 
 *.cache
+
+# Test reports and coverage
+coverage/
+test-reports/
+
+# xDebug logs and profiles
+xdebug-logs/
+xdebug-profiles/
