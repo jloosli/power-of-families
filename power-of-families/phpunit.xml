@@ -52,7 +52,6 @@
         <include>
             <directory suffix=".php">inc</directory>
             <file>functions.php</file>
-            <file>style.css</file>
         </include>
         <exclude>
             <directory>tests</directory>

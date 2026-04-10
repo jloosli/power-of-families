@@ -100,7 +100,7 @@ class TestDataFactory
      * Create a test tag
      *
      * @param array $tag_data Tag data
-     * @return int|WP_Error Tag ID
+     * @return array|WP_Error Term array with 'term_id' and 'term_taxonomy_id', or WP_Error
      */
     public static function create_tag($tag_data = [])
     {

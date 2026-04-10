@@ -356,9 +356,9 @@ class CoverageThresholdManager
         $current_coverage = $this->coverage_data['overall_coverage'] ?? 0;
 
         // Update thresholds based on current coverage
-        $this->thresholds['overall_coverage']['minimum'] = $current_coverage;
-        $this->thresholds['overall_coverage']['target'] = $current_coverage + 10;
-        $this->thresholds['overall_coverage']['high'] = $current_coverage + 20;
+        $this->thresholds['overall_coverage']['minimum'] = min($current_coverage, 100);
+        $this->thresholds['overall_coverage']['target'] = min($current_coverage + 10, 100);
+        $this->thresholds['overall_coverage']['high'] = min($current_coverage + 20, 100);
 
         return true;
     }
