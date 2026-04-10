@@ -81,19 +81,21 @@ class TestDataFactory
      * Create a test category
      *
      * @param array $category_data Category data
-     * @return int|WP_Error Category ID
+     * @return array|WP_Error Term array with 'term_id' and 'term_taxonomy_id', or WP_Error
      */
     public static function create_category($category_data = [])
     {
         $default_data = [
-            'cat_name' => 'Test Category ' . wp_generate_password(6, false),
-            'category_description' => 'A test category',
-            'category_nicename' => 'test-category-' . wp_generate_password(6, false),
+            'name' => 'Test Category ' . wp_generate_password(6, false),
+            'description' => 'A test category',
+            'slug' => 'test-category-' . wp_generate_password(6, false),
         ];
 
         $category_data = array_merge($default_data, $category_data);
+        $name = $category_data['name'];
+        unset($category_data['name']);
 
-        return wp_create_category($category_data['cat_name']);
+        return wp_insert_term($name, 'category', $category_data);
     }
 
     /**
@@ -261,9 +263,9 @@ class TestDataFactory
 
         // Create categories
         for ($i = 0; $i < $config['categories']; $i++) {
-            $cat_id = self::create_category();
-            if (!is_wp_error($cat_id)) {
-                $created['categories'][] = $cat_id;
+            $cat_result = self::create_category();
+            if (!is_wp_error($cat_result)) {
+                $created['categories'][] = $cat_result['term_id'];
             }
         }
 
@@ -283,10 +285,15 @@ class TestDataFactory
 
                 // Assign random category and tags
                 if (!empty($created['categories'])) {
-                    wp_set_post_categories($post_id, [array_rand($created['categories'])]);
+                    $cat_keys = array_keys($created['categories']);
+                    $cat_id = $created['categories'][$cat_keys[array_rand($cat_keys)]];
+                    wp_set_post_categories($post_id, [$cat_id]);
                 }
                 if (!empty($created['tags'])) {
-                    wp_set_post_tags($post_id, array_rand($created['tags'], min(3, count($created['tags']))));
+                    $tag_count = min(3, count($created['tags']));
+                    $tag_keys = (array) array_rand($created['tags'], $tag_count);
+                    $tag_ids = array_map(function ($k) use ($created) { return $created['tags'][$k]; }, $tag_keys);
+                    wp_set_post_tags($post_id, $tag_ids);
                 }
             }
         }

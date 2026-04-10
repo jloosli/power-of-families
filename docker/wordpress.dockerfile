@@ -9,7 +9,7 @@ RUN pecl install xdebug && docker-php-ext-enable xdebug
 
 # Line 3 for EWWW plugin 
 RUN apt-get update && apt-get install -y \
-    gifsicle optipng pngquant libwebp7 libjpeg-progs optipng
+    gifsicle optipng pngquant libwebp7 libjpeg-progs optipng mariadb-client
 
 COPY docker/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 

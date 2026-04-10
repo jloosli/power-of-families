@@ -29,7 +29,7 @@ class JUnitReportParser
         }
 
         $report = [
-            'timestamp' => (string) $xml['timestamp'] ?? date('c'),
+            'timestamp' => (string) ($xml['timestamp'] ?? date('c')),
             'testsuites' => [],
             'summary' => [
                 'total_tests' => 0,
@@ -48,7 +48,7 @@ class JUnitReportParser
                 'errors' => (int) $testsuite['errors'],
                 'skipped' => (int) $testsuite['skipped'],
                 'time' => (float) $testsuite['time'],
-                'timestamp' => (string) $testsuite['timestamp'] ?? '',
+                'timestamp' => (string) ($testsuite['timestamp'] ?? ''),
                 'testcases' => [],
                 'properties' => [],
             ];

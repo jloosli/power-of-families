@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <phpunit
-    bootstrap="tests/bootstrap.php"
+    bootstrap="power-of-families/tests/bootstrap.php"
     backupGlobals="false"
     colors="true"
     convertErrorsToExceptions="true"
@@ -37,8 +37,8 @@
     <!-- Test Suites -->
     <testsuites>
         <testsuite name="Theme Test Suite">
-            <file>./tests/test_sample.php</file>
-            <file>./tests/test_ThemeSetup.php</file>
+            <file>./power-of-families/tests/test-sample.php</file>
+            <file>./power-of-families/tests/test-ThemeSetup.php</file>
         </testsuite>
     </testsuites>
 

@@ -47,9 +47,10 @@ class TestDataSeeder
             'user_email' => 'admin@example.com',
             'display_name' => 'Administrator',
         ]);
-        if (!is_wp_error($admin_id)) {
-            $created['admin_id'] = $admin_id;
+        if (is_wp_error($admin_id)) {
+            return $created;
         }
+        $created['admin_id'] = $admin_id;
 
         // Create sample categories
         $categories = [
@@ -59,12 +60,12 @@ class TestDataSeeder
         ];
 
         foreach ($categories as $name => $description) {
-            $cat_id = TestDataFactory::create_category([
-                'cat_name' => $name,
-                'category_description' => $description,
+            $cat_result = TestDataFactory::create_category([
+                'name' => $name,
+                'description' => $description,
             ]);
-            if (!is_wp_error($cat_id)) {
-                $created['categories'][$name] = $cat_id;
+            if (!is_wp_error($cat_result)) {
+                $created['categories'][$name] = $cat_result['term_id'];
             }
         }
 

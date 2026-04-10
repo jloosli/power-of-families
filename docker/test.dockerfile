@@ -47,6 +47,6 @@ RUN chmod +x /usr/local/bin/run-tests.sh
 # Set proper permissions
 RUN chown -R www-data:www-data /var/www/html/coverage /var/www/html/test-reports
 
-# Default command
+# Default command: run CI mode (setup + phpunit)
 ENTRYPOINT ["/usr/local/bin/run-tests.sh"]
-CMD ["--mode", "unit"]
+CMD ["ci"]
