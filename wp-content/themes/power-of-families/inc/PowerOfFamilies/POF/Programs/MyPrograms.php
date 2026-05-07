@@ -23,11 +23,6 @@ class My_Programs
         //Filters
         //Short codes
         add_shortcode("pof_programs", array($this, "show_programs"));
-        //Scripts
-//        $this->add_users();
-
-//        add_action('wp_loaded', [$this, 'add_users']);
-
     }
 
     function enqueue_scripts()
@@ -116,32 +111,6 @@ class My_Programs
             }
         }
         return $the_programs;
-    }
-
-    function add_users()
-    {
-        if (($handle = fopen(dirname(__FILE__) . '/../../../members_20171103_164946.csv', 'r'))) {
-            $line = 0;
-            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
-                if ($line++ == 0) {
-                    continue;
-                }
-                $username = $data[0];
-                $levels = explode("\n", $data[5]);
-                $user = \get_user_by('login', $username);
-                if ($user) {
-                    foreach ($levels as $level) {
-                        $the_group = \Groups_Group::read_by_name($level);
-                        \Groups_User_Group::create([
-                            'user_id' => $user->ID,
-                            'group_id' => $the_group->group_id
-                        ]);
-                    }
-                }
-
-
-            }
-        }
     }
 
 }

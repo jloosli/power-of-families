@@ -25,10 +25,6 @@ class ThemeSetup
         if (!defined('PHPUNIT_RUNNING')) {
             require_once get_template_directory() . '/lib/init.php';
         }
-        // //* Child theme (do not remove)
-        // define('CHILD_THEME_NAME', 'Power of Families');
-        // define('CHILD_THEME_URL', 'http://avantidevelopment.com/');
-
         $this->register_theme_support();
 
         /* Move primary menu into header */
@@ -83,10 +79,6 @@ class ThemeSetup
         if (!is_user_logged_in()) {
             add_action('genesis_before_header', [$this, 'login_bar'], 10);
         }
-        //        add_filter( 'wp_nav_menu_items', [$this, 'genesis_search_secondary_nav_menu'], 10, 2 );
-
-        // Update category header
-        // add_action('genesis_before_loop', [$this, 'themeprefix_category_header']);
 
         // Hide Sharing buttons on protected pages
         // @todo: Need to update this for Groups instead of wishlist member
@@ -338,31 +330,6 @@ class ThemeSetup
 
         echo '<button type="button" class="close" data-toggle="collapse" data-target="#login-bar">
 <span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button></div></div>';
-    }
-
-    function genesis_search_secondary_nav_menu($menu, \stdClass $args)
-    {
-        if ('secondary' != $args->theme_location) {
-            return $menu;
-        }
-
-        if (genesis_get_option('nav_extras')) {
-            return $menu;
-        }
-
-        $menu .= sprintf('<div class="secondary-search">%s</div>', __(genesis_search_form()));
-
-
-        return $menu;
-    }
-
-    function themeprefix_category_header()
-    {
-        if (is_category()) {
-            echo '<h1 class="archive-title">Posts in the "';
-            echo single_cat_title();
-            echo '" category:</h1>';
-        }
     }
 
     private function get_protected_pages()
