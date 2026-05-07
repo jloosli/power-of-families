@@ -5,7 +5,7 @@ const config = {
     require('postcss-nested'),
     require('@csstools/postcss-global-data')({
 		files: [
-			'power-of-families/assets/css/components/variables.css'
+			'wp-content/themes/power-of-families/assets/css/components/variables.css'
 		]
 	}),
     require('postcss-custom-media'),
