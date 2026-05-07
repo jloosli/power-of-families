@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+#
+# check-php-version — fail if the PHP version pinned in docker-compose.yml
+# disagrees with composer.json's platform constraint. Run from CI so a bump
+# can't land in only one of the two files.
+
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+compose_php=$(grep -oE 'PHP_VERSION:-[0-9]+\.[0-9]+(\.[0-9]+)?' docker-compose.yml | head -1 | sed 's/PHP_VERSION:-//')
+composer_php=$(grep -oE '"php":[[:space:]]*"[0-9]+\.[0-9]+(\.[0-9]+)?"' wp-content/themes/power-of-families/composer.json | head -1 | sed -E 's/.*"([0-9.]+)".*/\1/')
+
+if [[ -z "$compose_php" ]]; then
+    echo "error: could not find PHP_VERSION default in docker-compose.yml" >&2
+    exit 2
+fi
+if [[ -z "$composer_php" ]]; then
+    echo "error: could not find platform.php in wp-content/themes/power-of-families/composer.json" >&2
+    exit 2
+fi
+
+if [[ "$compose_php" != "$composer_php" ]]; then
+    echo "PHP version mismatch:" >&2
+    echo "  docker-compose.yml (\${PHP_VERSION:-...}):    $compose_php" >&2
+    echo "  composer.json (config.platform.php):       $composer_php" >&2
+    echo "Bump both together." >&2
+    exit 1
+fi
+
+echo "PHP version in sync: $compose_php"

@@ -41,8 +41,10 @@ namespaces containers by directory name, so checkouts under
 won't collide with the main checkout. To run two stacks at the same time,
 each stack just needs **unique host ports**.
 
-In every additional worktree, copy `.env.example` to `.env` and pick free
-ports:
+All shared defaults (PHP version, MariaDB version, debug flag, host ports)
+live in [docker-compose.yml](docker-compose.yml) as `${VAR:-default}` fallbacks,
+so a fresh checkout works without any `.env` file. Per-worktree overrides go
+in a (gitignored) `.env`:
 
 ```shell
 cp .env.example .env
@@ -82,6 +84,18 @@ run the standard "First Time Setup" flow above to populate them.
 | `WP_PORT`          | `8080`  | wordpress host port        |
 | `PHPMYADMIN_PORT`  | `8180`  | phpmyadmin host port       |
 | `XDEBUG_PORT`      | `9003`  | wordpress + test xDebug    |
+| `PHP_VERSION`      | `8.4`   | wordpress + test image     |
+| `MARIA_DB_VERSION` | `10.11.13` | db image                |
+| `WORDPRESS_DEBUG`  | `false` | `WORDPRESS_SCRIPT_DEBUG`   |
+
+### Bumping the PHP version
+
+`PHP_VERSION` is pinned in two places that have to stay in sync:
+[docker-compose.yml](docker-compose.yml) (`${PHP_VERSION:-8.4}` default) and
+`wp-content/themes/power-of-families/composer.json` (`config.platform.php`).
+[bin/check-php-version](bin/check-php-version) — wired into CI and
+runnable locally as `npm run check:php-version` — fails the build if the
+two disagree, so a bump can't land in only one file.
 
 ## Ongoing Development
 
