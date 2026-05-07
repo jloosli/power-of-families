@@ -70,9 +70,15 @@ bin/use-worktree-data /path/to/power-of-families
 ```
 
 This symlinks `db-data`, `db-backups`, and `wordpress` to the main checkout
-so both stacks read/write the same on-disk data. Docker bind mounts on macOS
-follow host symlinks correctly. Caveat: only one stack should be writing to
-the DB at a time, since they share files.
+so both stacks resolve to the same on-disk files. Docker bind mounts on
+macOS follow host symlinks correctly.
+
+> **Important:** only one `db` service may run at a time when `db-data` is
+> shared. Two MariaDB instances pointed at the same datadir will fail to
+> lock or, worse, corrupt the data. Stop the other stack's `db`
+> (`docker compose stop db` from that worktree) before starting yours, or
+> edit `bin/use-worktree-data` to skip the `db-data` link and import the
+> dump from the shared `db-backups` into a per-worktree `db-data`.
 
 Without the helper script, a fresh worktree gets empty bind mounts and you
 run the standard "First Time Setup" flow above to populate them.

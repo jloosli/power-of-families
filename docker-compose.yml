@@ -24,7 +24,7 @@ services:
             WORDPRESS_SCRIPT_DEBUG: ${WORDPRESS_DEBUG:-false}
             # xDebug configuration
             XDEBUG_MODE: ${XDEBUG_MODE:-develop,coverage,debug,profile}
-            XDEBUG_CONFIG: ${XDEBUG_CONFIG:-client_host=host.docker.internal client_port=9003 idekey=docker}
+            XDEBUG_CONFIG: ${XDEBUG_CONFIG:-client_host=host.docker.internal client_port=${XDEBUG_PORT:-9003} idekey=docker}
             XDEBUG_IDEKEY: ${XDEBUG_IDEKEY:-docker}
             XDEBUG_LOG: ${XDEBUG_LOG:-/var/log/xdebug.log}
             XDEBUG_LOG_LEVEL: ${XDEBUG_LOG_LEVEL:-7}
@@ -114,7 +114,7 @@ services:
             TEST_DB_HOST: db
             WP_VERSION: latest
             XDEBUG_MODE: develop,coverage,debug,profile
-            XDEBUG_CONFIG: 'client_host=host.docker.internal client_port=9003 idekey=docker'
+            XDEBUG_CONFIG: client_host=host.docker.internal client_port=${XDEBUG_PORT:-9003} idekey=docker
             SKIP_DB_CREATE: false
         volumes:
             - ./wordpress:/var/www/html
