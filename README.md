@@ -80,6 +80,17 @@ macOS follow host symlinks correctly.
 > edit `bin/use-worktree-data` to skip the `db-data` link and import the
 > dump from the shared `db-backups` into a per-worktree `db-data`.
 
+The compose file bind-mounts the worktree's `wp-content/themes/power-of-families`
+and `wp-content/plugins/pof-bloom-plugin` *on top of* the symlinked
+`wordpress/` install — that's how each worktree runs its own theme/plugin
+code. Side effect: `vendor/` and `dist/` aren't shared, so each new worktree
+needs a one-time bootstrap before pages will render:
+
+```shell
+docker compose run --rm composer install --no-dev   # creates theme vendor/
+npm run build:theme                                 # creates theme dist/*.asset.php
+```
+
 Without the helper script, a fresh worktree gets empty bind mounts and you
 run the standard "First Time Setup" flow above to populate them.
 
