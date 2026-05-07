@@ -19,10 +19,13 @@ jobs:
     # Unit Tests
     unit-tests:
         name: Unit Tests
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
+
+            - name: Check PHP version is consistent across config
+              run: bin/check-php-version
 
             - name: Set up Node.js
               uses: actions/setup-node@v4
@@ -37,9 +40,7 @@ jobs:
               run: npm run build
 
             - name: Start Docker services
-              run: |
-                  docker compose up -d db
-                  docker compose up -d wordpress
+              run: docker compose up -d db wordpress
 
             - name: Wait for services to be ready
               run: |
@@ -67,7 +68,7 @@ jobs:
     # Build and Deploy (only on main branch)
     build-and-deploy:
         name: Build and Deploy
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         needs: unit-tests
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
