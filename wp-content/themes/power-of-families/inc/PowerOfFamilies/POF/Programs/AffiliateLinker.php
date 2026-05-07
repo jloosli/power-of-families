@@ -45,21 +45,6 @@ class Affiliate_Linker
 
     }
 
-    public function clear_all_crons( string $hook ) : void
-    {
-        $before = $crons = _get_cron_array();
-
-        if (empty($crons)) {
-            return;
-        }
-        foreach ($crons as $timestamp => $cron) {
-            if (!empty($cron[$hook])) {
-                unset($crons[$timestamp][$hook]);
-            }
-        }
-        _set_cron_array($crons);
-    }
-
     public function activation() : void
     {
         $cron = 'POF_Affiliate_Linker_CRON';
@@ -84,9 +69,7 @@ class Affiliate_Linker
 
     public function add_amazon_ajax() : void
     {
-        header('Content-Type: application/json');
         $this->add_amazon();
-        die;
     }
 
     public function add_amazon() : void
@@ -122,10 +105,14 @@ sql
                 );
             }
         }
-        echo json_encode([
+        wp_send_json([
             'success' => true,
-            'message' => sprintf("Replaced %d urls in %d posts (%0.2f%%)", $changeCount, count($has_amazon),
-                count($has_amazon)>0 ? $changeCount / count($has_amazon):0)
+            'message' => sprintf(
+                'Replaced %d urls in %d posts (%0.2f%%)',
+                $changeCount,
+                count($has_amazon),
+                count($has_amazon) > 0 ? $changeCount / count($has_amazon) : 0
+            ),
         ]);
 
     }

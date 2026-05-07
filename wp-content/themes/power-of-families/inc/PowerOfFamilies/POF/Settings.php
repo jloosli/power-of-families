@@ -65,9 +65,6 @@ class Settings
         // Add settings page to menu
         add_action('admin_menu', $this->add_menu_item(...));
 
-        // Add settings link to plugins page
-        add_filter('plugin_action_links_' . plugin_basename(PowerOfFamiliesPrograms::class), $this->add_settings_link(...));
-
         // Load up active programs
         $this->programs = $this->loadActivePrograms();
 
@@ -92,49 +89,9 @@ class Settings
             __('POF Settings', 'power-of-families-programs'),
             __('POF Settings', 'power-of-families-programs'),
             'manage_options',
-            $this->parent->token . '_settings', array(
-            $this,
-            'settings_page'
-        ));
-//        add_action('admin_print_styles-' . $page, array($this, 'settings_assets'));
-    }
-
-    /**
-     * Load settings JS & CSS
-     * @return void
-     */
-    public function settings_assets(): void
-    {
-
-        // We're including the farbtastic script & styles here because they're needed for the colour picker
-        // If you're not including a colour picker field then you can leave these calls out as well as the farbtastic dependency for the wpt-admin-js script below
-        wp_enqueue_style('farbtastic');
-        wp_enqueue_script('farbtastic');
-
-        // We're including the WP media scripts here because they're needed for the image upload field
-        // If you're not including an image upload then you can leave this function call out
-        wp_enqueue_media();
-
-        wp_register_script($this->parent->token . '-settings-js', $this->parent->assets_url . 'js/settings' . $this->parent->script_suffix . '.js', array(
-            'farbtastic',
-            'jquery'
-        ), '1.0.0');
-        wp_enqueue_script($this->parent->token . '-settings-js');
-    }
-
-    /**
-     * Add settings link to plugin list table
-     *
-     * @param  array $links Existing links
-     *
-     * @return array        Modified links
-     */
-    public function add_settings_link(array $links): array
-    {
-        $settings_link = '<a href="options-general.php?page=' . $this->parent->token . '_settings">' . __('Settings', 'power-of-families-programs') . '</a>';
-        array_push($links, $settings_link);
-
-        return $links;
+            $this->parent::TOKEN . '_settings',
+            $this->settings_page(...)
+        );
     }
 
     /**
@@ -206,7 +163,7 @@ class Settings
             }
         }
 
-        $settings = apply_filters($this->parent->token . '_settings_fields', $settings);
+        $settings = apply_filters($this->parent::TOKEN . '_settings_fields', $settings);
 
         return $settings;
     }
@@ -236,7 +193,7 @@ class Settings
                 }
 
                 // Add section to page
-                add_settings_section($section, $data['title'], $this->settings_section(...), $this->parent->token . '_settings');
+                add_settings_section($section, $data['title'], $this->settings_section(...), $this->parent::TOKEN . '_settings');
 
                 foreach ($data['fields'] as $field) {
 
@@ -248,13 +205,13 @@ class Settings
 
                     // Register field
                     $option_name = $this->base . $field['id'];
-                    register_setting($this->parent->token . '_settings', $option_name, $validation);
+                    register_setting($this->parent::TOKEN . '_settings', $option_name, $validation);
 
                     // Add field to page
                     add_settings_field($field['id'], $field['label'], array(
                         $this->parent->admin,
                         'display_field'
-                    ), $this->parent->token . '_settings', $section, array(
+                    ), $this->parent::TOKEN . '_settings', $section, array(
                         'field' => $field,
                         'prefix' => $this->base
                     ));
@@ -281,7 +238,7 @@ class Settings
     {
 
         // Build page HTML
-        $html = '<div class="wrap" id="' . $this->parent->token . '_settings">' . "\n";
+        $html = '<div class="wrap" id="' . $this->parent::TOKEN . '_settings">' . "\n";
         $html .= '<h2>' . __('POF Settings', 'power-of-families-programs') . '</h2>' . "\n";
 
         $tab = '';
@@ -328,8 +285,8 @@ class Settings
 
         // Get settings fields
         ob_start();
-        settings_fields($this->parent->token . '_settings');
-        do_settings_sections($this->parent->token . '_settings');
+        settings_fields($this->parent::TOKEN . '_settings');
+        do_settings_sections($this->parent::TOKEN . '_settings');
         $html .= ob_get_clean();
 
         $html .= '<p class="submit">' . "\n";

@@ -106,7 +106,7 @@ class ThemeSetup
             $js_asset['version']
         );
 
-        wp_enqueue_style('custom-google-fonts', 'https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,600,700|Playfair+Display:400,700', false);
+        wp_enqueue_style('custom-google-fonts', 'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Playfair+Display:wght@400;700&display=swap', false);
         wp_enqueue_style(
             'power_of_families_styles',
             get_stylesheet_directory_uri() . '/dist/main.ts.css',
@@ -147,7 +147,7 @@ class ThemeSetup
 
     public function newgravatar(array $avatar_defaults): array
     {
-        $myavatar = get_stylesheet_directory_uri() . '/images/default_avatar.jpg';
+        $myavatar = get_stylesheet_directory_uri() . '/assets/images/default_avatar.jpg';
         $avatar_defaults[$myavatar] = "Power of Families Avatar";
 
         return $avatar_defaults;
