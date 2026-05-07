@@ -7,6 +7,13 @@
 
 ## First Time Setup
 
+> **Upgrading from the pre-worktree layout?** Earlier versions of this repo
+> used hardcoded container names (`pof_wordpress`, `pof_db`, etc.) and ports.
+> If you have stale `pof_*` containers from before the refactor, run
+> `docker compose down` from your old project checkout (or
+> `docker rm -f pof_wordpress pof_db pof_phpmyadmin pof_wpcli pof_composer pof_test`)
+> before bringing up the new stack.
+
 1. Run `docker compose up -d wordpress` to start the containers.
 1. Visit [http://localhost:8080](http://localhost:8080) to set up WordPress.
 1. Set up the admin user. It will be overwritten later.
@@ -25,6 +32,56 @@
     ```
 
 1. Run tests: `npm run test:php`
+
+## Running Multiple Worktrees in Parallel
+
+Each git worktree gets its own independent docker compose stack — Compose
+namespaces containers by directory name, so checkouts under
+`.claude/worktrees/<name>/` automatically use the project name `<name>` and
+won't collide with the main checkout. To run two stacks at the same time,
+each stack just needs **unique host ports**.
+
+In every additional worktree, copy `.env.example` to `.env` and pick free
+ports:
+
+```shell
+cp .env.example .env
+# then edit .env:
+# WP_PORT=8081
+# PHPMYADMIN_PORT=8181
+# XDEBUG_PORT=9103
+```
+
+Then `docker compose up -d wordpress` from the worktree directory. Visit
+`http://localhost:<your WP_PORT>` — the main checkout keeps `:8080`.
+
+### Sharing DB / WordPress data with the main checkout
+
+The DB volume is large (~1.6 GB) and re-running first-time setup in every
+worktree is wasteful. To reuse the data from the main project, run from
+inside the worktree:
+
+```shell
+bin/use-worktree-data
+# or, if your main project lives elsewhere:
+bin/use-worktree-data /path/to/power-of-families
+```
+
+This symlinks `db-data`, `db-backups`, and `wordpress` to the main checkout
+so both stacks read/write the same on-disk data. Docker bind mounts on macOS
+follow host symlinks correctly. Caveat: only one stack should be writing to
+the DB at a time, since they share files.
+
+Without the helper script, a fresh worktree gets empty bind mounts and you
+run the standard "First Time Setup" flow above to populate them.
+
+### Reference: Docker compose env overrides
+
+| Var                | Default | Used in                    |
+| ------------------ | ------- | -------------------------- |
+| `WP_PORT`          | `8080`  | wordpress host port        |
+| `PHPMYADMIN_PORT`  | `8180`  | phpmyadmin host port       |
+| `XDEBUG_PORT`      | `9003`  | wordpress + test xDebug    |
 
 ## Ongoing Development
 

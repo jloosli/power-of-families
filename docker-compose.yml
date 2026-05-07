@@ -5,13 +5,12 @@ services:
             dockerfile: docker/wordpress.dockerfile
             args:
                 PHP_VERSION: ${PHP_VERSION:-8.4}
-        container_name: pof_wordpress
         depends_on:
             - db
             - phpmyadmin
         ports:
-            - 8080:80
-            - 9003:9003 # xDebug port
+            - ${WP_PORT:-8080}:80
+            - ${XDEBUG_PORT:-9003}:9003 # xDebug port
 
         environment:
             WORDPRESS_DB_HOST: db
@@ -19,8 +18,8 @@ services:
             WORDPRESS_DB_PASSWORD: pofpass
             WORDPRESS_DB_NAME: poweroffamilies
             WORDPRESS_TABLE_PREFIX: wp_
-            WORDPRESS_HOME: http://localhost:8080
-            WORDPRESS_SITEURL: http://localhost:8080
+            WORDPRESS_HOME: http://localhost:${WP_PORT:-8080}
+            WORDPRESS_SITEURL: http://localhost:${WP_PORT:-8080}
             # WORDPRESS_DEBUG: ${WORDPRESS_DEBUG:-false}
             WORDPRESS_SCRIPT_DEBUG: ${WORDPRESS_DEBUG:-false}
             # xDebug configuration
@@ -54,7 +53,6 @@ services:
         user: '33'
         entrypoint: wp
         command: '--info'
-        container_name: pof_wpcli
         volumes:
             - ./wordpress:/var/www/html
             - type: bind
@@ -72,7 +70,6 @@ services:
 
     db:
         image: mariadb:${MARIA_DB_VERSION:-10.11.13}
-        container_name: pof_db
         restart: always
         environment:
             MYSQL_DATABASE: poweroffamilies
@@ -87,10 +84,9 @@ services:
         depends_on:
             - db
         image: phpmyadmin/phpmyadmin:latest
-        container_name: pof_phpmyadmin
         restart: always
         ports:
-            - 8180:80
+            - ${PHPMYADMIN_PORT:-8180}:80
         environment:
             PMA_HOST: db
             MYSQL_ROOT_PASSWORD: password
@@ -99,7 +95,6 @@ services:
 
     composer:
         image: composer:latest
-        container_name: pof_composer
         volumes:
             - ./wp-content/themes/power-of-families:/var/www/html/wp-content/themes/power-of-families
         working_dir: /var/www/html/wp-content/themes/power-of-families
@@ -110,7 +105,6 @@ services:
             dockerfile: docker/test.dockerfile
             args:
                 PHP_VERSION: ${PHP_VERSION:-8.4}
-        container_name: pof_test
         depends_on:
             - db
         environment:
@@ -135,7 +129,7 @@ services:
             - ./coverage:/var/www/html/coverage
             - ./test-reports:/var/www/html/test-reports
         ports:
-            - '9003:9003' # xDebug port
+            - '${XDEBUG_PORT:-9003}:9003' # xDebug port
         profiles:
             - testing
 
