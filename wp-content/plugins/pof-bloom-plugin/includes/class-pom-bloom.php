@@ -307,7 +307,7 @@ class POM_Bloom {
      * @return  void
      */
     public function admin_enqueue_scripts( $hook = '' ) {
-        wp_register_script( $this->_token . '-admin', esc_url( $this->assets_url ) . 'js/admin' . $this->script_suffix . '.js', array( 'jquery' ), $this->_version );
+        wp_register_script( $this->_token . '-admin', $this->build_url . 'admin.js', array( 'jquery' ), $this->_version );
         wp_enqueue_script( $this->_token . '-admin' );
     } // End admin_enqueue_scripts ()
 
