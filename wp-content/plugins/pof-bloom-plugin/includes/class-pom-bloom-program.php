@@ -84,7 +84,7 @@ class POM_Bloom_Program {
 
     function bloom_create_goalset() {
         $dow = 6; // Saturday
-        if ( date( 'w' ) === $dow ) {
+        if ( (int) date( 'w' ) === $dow ) {
             $this->addGoalset( date( 'Y-m-d', strtotime( 'next Monday' ) ) );
         }
     }
@@ -487,7 +487,7 @@ class POM_Bloom_Program {
             $goalset = date( "Y-m-d" );
         }
         wp_insert_term( $goalset, 'bloom-goalsets' );
-        echo "BLOOM: Inserted $goalset";
+        error_log( "BLOOM: Inserted $goalset" );
     }
 
     protected function getLatestGoalset() {
