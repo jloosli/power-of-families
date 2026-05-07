@@ -107,14 +107,15 @@ class POM_Bloom_Program {
     }
 
     public function ajax_callback() {
+        check_ajax_referer( 'pom_bloom_nonce', 'nonce' );
         $result = array( 'success' => false );
         switch ( $_POST['route'] ) {
             case 'preferences':
-                update_user_meta( $_POST['user'], $this->parent->_token . 'preference_level', $_POST['preference'] );
+                update_user_meta( get_current_user_id(), $this->parent->_token . 'preference_level', sanitize_text_field( $_POST['preference'] ) );
                 $result = array( 'success' => true );
                 break;
             case 'assessments':
-                $user               = (int) $_POST['user'];
+                $user               = get_current_user_id();
                 $average            = [ 'sum' => 0, 'count' => 0 ];
                 $assessment_results = array_map( function ( $a ) use ( &$average ) {
                     if ( (int) $a['value'] > 0 ) {
@@ -146,7 +147,7 @@ class POM_Bloom_Program {
                         array(
                             'taxonomy'         => 'bloom-categories',
                             'field'            => 'id',
-                            'terms'            => $_POST['category_id'],
+                            'terms'            => absint( $_POST['category_id'] ),
                             'include_children' => false
                         )
                     )
@@ -211,19 +212,19 @@ class POM_Bloom_Program {
                 break;
             case 'update_goals':
                 $opts      = $_POST;
-                $completed = get_post_meta( $opts['goal'], 'completed', true );
+                $completed = get_post_meta( absint( $opts['goal'] ), 'completed', true );
                 if ( empty( $completed ) ) {
                     $completed = [ ];
                 }
-                $completed[ $opts['day'] ] = $opts['set'] === 'true';
-                update_post_meta( $opts['goal'], 'completed', $completed );
+                $completed[ sanitize_key( $opts['day'] ) ] = $opts['set'] === 'true';
+                update_post_meta( absint( $opts['goal'] ), 'completed', $completed );
                 $result['success'] = true;
                 $result['set']     = $opts['set'] === 'true';
                 break;
             case 'update_serendipity':
                 $args              = [
-                    'ID'         => $_POST['id'],
-                    'post_title' => $_POST['serendipity']
+                    'ID'         => absint( $_POST['id'] ),
+                    'post_title' => sanitize_text_field( $_POST['serendipity'] )
                 ];
                 $update            = wp_update_post( $args );
                 $result['success'] = true;
@@ -275,7 +276,8 @@ class POM_Bloom_Program {
             'POM_BLOOM',
             array(
                 'ajax_url'     => admin_url( 'admin-ajax.php' ),
-                'current_user' => get_current_user_id()
+                'current_user' => get_current_user_id(),
+                'nonce'        => wp_create_nonce( 'pom_bloom_nonce' )
             )
         );
     }

@@ -256,6 +256,7 @@ class AdminAPI {
 		if ( ! is_array( $fields ) || 0 == count( $fields ) ) return;
 
 		echo '<div class="custom-field-panel">' . "\n";
+		wp_nonce_field( 'pof_save_meta', 'pof_meta_nonce' );
 
 		foreach ( $fields as $field ) {
 
@@ -297,6 +298,16 @@ class AdminAPI {
 	 */
 	public function save_meta_boxes ( $post_id = 0 ) {
 
+		if ( ! isset( $_POST['pof_meta_nonce'] ) || ! wp_verify_nonce( $_POST['pof_meta_nonce'], 'pof_save_meta' ) ) {
+			return;
+		}
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return;
+		}
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+
 		if ( ! $post_id ) return;
 
 		$post_type = get_post_type( $post_id );
@@ -306,8 +317,8 @@ class AdminAPI {
 		if ( ! is_array( $fields ) || 0 == count( $fields ) ) return;
 
 		foreach ( $fields as $field ) {
-			if ( isset( $_REQUEST[ $field['id'] ] ) ) {
-				update_post_meta( $post_id, $field['id'], $this->validate_field( $_REQUEST[ $field['id'] ], $field['type'] ) );
+			if ( isset( $_POST[ $field['id'] ] ) ) {
+				update_post_meta( $post_id, $field['id'], $this->validate_field( $_POST[ $field['id'] ], $field['type'] ) );
 			} else {
 				update_post_meta( $post_id, $field['id'], '' );
 			}

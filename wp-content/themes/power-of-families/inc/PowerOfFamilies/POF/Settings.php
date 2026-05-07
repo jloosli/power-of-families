@@ -180,14 +180,17 @@ class Settings
 
     public function loadActivePrograms()
     {
+        $allowed = [ 'Affiliate_Linker', 'My_Programs' ];
         $programs = [];
         foreach ($this->getActivePrograms() as $program) {
-            if (array_key_exists($program, $this->getAvailablePrograms())) {
+            if (
+                in_array( $program, $allowed, true ) &&
+                array_key_exists( $program, $this->getAvailablePrograms() )
+            ) {
                 $ClassName = '\PowerOfFamilies\POF\Programs\\' . $program;
                 $programs[$program] = new $ClassName($this->parent);
             }
         }
-
         return $programs;
     }
 

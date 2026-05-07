@@ -308,7 +308,9 @@ class ThemeSetup
     {
 
         echo '<div class="login-bar collapse" id="login-bar"><div class="wrap">';
-        $request = isset($_GET['wlfrom']) ? $_GET['wlfrom'] : $_SERVER['REQUEST_URI'];
+        $request = isset( $_GET['wlfrom'] )
+            ? esc_url_raw( wp_validate_redirect( sanitize_url( wp_unslash( $_GET['wlfrom'] ) ), home_url() ) )
+            : esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) );
         $args = array(
             'echo' => true,
             //'redirect'       => $request,
