@@ -1,31 +1,83 @@
 #!/usr/bin/env bash
 #
-# check-php-version — fail if the PHP version pinned in docker-compose.yml
-# disagrees with composer.json's platform constraint. Run from CI so a bump
-# can't land in only one of the two files.
+# check-php-version — fail if any of the PHP version pins across the repo
+# disagree. PHP is pinned in:
+#   - docker-compose.yml                (${PHP_VERSION:-X} default — canonical)
+#   - composer.json (platform.php)      (Composer dependency resolution)
+#   - .github/workflows/*.yml           (PHP_VERSION env vars, php-version
+#                                        action inputs)
+#
+# Run from CI so a bump can't land in only some of these files. Run locally
+# with: npm run check:php-version
 
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-compose_php=$(grep -oE 'PHP_VERSION:-[0-9]+\.[0-9]+(\.[0-9]+)?' docker-compose.yml | head -1 | sed 's/PHP_VERSION:-//')
-composer_php=$(grep -oE '"php":[[:space:]]*"[0-9]+\.[0-9]+(\.[0-9]+)?"' wp-content/themes/power-of-families/composer.json | head -1 | sed -E 's/.*"([0-9.]+)".*/\1/')
+# pins[label]=version, but bash 3 (macOS default) lacks associative arrays,
+# so use parallel arrays.
+labels=()
+versions=()
 
+add_pin() {
+    labels+=("$1")
+    versions+=("$2")
+}
+
+# 1. docker-compose.yml — ${PHP_VERSION:-X} default (canonical)
+compose_php=$(grep -oE 'PHP_VERSION:-[0-9]+\.[0-9]+(\.[0-9]+)?' docker-compose.yml \
+    | head -1 | sed 's/PHP_VERSION:-//')
 if [[ -z "$compose_php" ]]; then
-    echo "error: could not find PHP_VERSION default in docker-compose.yml" >&2
+    echo "error: could not find \${PHP_VERSION:-X} default in docker-compose.yml" >&2
     exit 2
 fi
-if [[ -z "$composer_php" ]]; then
-    echo "error: could not find platform.php in wp-content/themes/power-of-families/composer.json" >&2
-    exit 2
-fi
+add_pin "docker-compose.yml (\${PHP_VERSION:-...})" "$compose_php"
 
-if [[ "$compose_php" != "$composer_php" ]]; then
-    echo "PHP version mismatch:" >&2
-    echo "  docker-compose.yml (\${PHP_VERSION:-...}):    $compose_php" >&2
-    echo "  composer.json (config.platform.php):       $composer_php" >&2
-    echo "Bump both together." >&2
+# 2. composer.json — config.platform.php
+composer_file="wp-content/themes/power-of-families/composer.json"
+composer_php=$(grep -oE '"php":[[:space:]]*"[0-9]+\.[0-9]+(\.[0-9]+)?"' "$composer_file" \
+    | head -1 | sed -E 's/.*"([0-9.]+)".*/\1/')
+if [[ -z "$composer_php" ]]; then
+    echo "error: could not find platform.php in $composer_file" >&2
+    exit 2
+fi
+add_pin "$composer_file (platform.php)" "$composer_php"
+
+# 3. .github/workflows/*.yml — literal "PHP_VERSION: 'X'" env vars and
+#    "php-version: 'X'" action inputs. Skips lines that reference
+#    \${{ env.PHP_VERSION }} since those are derived, not pins.
+while IFS= read -r match; do
+    file=${match%%:*}
+    rest=${match#*:}
+    lineno=${rest%%:*}
+    content=${rest#*:}
+    version=$(printf '%s' "$content" \
+        | grep -oE "[0-9]+\.[0-9]+(\.[0-9]+)?" | head -1)
+    [[ -n "$version" ]] && add_pin "$file:$lineno" "$version"
+done < <(grep -nE "(PHP_VERSION|php-version):[[:space:]]*['\"]?[0-9]+\.[0-9]+(\.[0-9]+)?['\"]?" \
+    .github/workflows/*.yml 2>/dev/null || true)
+
+# Compare against canonical (docker-compose.yml)
+canonical="$compose_php"
+mismatch=0
+for v in "${versions[@]}"; do
+    [[ "$v" != "$canonical" ]] && mismatch=1
+done
+
+if [[ $mismatch -eq 1 ]]; then
+    echo "PHP version mismatch (canonical: docker-compose.yml = $canonical)" >&2
+    echo >&2
+    for i in "${!labels[@]}"; do
+        marker="    "
+        [[ "${versions[$i]}" != "$canonical" ]] && marker="!!  "
+        printf '  %s%-7s  %s\n' "$marker" "${versions[$i]}" "${labels[$i]}" >&2
+    done
+    echo >&2
+    echo "Bump every location together." >&2
     exit 1
 fi
 
-echo "PHP version in sync: $compose_php"
+echo "PHP version in sync ($canonical) across ${#labels[@]} location(s):"
+for label in "${labels[@]}"; do
+    echo "  - $label"
+done

@@ -90,12 +90,14 @@ run the standard "First Time Setup" flow above to populate them.
 
 ### Bumping the PHP version
 
-`PHP_VERSION` is pinned in two places that have to stay in sync:
-[docker-compose.yml](docker-compose.yml) (`${PHP_VERSION:-8.4}` default) and
-`wp-content/themes/power-of-families/composer.json` (`config.platform.php`).
-[bin/check-php-version](bin/check-php-version) — wired into CI and
-runnable locally as `npm run check:php-version` — fails the build if the
-two disagree, so a bump can't land in only one file.
+`PHP_VERSION` is pinned in several places that have to stay in sync:
+[docker-compose.yml](docker-compose.yml) (`${PHP_VERSION:-8.4}` default —
+canonical), `wp-content/themes/power-of-families/composer.json`
+(`config.platform.php`), and a `PHP_VERSION:` / `php-version:` literal in
+each `.github/workflows/*.yml`. [bin/check-php-version](bin/check-php-version)
+— wired into CI and runnable locally as `npm run check:php-version` —
+prints every pin with its version and fails the build if any disagree,
+so a bump can't land in only some files.
 
 ## Ongoing Development
 
