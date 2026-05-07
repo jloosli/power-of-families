@@ -83,10 +83,8 @@ class POM_Bloom_Program {
 
 
     function bloom_create_goalset() {
-        wp_mail('jloosli@gmail.com',
-            'Inside bloom_create_goalset',"I'm right inside. DOW = ".date('w'));
         $dow = 6; // Saturday
-        if ( date( 'w' ) === $dow ) {
+        if ( (int) date( 'w' ) === $dow ) {
             $this->addGoalset( date( 'Y-m-d', strtotime( 'next Monday' ) ) );
         }
     }
@@ -488,9 +486,8 @@ class POM_Bloom_Program {
         if ( empty( $goalset ) ) {
             $goalset = date( "Y-m-d" );
         }
-        wp_mail('jloosli@gmail.com','Inside bloom addGoalset', "About to add goalset '$goalset'");
         wp_insert_term( $goalset, 'bloom-goalsets' );
-        echo "BLOOM: Inserted $goalset";
+        error_log( "BLOOM: Inserted $goalset" );
     }
 
     protected function getLatestGoalset() {
