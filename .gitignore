@@ -3,8 +3,6 @@
 *#
 #*
 node_modules
-build
-dist
 .sass-cache
 .tmp
 
@@ -22,6 +20,10 @@ docker/ZscalerRootCA.crt
 vendor
 
 *.cache
+
+# Build outputs (theme dist + plugin build)
+wp-content/themes/power-of-families/dist/
+wp-content/plugins/pof-bloom-plugin/build/
 
 # Test reports and coverage
 coverage/

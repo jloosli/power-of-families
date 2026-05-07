@@ -107,7 +107,7 @@ class POM_Bloom_Settings {
     	// If you're not including an image upload then you can leave this function call out
     	wp_enqueue_media();
 
-    	wp_register_script( $this->parent->_token . '-settings-js', $this->parent->assets_url . 'js/settings' . $this->parent->script_suffix . '.js', array( 'jquery' ), '1.0.0' );
+    	wp_register_script( $this->parent->_token . '-settings-js', $this->parent->build_url . 'settings.js', array( 'jquery' ), '1.0.0' );
     	wp_enqueue_script( $this->parent->_token . '-settings-js' );
 	}
 

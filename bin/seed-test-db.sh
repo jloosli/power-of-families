@@ -183,14 +183,14 @@ seed_database() {
 require_once '/tmp/wordpress-tests-lib/includes/functions.php';
 
 // Load theme functions
-require_once dirname(__DIR__) . '/power-of-families/functions.php';
+require_once dirname(__DIR__) . '/wp-content/themes/power-of-families/functions.php';
 
 // Load test data classes
-require_once dirname(__DIR__) . '/power-of-families/tests/factories/TestDataFactory.php';
-require_once dirname(__DIR__) . '/power-of-families/tests/fixtures/TestFixtures.php';
-require_once dirname(__DIR__) . '/power-of-families/tests/seeders/TestDataSeeder.php';
-require_once dirname(__DIR__) . '/power-of-families/tests/seeders/TestSeederConfig.php';
-require_once dirname(__DIR__) . '/power-of-families/tests/seeders/EnhancedTestDataSeeder.php';
+require_once dirname(__DIR__) . '/wp-content/themes/power-of-families/tests/factories/TestDataFactory.php';
+require_once dirname(__DIR__) . '/wp-content/themes/power-of-families/tests/fixtures/TestFixtures.php';
+require_once dirname(__DIR__) . '/wp-content/themes/power-of-families/tests/seeders/TestDataSeeder.php';
+require_once dirname(__DIR__) . '/wp-content/themes/power-of-families/tests/seeders/TestSeederConfig.php';
+require_once dirname(__DIR__) . '/wp-content/themes/power-of-families/tests/seeders/EnhancedTestDataSeeder.php';
 
 // Get scenario from environment
 $scenario = getenv('SCENARIO') ?: 'minimal';
@@ -248,7 +248,7 @@ verify_data_integrity() {
 require_once '/tmp/wordpress-tests-lib/includes/functions.php';
 
 // Load theme functions
-require_once dirname(__DIR__) . '/power-of-families/functions.php';
+require_once dirname(__DIR__) . '/wp-content/themes/power-of-families/functions.php';
 
 $errors = 0;
 

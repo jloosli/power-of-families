@@ -106,7 +106,7 @@ create_test_class() {
         return 1
     fi
     
-    local test_file="power-of-families/tests/test-${class_name}.php"
+    local test_file="wp-content/themes/power-of-families/tests/test-${class_name}.php"
     local class_name_lower=$(echo "$class_name" | tr '[:upper:]' '[:lower:]')
     
     if [ -f "$test_file" ]; then
@@ -179,7 +179,7 @@ create_test_factory() {
         return 1
     fi
     
-    local factory_file="power-of-families/tests/factories/${factory_name}.php"
+    local factory_file="wp-content/themes/power-of-families/tests/factories/${factory_name}.php"
     
     if [ -f "$factory_file" ]; then
         log_warning "Factory file already exists: $factory_file"
@@ -249,7 +249,7 @@ create_test_fixture() {
         return 1
     fi
     
-    local fixture_file="power-of-families/tests/fixtures/${fixture_name}.php"
+    local fixture_file="wp-content/themes/power-of-families/tests/fixtures/${fixture_name}.php"
     
     if [ -f "$fixture_file" ]; then
         log_warning "Fixture file already exists: $fixture_file"
@@ -311,7 +311,7 @@ create_test_seeder() {
         return 1
     fi
     
-    local seeder_file="power-of-families/tests/seeders/${seeder_name}.php"
+    local seeder_file="wp-content/themes/power-of-families/tests/seeders/${seeder_name}.php"
     
     if [ -f "$seeder_file" ]; then
         log_warning "Seeder file already exists: $seeder_file"
@@ -374,7 +374,7 @@ list_tests() {
     log_info "Available test files:"
     echo ""
     
-    local test_files=$(find power-of-families/tests -name "test_*.php" -type f | sort)
+    local test_files=$(find wp-content/themes/power-of-families/tests -name "test_*.php" -type f | sort)
     
     if [ -z "$test_files" ]; then
         log_warning "No test files found"
@@ -398,7 +398,7 @@ list_factories() {
     log_info "Available test data factories:"
     echo ""
     
-    local factory_files=$(find power-of-families/tests/factories -name "*.php" -type f | sort)
+    local factory_files=$(find wp-content/themes/power-of-families/tests/factories -name "*.php" -type f | sort)
     
     if [ -z "$factory_files" ]; then
         log_warning "No factory files found"
@@ -421,7 +421,7 @@ list_fixtures() {
     log_info "Available test fixtures:"
     echo ""
     
-    local fixture_files=$(find power-of-families/tests/fixtures -name "*.php" -type f | sort)
+    local fixture_files=$(find wp-content/themes/power-of-families/tests/fixtures -name "*.php" -type f | sort)
     
     if [ -z "$fixture_files" ]; then
         log_warning "No fixture files found"
@@ -444,7 +444,7 @@ validate_tests() {
     log_info "Validating test files..."
     echo ""
     
-    local test_files=$(find power-of-families/tests -name "test_*.php" -type f)
+    local test_files=$(find wp-content/themes/power-of-families/tests -name "test_*.php" -type f)
     local valid_count=0
     local invalid_count=0
     
@@ -491,8 +491,8 @@ generate_test_data() {
     # Run the enhanced test data seeder
     if docker-compose run --rm test php -r "
         require_once '/tmp/wordpress-tests-lib/includes/functions.php';
-        require_once dirname(__DIR__) . '/power-of-families/functions.php';
-        require_once dirname(__DIR__) . '/power-of-families/tests/seeders/EnhancedTestDataSeeder.php';
+        require_once dirname(__DIR__) . '/wp-content/themes/power-of-families/functions.php';
+        require_once dirname(__DIR__) . '/wp-content/themes/power-of-families/tests/seeders/EnhancedTestDataSeeder.php';
         
         \$seeder = new EnhancedTestDataSeeder();
         \$result = \$seeder->seed(['scenario' => 'development']);

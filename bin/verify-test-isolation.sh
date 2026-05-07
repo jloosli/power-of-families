@@ -148,10 +148,10 @@ run_verification() {
 require_once '/tmp/wordpress-tests-lib/includes/functions.php';
 
 // Load theme functions
-require_once dirname(__DIR__) . '/power-of-families/functions.php';
+require_once dirname(__DIR__) . '/wp-content/themes/power-of-families/functions.php';
 
 // Load verification classes
-require_once dirname(__DIR__) . '/power-of-families/tests/verification/DatabaseIsolationVerifier.php';
+require_once dirname(__DIR__) . '/wp-content/themes/power-of-families/tests/verification/DatabaseIsolationVerifier.php';
 
 // Get options from environment
 $options = [
