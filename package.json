@@ -43,15 +43,20 @@
 		"@playwright/test": "^1.55.0",
 		"@types/node": "^24.3.1",
 		"@wordpress/prettier-config": "^4.27.0",
-		"@wordpress/scripts": "^30.20.0",
+		"@wordpress/scripts": "^32.1.0",
 		"normalize.css": "^8.0.1",
+		"postcss": "^8.5.14",
 		"prettier": "^3.2.5",
 		"wp-types": "^4.68.1"
+	},
+	"overrides": {
+		"serialize-javascript": "^7.0.5",
+		"minimatch": "^3.1.4",
+		"webpack-dev-server": "^5.2.1"
 	},
 	"dependencies": {
 		"@csstools/postcss-global-data": "^3.0.0",
 		"autoprefixer": "^10.4.21",
-		"postcss": "^8.5.6",
 		"postcss-custom-media": "^11.0.6",
 		"postcss-nested": "^7.0.2"
 	}
