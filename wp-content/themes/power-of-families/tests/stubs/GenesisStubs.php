@@ -1,0 +1,146 @@
+<?php
+
+/**
+ * Genesis Framework function stubs for unit testing.
+ *
+ * Allows theme PHP logic to be exercised without the Genesis parent theme
+ * present in the test environment. Each stub provides the minimal behaviour
+ * the theme code depends on. Stubs that are used as hook callbacks (e.g.
+ * genesis_do_nav) are no-ops; stubs that return data return safe defaults.
+ *
+ * @package Power_Of_Families
+ */
+
+// Prevent ThemeSetup::child_theme_setup() from loading Genesis's lib/init.php.
+if ( ! defined( 'PHPUNIT_RUNNING' ) ) {
+    define( 'PHPUNIT_RUNNING', true );
+}
+
+/**
+ * Register a Genesis sidebar/widget area.
+ * No-op in tests; the theme calls this during widgets_init.
+ *
+ * @param array $args Sidebar arguments.
+ */
+function genesis_register_sidebar( $args = [] ) {}
+
+/**
+ * Return a theme config array by name.
+ * Returns the real theme-supports values so register_theme_support() can be
+ * tested without loading Genesis.
+ *
+ * @param string $config_name Config file name (without .php extension).
+ * @return array
+ */
+function genesis_get_config( $config_name = '' ) {
+    if ( 'theme-supports' === $config_name ) {
+        return [
+            'genesis-responsive-viewport' => true,
+            'genesis-footer-widgets'      => 3,
+            'genesis-menus'               => [
+                'primary'   => 'Primary Navigation Menu',
+                'secondary' => 'Secondary Navigation Menu',
+                'tertiary'  => 'Footer Navigation Menu',
+            ],
+        ];
+    }
+    return [];
+}
+
+/**
+ * Return whether the theme declares HTML5 support for a given feature.
+ *
+ * @param string $feature Feature to check.
+ * @return bool
+ */
+function genesis_html5( $feature = '' ) {
+    return true;
+}
+
+/**
+ * Return the value of a Genesis custom field on a post.
+ *
+ * @param string   $field   Field name.
+ * @param int|null $post_id Post ID, or null for current post.
+ * @return string
+ */
+function genesis_get_custom_field( $field, $post_id = null ) {
+    return '';
+}
+
+/**
+ * Return a Genesis option value.
+ *
+ * @param string      $key       Option key.
+ * @param string|null $setting   Settings field name.
+ * @param bool        $use_cache Whether to use the option cache.
+ * @return string
+ */
+function genesis_get_option( $key, $setting = null, $use_cache = true ) {
+    return '';
+}
+
+/**
+ * Return a Genesis search form HTML string.
+ *
+ * @param bool   $hidden  Whether to return a hidden search form.
+ * @param string $context Context for the form.
+ * @return string
+ */
+function genesis_search_form( $hidden = false, $context = '' ) {
+    return '<form role="search" method="get" class="search-form" action="' . esc_url( home_url( '/' ) ) . '">'
+        . '<input type="search" name="s" value="" />'
+        . '</form>';
+}
+
+/**
+ * Output a registered Genesis widget area.
+ * Echoes the before/after wrappers so output-capture tests can assert on them.
+ *
+ * @param string $id   Widget area ID.
+ * @param array  $args Output arguments (before, after).
+ */
+function genesis_widget_area( $id, $args = [] ) {
+    echo isset( $args['before'] ) ? $args['before'] : '';
+    echo isset( $args['after'] ) ? $args['after'] : '';
+}
+
+/**
+ * Output the Genesis author box on single posts.
+ * No-op; used only as a hook callback.
+ */
+function genesis_do_author_box_single() {}
+
+/**
+ * Output the Genesis default footer.
+ * No-op; the theme replaces this with its own footer.
+ */
+function genesis_do_footer() {}
+
+/**
+ * Output the Genesis primary navigation menu.
+ * No-op; the theme relocates this hook.
+ */
+function genesis_do_nav() {}
+
+/**
+ * Output the post featured image in Genesis entry markup.
+ * No-op; the theme repositions this hook.
+ */
+function genesis_do_post_image() {}
+
+/**
+ * Output the Genesis post meta footer.
+ * No-op; the theme removes this hook.
+ */
+function genesis_post_meta() {}
+
+/**
+ * Return the Genesis full-width-content layout identifier.
+ * Used as a filter callback on genesis_pre_get_option_site_layout.
+ *
+ * @return string
+ */
+function __genesis_return_full_width_content() {
+    return 'full-width-content';
+}

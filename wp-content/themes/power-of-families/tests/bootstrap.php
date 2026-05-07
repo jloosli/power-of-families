@@ -22,6 +22,10 @@ if ( file_exists( dirname( __DIR__ ) . '/vendor/autoload.php' ) ) {
 	require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 }
 
+// Load Genesis stubs before WordPress initialises so all genesis_*
+// functions exist when theme files are parsed.
+require_once __DIR__ . '/stubs/GenesisStubs.php';
+
 // Give access to tests_add_filter() function.
 require_once "{$_tests_dir}/includes/functions.php";
 
@@ -55,19 +59,6 @@ function _register_theme()
 function fix_phpunit_get_template_directory($template_dir, $template, $theme_root)
 {
 	return wp_get_theme()->parent()->get_stylesheet_directory();
-}
-
-/**
- * Mocked genesis functions
- */
-function genesis_register_sidebar()
-{
-	return;
-}
-
-function genesis_get_config()
-{
-	return [];
 }
 
 tests_add_filter('muplugins_loaded', '_register_theme');
