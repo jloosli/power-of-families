@@ -33,3 +33,11 @@
 .woocommerce-page ul.tabs.wc-tabs {
 	display: none;
 }
+
+/* Override broad `.entry-content ul > li { list-style-type: disc; }` from entries.css
+   so checkout payment methods don't render bullets. */
+.entry-content ul.wc_payment_methods,
+.entry-content ul.wc_payment_methods > li,
+.entry-content ul.wc_payment_methods li {
+	list-style-type: none;
+}
