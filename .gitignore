@@ -6,6 +6,11 @@ node_modules
 .sass-cache
 .tmp
 
+# Per-worktree env overrides (defaults live in docker-compose.yml; copy
+# .env.example to .env if you need to override host ports etc.)
+.env
+.env.local
+
 db-backups
 
 .idea
