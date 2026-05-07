@@ -72,12 +72,12 @@ class POM_Bloom {
     public $assets_url;
 
     /**
-     * Suffix for Javascripts.
+     * The plugin build assets URL (wp-scripts output).
      * @var     string
      * @access  public
      * @since   1.0.0
      */
-    public $script_suffix;
+    public $build_url;
 
     /**
      * Constructor function.
@@ -94,8 +94,7 @@ class POM_Bloom {
         $this->dir        = dirname( $this->file );
         $this->assets_dir = trailingslashit( $this->dir ) . 'assets';
         $this->assets_url = esc_url( trailingslashit( plugins_url( '/assets/', $this->file ) ) );
-
-        $this->script_suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+        $this->build_url  = esc_url( trailingslashit( plugins_url( '/build/', $this->file ) ) );
 
         register_activation_hook( $this->file, array( $this, 'install' ) );
         register_deactivation_hook($this->file, array($this, 'uninstall'));
@@ -285,7 +284,7 @@ class POM_Bloom {
      * @return  void
      */
     public function enqueue_scripts() {
-        wp_register_script( $this->_token . '-frontend', esc_url( $this->assets_url ) . 'js/frontend' . $this->script_suffix . '.js', array( 'jquery' ), $this->_version );
+        wp_register_script( $this->_token . '-frontend', $this->build_url . 'frontend.js', array( 'jquery' ), $this->_version );
         wp_register_script('jquery-dotdotdot', esc_url($this->assets_url) . 'js/jQuery.dotdotdot-master/src/js/jquery.dotdotdot.min.js',array('jquery'), $this->_version);
 //		wp_enqueue_script( $this->_token . '-frontend' );
     } // End enqueue_scripts ()

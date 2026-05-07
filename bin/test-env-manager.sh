@@ -228,7 +228,7 @@ check_test_directories() {
 check_test_files() {
     log_verbose "Checking test files..."
     
-    local test_files=("power-of-families/tests/test_sample.php" "power-of-families/tests/test_ThemeSetup.php")
+    local test_files=("wp-content/themes/power-of-families/tests/test_sample.php" "wp-content/themes/power-of-families/tests/test_ThemeSetup.php")
     local all_exist=true
     
     for file in "${test_files[@]}"; do

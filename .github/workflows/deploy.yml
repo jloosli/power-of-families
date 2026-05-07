@@ -76,7 +76,7 @@ jobs:
             - name: Build project
               run: |
                   npm run build
-                  cd power-of-families
+                  cd wp-content/themes/power-of-families
                   composer install --no-dev
                   composer dump-autoload --optimize
 
@@ -87,4 +87,4 @@ jobs:
                   mkdir -p ~/.ssh
                   echo "$SSH_KEY" > ~/.ssh/id_rsa
                   chmod 600 ~/.ssh/id_rsa
-                  rsync -avhz --delete -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" power-of-families/ "$SSH_USER@$SSH_HOST:$DEST_PATH"
+                  rsync -avhz --delete -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" wp-content/themes/power-of-families/ "$SSH_USER@$SSH_HOST:$DEST_PATH"

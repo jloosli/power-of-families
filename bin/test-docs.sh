@@ -501,7 +501,7 @@ show_environment_setup() {
     echo ""
     echo -e "${CYAN}1. Clone Repository${NC}"
     echo "   git clone <repository-url>"
-    echo "   cd power-of-families"
+    echo "   cd wp-content/themes/power-of-families"
     echo ""
     echo -e "${CYAN}2. Start Docker Services${NC}"
     echo "   docker-compose up -d"

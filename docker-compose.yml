@@ -36,12 +36,11 @@ services:
         volumes:
             - ./wordpress:/var/www/html
             - type: bind
-              source: ./power-of-families
+              source: ./wp-content/themes/power-of-families
               target: /var/www/html/wp-content/themes/power-of-families
-            # - type: bind
-            #   source: ./pof-bloom-plugin
-            #   target: /var/www/html/wp-content/plugins/pof-bloom
-            - ./phpunit.xml.dist:/var/www/html/wp-content/themes/power-of-families/phpunit.xml
+            - type: bind
+              source: ./wp-content/plugins/pof-bloom-plugin
+              target: /var/www/html/wp-content/plugins/pof-bloom-plugin
             - ./.phpcs.xml.dist:/var/www/html/wp-content/themes/power-of-families/.phpcs.xml
             - ./bin:/var/www/html/bin
             - ./xdebug-logs:/var/log
@@ -59,7 +58,7 @@ services:
         volumes:
             - ./wordpress:/var/www/html
             - type: bind
-              source: ./power-of-families
+              source: ./wp-content/themes/power-of-families
               target: /var/www/html/wp-content/themes/power-of-families
         working_dir: /var/www/html
         environment:
@@ -102,7 +101,7 @@ services:
         image: composer:latest
         container_name: pof_composer
         volumes:
-            - ./power-of-families:/var/www/html/wp-content/themes/power-of-families
+            - ./wp-content/themes/power-of-families:/var/www/html/wp-content/themes/power-of-families
         working_dir: /var/www/html/wp-content/themes/power-of-families
 
     test:
@@ -126,9 +125,11 @@ services:
         volumes:
             - ./wordpress:/var/www/html
             - type: bind
-              source: ./power-of-families
+              source: ./wp-content/themes/power-of-families
               target: /var/www/html/wp-content/themes/power-of-families
-            - ./power-of-families/phpunit.xml:/var/www/html/wp-content/themes/power-of-families/phpunit.xml
+            - type: bind
+              source: ./wp-content/plugins/pof-bloom-plugin
+              target: /var/www/html/wp-content/plugins/pof-bloom-plugin
             - ./.phpcs.xml.dist:/var/www/html/wp-content/themes/power-of-families/.phpcs.xml
             - ./bin:/var/www/html/bin
             - ./coverage:/var/www/html/coverage
