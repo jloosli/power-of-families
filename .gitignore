@@ -9,6 +9,10 @@ node_modules
 db-backups
 
 .idea
+
+# Claude Code (local settings + worktree mirrors under .claude/worktrees/)
+.claude/
+
 # Logs
 logs
 *.log
