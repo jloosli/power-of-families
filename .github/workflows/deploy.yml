@@ -10,7 +10,7 @@ jobs:
     # Run tests before deployment
     test-before-deploy:
         name: Test Before Deploy
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
@@ -29,8 +29,7 @@ jobs:
 
             - name: Start Docker services
               run: |
-                  docker compose up -d db
-                  docker compose up -d wordpress
+                  docker compose up -d db wordpress
 
             - name: Wait for services to be ready
               run: |
@@ -47,7 +46,7 @@ jobs:
 
     build-and-deploy:
         name: Build and Deploy
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         needs: test-before-deploy
         env:
             SSH_HOST: ${{ secrets.SSH_HOST }}
