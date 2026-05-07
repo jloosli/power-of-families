@@ -85,7 +85,7 @@ run the standard "First Time Setup" flow above to populate them.
 | `PHPMYADMIN_PORT`  | `8180`  | phpmyadmin host port       |
 | `XDEBUG_PORT`      | `9003`  | wordpress + test xDebug    |
 | `PHP_VERSION`      | `8.4`   | wordpress + test image     |
-| `MARIA_DB_VERSION` | `10.11.13` | db image                |
+| `MARIA_DB_VERSION` | `10.11.14` | db image                |
 | `WORDPRESS_DEBUG`  | `false` | `WORDPRESS_SCRIPT_DEBUG`   |
 
 ### Bumping the PHP version
