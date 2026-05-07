@@ -49,7 +49,6 @@ class My_Programs
         ), $atts));
         $title = $showtitle == "true" ? "<h2>$title</h2>" : "";
         $output = "<div id='pof_userprograms'>$title\n";
-        $output .= "<style>#pof_userprograms .program {display: block; clear: both;}</style>";
         if (is_user_logged_in()) {
             $progs = $this->getCurrentUserPrograms(get_current_user_id());
             if ($progs) {

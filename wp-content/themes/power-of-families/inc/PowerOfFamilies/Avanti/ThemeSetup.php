@@ -69,8 +69,8 @@ class ThemeSetup
         add_action('genesis_footer', [$this, 'power_of_families_footer']);
 
         // Add Favicons
-        add_filter('genesis_pre_load_favicon', [$this, 'pre_load_favicon']);
-        add_filter('admin_head', [$this, 'pre_load_favicon']);
+        add_action('wp_head', [$this, 'pre_load_favicon']);
+        add_action('admin_head', [$this, 'pre_load_favicon']);
 
         // Setup Widget areas
         add_action('widgets_init', [$this, 'createWidgets']);
@@ -110,7 +110,7 @@ class ThemeSetup
         wp_enqueue_style(
             'power_of_families_styles',
             get_stylesheet_directory_uri() . '/dist/main.ts.css',
-            $js_asset['dependencies'],
+            [],
             $js_asset['version']
         );
     }

@@ -2,3 +2,8 @@
   float: left;
   width: 100%
 }
+
+#pof_userprograms .program {
+  display: block;
+  clear: both;
+}

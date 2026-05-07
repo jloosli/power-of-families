@@ -9,8 +9,6 @@
 
 namespace PowerOfFamilies\Avanti;
 
-global $product;
-
 class WooCommerce
 {
 
@@ -62,7 +60,7 @@ class WooCommerce
 
     function remove_elements_from_header_of_family_coaching_group_product_page()
     {
-        $ids = array(62545);
+        $ids = array_map('absint', explode(',', get_option('pof_family_coaching_product_ids', '62545')));
         if (!function_exists('is_product') || !function_exists('wc_get_product')) return;
         $product = wc_get_product();
         if (is_product() && $product && in_array($product->get_id(), $ids)) {

@@ -144,33 +144,12 @@ class Settings
      * Get available programs from the programs directory
      * @return array
      */
-    private function getAvailablePrograms()
+    private function getAvailablePrograms(): array
     {
-        // Get the files
-        $programsDirectory = dirname(__FILE__) . '/Programs';
-        $files = scandir($programsDirectory);
-
-        // Return only the classes
-        $files = array_filter($files, function ($file) {
-            return strstr($file, 'class');
-        });
-
-        // Format the programs
-        $programs = [];
-        foreach ($files as $file) {
-            $key = str_replace(".class.php", "", $file);
-            $program = ucwords(str_replace("_", " ", $key));
-            if (strpos($key, "_Settings")) {
-                $programs[str_replace("_Settings", "", $key)]['has-settings'] = true;
-            } else {
-                $programs[$key]['name'] = $program;
-                if (empty($programs[$key]['has-settings'])) {
-                    $programs[$key]['has-settings'] = false;
-                }
-            }
-        }
-
-        return $programs;
+        return [
+            'Affiliate_Linker' => ['name' => 'Affiliate Linker', 'has-settings' => true],
+            'My_Programs'      => ['name' => 'My Programs',      'has-settings' => false],
+        ];
     }
 
     public function getActivePrograms()
