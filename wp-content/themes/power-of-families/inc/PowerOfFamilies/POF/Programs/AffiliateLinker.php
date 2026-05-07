@@ -17,15 +17,15 @@ function POF_Affiliate_Linker_CRON()
 
 class Affiliate_Linker
 {
-    public static $settingsInstance;
+    public static ?Affiliate_Linker_Settings $settingsInstance = null;
 
-    function __construct()
+    public function __construct()
     {
         $this->affiliate_id = get_option('pof_amazon_affiliate_id');
 
         //Actions
-        add_action('wp', array($this, 'activation'));
-        add_action('wp_ajax_pof_affiliates_run', array($this, 'add_amazon_ajax'));
+        add_action('wp', $this->activation(...));
+        add_action('wp_ajax_pof_affiliates_run', $this->add_amazon_ajax(...));
 
         //Filters
 
@@ -35,7 +35,7 @@ class Affiliate_Linker
 
     }
 
-    public static function getSettingsInstance()
+    public static function getSettingsInstance() : Affiliate_Linker_Settings
     {
         if (is_null(self::$settingsInstance)) {
             self::$settingsInstance = new Affiliate_Linker_Settings();
@@ -45,7 +45,7 @@ class Affiliate_Linker
 
     }
 
-    function clear_all_crons($hook)
+    public function clear_all_crons( string $hook ) : void
     {
         $before = $crons = _get_cron_array();
 
@@ -60,7 +60,7 @@ class Affiliate_Linker
         _set_cron_array($crons);
     }
 
-    function activation()
+    public function activation() : void
     {
         $cron = 'POF_Affiliate_Linker_CRON';
         if (!wp_next_scheduled($cron)) {
@@ -70,7 +70,7 @@ class Affiliate_Linker
 //        wp_clear_scheduled_hook($cron);
     }
 
-    public function add_amazon_tag($matches)
+    public function add_amazon_tag( array $matches ) : string
     {
 
         $url = parse_url($matches[2]); // split url into parts
@@ -82,14 +82,14 @@ class Affiliate_Linker
 
     }
 
-    function add_amazon_ajax()
+    public function add_amazon_ajax() : void
     {
         header('Content-Type: application/json');
         $this->add_amazon();
         die;
     }
 
-    public function add_amazon()
+    public function add_amazon() : void
     {
 
         global $wpdb;

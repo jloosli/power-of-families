@@ -15,7 +15,7 @@ class Settings
      * @access   private
      * @since    1.0.0
      */
-    private static $_instance = null;
+    private static ?self $_instance = null;
 
     /**
      * The main plugin object.
@@ -23,7 +23,7 @@ class Settings
      * @access   public
      * @since    1.0.0
      */
-    public $parent = null;
+    public ?PowerOfFamiliesPrograms $parent = null;
 
     /**
      * Prefix for plugin settings.
@@ -31,7 +31,7 @@ class Settings
      * @access  public
      * @since   1.0.0
      */
-    public $base = '';
+    public string $base = '';
 
     /**
      * Available settings for plugin.
@@ -39,7 +39,7 @@ class Settings
      * @access  public
      * @since   1.0.0
      */
-    public $settings = array();
+    public array $settings = [];
 
     /**
      * Active programs
@@ -47,7 +47,7 @@ class Settings
      * @access public
      * @since  2.0.0
      */
-    public $programs = array();
+    public array $programs = [];
 
 
     public function __construct($parent)
@@ -57,19 +57,16 @@ class Settings
         $this->base = 'pof_';
 
         // Initialise settings
-        add_action('init', array($this, 'init_settings'), 11);
+        add_action('init', $this->init_settings(...), 11);
 
         // Register plugin settings
-        add_action('admin_init', array($this, 'register_settings'));
+        add_action('admin_init', $this->register_settings(...));
 
         // Add settings page to menu
-        add_action('admin_menu', array($this, 'add_menu_item'));
+        add_action('admin_menu', $this->add_menu_item(...));
 
         // Add settings link to plugins page
-        add_filter('plugin_action_links_' . plugin_basename(PowerOfFamiliesPrograms::class), array(
-            $this,
-            'add_settings_link'
-        ));
+        add_filter('plugin_action_links_' . plugin_basename(PowerOfFamiliesPrograms::class), $this->add_settings_link(...));
 
         // Load up active programs
         $this->programs = $this->loadActivePrograms();
@@ -80,7 +77,7 @@ class Settings
      * Initialise settings
      * @return void
      */
-    public function init_settings()
+    public function init_settings(): void
     {
         $this->settings = $this->settings_fields();
     }
@@ -89,7 +86,7 @@ class Settings
      * Add settings page to admin menu
      * @return void
      */
-    public function add_menu_item()
+    public function add_menu_item(): void
     {
         $page = add_options_page(
             __('POF Settings', 'power-of-families-programs'),
@@ -106,7 +103,7 @@ class Settings
      * Load settings JS & CSS
      * @return void
      */
-    public function settings_assets()
+    public function settings_assets(): void
     {
 
         // We're including the farbtastic script & styles here because they're needed for the colour picker
@@ -132,7 +129,7 @@ class Settings
      *
      * @return array        Modified links
      */
-    public function add_settings_link($links)
+    public function add_settings_link(array $links): array
     {
         $settings_link = '<a href="options-general.php?page=' . $this->parent->token . '_settings">' . __('Settings', 'power-of-families-programs') . '</a>';
         array_push($links, $settings_link);
@@ -152,12 +149,12 @@ class Settings
         ];
     }
 
-    public function getActivePrograms()
+    public function getActivePrograms(): array
     {
         return get_option('pof_active_programs', []);
     }
 
-    public function loadActivePrograms()
+    public function loadActivePrograms(): array
     {
         $allowed = [ 'Affiliate_Linker', 'My_Programs' ];
         $programs = [];
@@ -178,7 +175,7 @@ class Settings
      * Build settings fields
      * @return array Fields to be displayed on settings page
      */
-    private function settings_fields()
+    private function settings_fields(): array
     {
 
         $availablePrograms = array_map(function ($program) {
@@ -218,7 +215,7 @@ class Settings
      * Register plugin settings
      * @return void
      */
-    public function register_settings()
+    public function register_settings(): void
     {
         if (is_array($this->settings)) {
 
@@ -239,10 +236,7 @@ class Settings
                 }
 
                 // Add section to page
-                add_settings_section($section, $data['title'], array(
-                    $this,
-                    'settings_section'
-                ), $this->parent->token . '_settings');
+                add_settings_section($section, $data['title'], $this->settings_section(...), $this->parent->token . '_settings');
 
                 foreach ($data['fields'] as $field) {
 
@@ -273,7 +267,7 @@ class Settings
         }
     }
 
-    public function settings_section($section)
+    public function settings_section(array $section): void
     {
         $html = '<p> ' . $this->settings[$section['id']]['description'] . '</p>' . "\n";
         echo $html;
@@ -283,7 +277,7 @@ class Settings
      * Load settings page content
      * @return void
      */
-    public function settings_page()
+    public function settings_page(): void
     {
 
         // Build page HTML
@@ -358,7 +352,7 @@ class Settings
      * @see   Power_of_Moms_Programs()
      * @return Main Power_of_Moms_Programs_Settings instance
      */
-    public static function instance($parent)
+    public static function instance($parent): static
     {
         if (is_null(self::$_instance)) {
             self::$_instance = new self($parent);
@@ -372,9 +366,9 @@ class Settings
      *
      * @since 1.0.0
      */
-    public function __clone()
+    public function __clone(): void
     {
-        _doing_it_wrong(__FUNCTION__, __('Cheatin&#8217; huh?'), $this->parent->_version);
+        _doing_it_wrong(__FUNCTION__, __('Cheatin&#8217; huh?'), '1.0.0');
     } // End __clone()
 
     /**
@@ -382,9 +376,9 @@ class Settings
      *
      * @since 1.0.0
      */
-    public function __wakeup()
+    public function __wakeup(): void
     {
-        _doing_it_wrong(__FUNCTION__, __('Cheatin&#8217; huh?'), $this->parent->_version);
+        _doing_it_wrong(__FUNCTION__, __('Cheatin&#8217; huh?'), '1.0.0');
     } // End __wakeup()
 
 }

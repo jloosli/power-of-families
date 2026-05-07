@@ -8,9 +8,9 @@ namespace PowerOfFamilies\POF\Programs;
 class My_Programs
 {
 
-    public static $settingsInstance;
+    public static mixed $settingsInstance = null;
 
-    function __construct($parent = null)
+    public function __construct($parent = null)
     {
         $this->parent = $parent;
 
@@ -19,13 +19,13 @@ class My_Programs
         }
 
         //Actions
-        add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
+        add_action('wp_enqueue_scripts', $this->enqueue_scripts(...));
         //Filters
         //Short codes
-        add_shortcode("pof_programs", array($this, "show_programs"));
+        add_shortcode("pof_programs", $this->show_programs(...));
     }
 
-    function enqueue_scripts()
+    public function enqueue_scripts() : void
     {
         wp_enqueue_script($this->parent->token . '-frontend');
 
@@ -34,19 +34,18 @@ class My_Programs
     /**
      * Create shortcode for POF Programs
      */
-    function show_programs($atts)
+    public function show_programs($atts) : string
     {
-        /** @var $showtitle bool
-         * @var $title           string
-         * @var $notloggedin     string
-         * @var $nosubscriptions string
-         */
-        extract(shortcode_atts(array(
-            'showtitle' => "true",
-            'title' => 'My Programs',
-            'notloggedin' => "Sorry. You need to log in to view your Programs.",
-            'nosubscriptions' => "You haven\'t subscribed to any Programs. Go check out some of <a href='/store'>our Programs</a> and see what may be of use to you."
-        ), $atts));
+        $atts = shortcode_atts( [
+            'showtitle'       => 'true',
+            'title'           => 'My Programs',
+            'notloggedin'     => 'Sorry. You need to log in to view your Programs.',
+            'nosubscriptions' => "You haven't subscribed to any Programs. Go check out some of <a href='/store'>our Programs</a> and see what may be of use to you.",
+        ], $atts );
+        $showtitle       = $atts['showtitle'];
+        $title           = $atts['title'];
+        $notloggedin     = $atts['notloggedin'];
+        $nosubscriptions = $atts['nosubscriptions'];
         $title = $showtitle == "true" ? "<h2>$title</h2>" : "";
         $output = "<div id='pof_userprograms'>$title\n";
         if (is_user_logged_in()) {
@@ -72,7 +71,7 @@ class My_Programs
         return $output;
     }
 
-    private function getProgramMetaFromDescription($description)
+    private function getProgramMetaFromDescription( string $description ) : \stdClass
     {
         $meta = new \stdClass();
         $lines = explode("\n", $description);
@@ -87,7 +86,7 @@ class My_Programs
         return $meta;
     }
 
-    private function getCurrentUserPrograms($user_id = null)
+    private function getCurrentUserPrograms( ?int $user_id = null ) : array
     {
         if (!$user_id) {
             $user_id = get_current_user_id();
