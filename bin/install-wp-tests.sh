@@ -19,9 +19,9 @@ WP_CORE_DIR=${WP_CORE_DIR-$TMPDIR/wordpress}
 
 download() {
     if [ `which curl` ]; then
-        curl -s "$1" > "$2";
+        curl -fsSL --retry 3 --retry-delay 5 --retry-all-errors --connect-timeout 10 --max-time 300 -o "$2" "$1"
     elif [ `which wget` ]; then
-        wget -nv -O "$2" "$1"
+        wget --tries=3 --timeout=60 --waitretry=5 -nv -O "$2" "$1"
     else
         echo "Error: Neither curl nor wget is installed."
         exit 1
