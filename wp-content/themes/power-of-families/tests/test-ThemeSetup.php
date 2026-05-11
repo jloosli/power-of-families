@@ -33,6 +33,13 @@ class test_ThemeSetup extends WP_UnitTestCase {
     // -------------------------------------------------------------------------
 
     public function test_custom_load_styles_and_scripts() {
+        // Method `require`s dist/main.ts.asset.php (produced by `npm run build`,
+        // gitignored). Skip rather than fatal on a fresh checkout.
+        $asset_file = get_theme_file_path( 'dist/main.ts.asset.php' );
+        if ( ! file_exists( $asset_file ) ) {
+            $this->markTestSkipped( "Theme build artifact missing ({$asset_file}); run `npm run build` to exercise this test." );
+        }
+
         $this->assertFalse( wp_script_is( 'pof_theme_scripts' ) );
         $this->theme_setup->custom_load_styles_and_scripts();
 
@@ -45,13 +52,19 @@ class test_ThemeSetup extends WP_UnitTestCase {
     // -------------------------------------------------------------------------
 
     public function test_hideAdminBarFromSubscribers() {
-        $no_user       = $this->factory->user->create_and_get();
-        $admin_user    = $this->factory->user->create_and_get( [ 'role' => 'administrator' ] );
-        $subscriber    = $this->factory->user->create_and_get( [ 'role' => 'subscriber' ] );
+        $default_role_user = $this->factory->user->create_and_get();
+        $admin_user        = $this->factory->user->create_and_get( [ 'role' => 'administrator' ] );
+        $subscriber        = $this->factory->user->create_and_get( [ 'role' => 'subscriber' ] );
+        $nonexistent_user  = new WP_User( 0 );
 
-        $this->assertFalse( $this->theme_setup->hideAdminBarFromSubscribers( $no_user ) );
+        // Default new-user role is 'subscriber', so this hits the subscriber branch.
+        $this->assertFalse( $this->theme_setup->hideAdminBarFromSubscribers( $default_role_user ) );
         $this->assertTrue( $this->theme_setup->hideAdminBarFromSubscribers( $admin_user ) );
         $this->assertFalse( $this->theme_setup->hideAdminBarFromSubscribers( $subscriber ) );
+
+        // Non-existent / unauthenticated users fall through and keep the admin bar shown.
+        $this->assertTrue( $this->theme_setup->hideAdminBarFromSubscribers( $nonexistent_user ) );
+        $this->assertTrue( $this->theme_setup->hideAdminBarFromSubscribers( null ) );
     }
 
     // -------------------------------------------------------------------------
