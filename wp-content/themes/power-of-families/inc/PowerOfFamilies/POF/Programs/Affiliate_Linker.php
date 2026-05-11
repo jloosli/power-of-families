@@ -69,10 +69,19 @@ class Affiliate_Linker
 
     public function add_amazon_ajax() : void
     {
-        $this->add_amazon();
+        check_ajax_referer( 'pof_affiliates_run', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => 'Insufficient permissions.' ], 403 );
+        }
+        wp_send_json( $this->add_amazon() );
     }
 
-    public function add_amazon() : void
+    /**
+     * Walk published posts, append the affiliate tag to Amazon URLs.
+     * Returns a summary; does not terminate execution so the daily cron
+     * (POF_Affiliate_Linker_CRON) can invoke this without wp_die().
+     */
+    public function add_amazon() : array
     {
 
         global $wpdb;
@@ -105,7 +114,7 @@ sql
                 );
             }
         }
-        wp_send_json([
+        return [
             'success' => true,
             'message' => sprintf(
                 'Replaced %d urls in %d posts (%0.2f%%)',
@@ -113,7 +122,7 @@ sql
                 count($has_amazon),
                 count($has_amazon) > 0 ? $changeCount / count($has_amazon) : 0
             ),
-        ]);
+        ];
 
     }
 

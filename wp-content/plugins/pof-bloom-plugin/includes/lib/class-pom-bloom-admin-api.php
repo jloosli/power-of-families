@@ -307,7 +307,7 @@ class POM_Bloom_Admin_API {
 	 */
 	public function save_meta_boxes ( $post_id = 0 ) {
 
-		if ( ! isset( $_POST['pom_bloom_meta_nonce'] ) || ! wp_verify_nonce( $_POST['pom_bloom_meta_nonce'], 'pom_bloom_save_meta' ) ) {
+		if ( ! isset( $_POST['pom_bloom_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pom_bloom_meta_nonce'] ) ), 'pom_bloom_save_meta' ) ) {
 			return;
 		}
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
@@ -327,7 +327,7 @@ class POM_Bloom_Admin_API {
 
 		foreach ( $fields as $field ) {
 			if ( isset( $_POST[ $field['id'] ] ) ) {
-				update_post_meta( $post_id, $field['id'], $this->validate_field( $_POST[ $field['id'] ], $field['type'] ) );
+				update_post_meta( $post_id, $field['id'], $this->validate_field( wp_unslash( $_POST[ $field['id'] ] ), $field['type'] ) );
 			} else {
 				update_post_meta( $post_id, $field['id'], '' );
 			}

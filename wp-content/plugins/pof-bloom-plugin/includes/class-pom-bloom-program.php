@@ -162,10 +162,10 @@ class POM_Bloom_Program {
                 ];
                 break;
             case 'add_goals':
-                $opts = $_POST;
-                $data = array();
-                parse_str( $opts['data'], $data );
-                $goalCount = count( $data['goals'] );
+                $current_user = get_current_user_id();
+                $data         = array();
+                parse_str( wp_unslash( $_POST['data'] ?? '' ), $data );
+                $goalCount = isset( $data['goals'] ) ? count( $data['goals'] ) : 0;
                 $goals     = [ ];
                 for ( $i = 0; $i < $goalCount; $i ++ ) {
                     $goals[] = [
@@ -175,59 +175,88 @@ class POM_Bloom_Program {
                         'per_week'      => $data['per_week'][ $i ]
                     ];
                 }
-                array_map( function ( $goal ) use ( $opts, $data ) {
+                array_map( function ( $goal ) use ( $current_user, $data ) {
                     $post    = [
-                        'post_title'  => $goal['goal'],
-                        'post_author' => $opts['user'],
+                        'post_title'  => sanitize_text_field( $goal['goal'] ),
+                        'post_author' => $current_user,
                         'tax_input'   => array(
-                            'bloom-categories' => array( $goal['category_id'] ),
-                            'bloom-goalsets'   => array( $data['goalset'] )
+                            'bloom-categories' => array( absint( $goal['category_id'] ) ),
+                            'bloom-goalsets'   => array( absint( $data['goalset'] ) )
                         ),
                         'post_status' => 'publish',
                         'post_type'   => 'bloom-user-goals'
                     ];
                     $goal_id = wp_insert_post( $post, true );
-                    add_post_meta( $goal_id, 'per_week', $goal['per_week'] );
-                    add_post_meta( $goal_id, 'suggested_id', $goal['suggested_id'] );
+                    add_post_meta( $goal_id, 'per_week', absint( $goal['per_week'] ) );
+                    add_post_meta( $goal_id, 'suggested_id', absint( $goal['suggestion_id'] ) );
                 }, $goals );
                 // Serendipity
                 $post        = [
                     'post_title'  => '',
-                    'post_author' => $opts['user'],
+                    'post_author' => $current_user,
                     'post_status' => 'publish',
                     'post_type'   => 'bloom-user-goals',
                     'tax_input'   => array(
-                        'bloom-goalsets' => array( $data['goalset'] )
+                        'bloom-goalsets' => array( absint( $data['goalset'] ) )
                     ),
 
                 ];
-                $is_advanced = get_user_meta( get_current_user_id(), $this->parent->_token . 'preference_level', true ) === 'advanced';
+                $is_advanced = get_user_meta( $current_user, $this->parent->_token . 'preference_level', true ) === 'advanced';
                 for ( $i = $is_advanced ? 2 : 1; $i > 0; $i -- ) {
                     $goal_id = wp_insert_post( $post, true );
                 }
                 $result['success'] = true;
                 break;
             case 'update_goals':
-                $opts      = $_POST;
-                $completed = get_post_meta( absint( $opts['goal'] ), 'completed', true );
+                $goal_id = absint( $_POST['goal'] ?? 0 );
+                if ( ! $this->user_owns_bloom_goal( $goal_id ) ) {
+                    $result = array( 'success' => false, 'error' => 'forbidden' );
+                    break;
+                }
+                $completed = get_post_meta( $goal_id, 'completed', true );
                 if ( empty( $completed ) ) {
                     $completed = [ ];
                 }
-                $completed[ sanitize_key( $opts['day'] ) ] = $opts['set'] === 'true';
-                update_post_meta( absint( $opts['goal'] ), 'completed', $completed );
+                $set = isset( $_POST['set'] ) && $_POST['set'] === 'true';
+                $completed[ sanitize_key( $_POST['day'] ?? '' ) ] = $set;
+                update_post_meta( $goal_id, 'completed', $completed );
                 $result['success'] = true;
-                $result['set']     = $opts['set'] === 'true';
+                $result['set']     = $set;
                 break;
             case 'update_serendipity':
+                $goal_id = absint( $_POST['id'] ?? 0 );
+                if ( ! $this->user_owns_bloom_goal( $goal_id ) ) {
+                    $result = array( 'success' => false, 'error' => 'forbidden' );
+                    break;
+                }
                 $args              = [
-                    'ID'         => absint( $_POST['id'] ),
-                    'post_title' => sanitize_text_field( $_POST['serendipity'] )
+                    'ID'         => $goal_id,
+                    'post_title' => sanitize_text_field( wp_unslash( $_POST['serendipity'] ?? '' ) )
                 ];
                 $update            = wp_update_post( $args );
                 $result['success'] = true;
                 break;
         }
         die( json_encode( $result ) );
+    }
+
+    /**
+     * Authorize a write against a bloom-user-goals post: the post must
+     * exist, be the expected post type, and either be authored by the
+     * current user or be editable via standard WP capabilities.
+     */
+    protected function user_owns_bloom_goal( int $goal_id ) : bool {
+        if ( ! $goal_id ) {
+            return false;
+        }
+        $post = get_post( $goal_id );
+        if ( ! $post || $post->post_type !== 'bloom-user-goals' ) {
+            return false;
+        }
+        if ( (int) $post->post_author === get_current_user_id() ) {
+            return true;
+        }
+        return current_user_can( 'edit_post', $goal_id );
     }
 
     protected function getRoute() {

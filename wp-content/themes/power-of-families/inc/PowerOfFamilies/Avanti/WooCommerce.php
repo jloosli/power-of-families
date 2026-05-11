@@ -106,7 +106,7 @@ class WooCommerce
             {
                 global $product;
                 $link = $product->get_permalink();
-                echo do_shortcode('<br><a class="button" href="' . esc_attr($link) . '">Learn More</a>');
+                echo do_shortcode('<br><a class="button" href="' . esc_url($link) . '">Learn More</a>');
             }
 
             public function change_billing_details_to_your_details($translated_text, $text = '', $domain = ''): string

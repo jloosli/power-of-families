@@ -27,7 +27,7 @@ class My_Programs
 
     public function enqueue_scripts() : void
     {
-        wp_enqueue_script($this->parent->token . '-frontend');
+        wp_enqueue_script($this->parent::TOKEN . '-frontend');
 
     }
 
@@ -43,9 +43,9 @@ class My_Programs
             'nosubscriptions' => "You haven't subscribed to any Programs. Go check out some of <a href='/store'>our Programs</a> and see what may be of use to you.",
         ], $atts );
         $showtitle       = $atts['showtitle'];
-        $title           = $atts['title'];
-        $notloggedin     = $atts['notloggedin'];
-        $nosubscriptions = $atts['nosubscriptions'];
+        $title           = esc_html( $atts['title'] );
+        $notloggedin     = wp_kses_post( $atts['notloggedin'] );
+        $nosubscriptions = wp_kses_post( $atts['nosubscriptions'] );
         $title = $showtitle == "true" ? "<h2>$title</h2>" : "";
         $output = "<div id='pof_userprograms'>$title\n";
         if (is_user_logged_in()) {
@@ -55,9 +55,14 @@ class My_Programs
                     $meta = $this->getProgramMetaFromDescription($prog->description);
                     $image = '';
                     if (!empty($meta->image)) {
-                        $image = sprintf("<img class='alignleft' src='%s' width='88' height='88' />", $meta->image);
+                        $image = sprintf("<img class='alignleft' src='%s' width='88' height='88' />", esc_url($meta->image));
                     }
-                    $output .= sprintf("<div class='program'><a href='%s'>%s%s</a></div>", !empty($meta->home) ? $meta->home : '', $image, stripslashes($prog->name));
+                    $output .= sprintf(
+                        "<div class='program'><a href='%s'>%s%s</a></div>",
+                        esc_url( !empty($meta->home) ? $meta->home : '' ),
+                        $image,
+                        esc_html( stripslashes($prog->name) )
+                    );
                 }
                 $output .= "</div>";
             } else {
