@@ -57,13 +57,13 @@ class Settings
         $this->base = 'pof_';
 
         // Initialise settings
-        add_action('init', $this->init_settings(...), 11);
+        add_action('init', [$this, 'init_settings'], 11);
 
         // Register plugin settings
-        add_action('admin_init', $this->register_settings(...));
+        add_action('admin_init', [$this, 'register_settings']);
 
         // Add settings page to menu
-        add_action('admin_menu', $this->add_menu_item(...));
+        add_action('admin_menu', [$this, 'add_menu_item']);
 
         // Load up active programs
         $this->programs = $this->loadActivePrograms();
@@ -90,7 +90,7 @@ class Settings
             __('POF Settings', 'power-of-families-programs'),
             'manage_options',
             $this->parent::TOKEN . '_settings',
-            $this->settings_page(...)
+            [$this, 'settings_page']
         );
     }
 
@@ -193,7 +193,7 @@ class Settings
                 }
 
                 // Add section to page
-                add_settings_section($section, $data['title'], $this->settings_section(...), $this->parent::TOKEN . '_settings');
+                add_settings_section($section, $data['title'], [$this, 'settings_section'], $this->parent::TOKEN . '_settings');
 
                 foreach ($data['fields'] as $field) {
 

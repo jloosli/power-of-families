@@ -35,18 +35,18 @@ class ThemeSetup
         unregister_sidebar('header-right');
 
         /* Filter primary menu */
-        add_filter('genesis_nav_items', $this->be_follow_icons(...), 10, 2);
-        add_filter('wp_nav_menu_items', $this->be_follow_icons(...), 10, 2);
-        add_filter('wp_nav_menu_header_items', $this->be_follow_icons(...), 10, 2);
+        add_filter('genesis_nav_items', [$this, 'be_follow_icons'], 10, 2);
+        add_filter('wp_nav_menu_items', [$this, 'be_follow_icons'], 10, 2);
+        add_filter('wp_nav_menu_header_items', [$this, 'be_follow_icons'], 10, 2);
 
         //edit the way the post info displays
-        add_filter('genesis_post_info', $this->sp_post_info_filter(...));
+        add_filter('genesis_post_info', [$this, 'sp_post_info_filter']);
 
         // Remove Post Meta
         remove_action('genesis_entry_footer', 'genesis_post_meta');
 
         /* Display Post Author Avatars */
-        add_action('genesis_entry_header', $this->wpsites_post_author_avatars(...));
+        add_action('genesis_entry_header', [$this, 'wpsites_post_author_avatars']);
 
         // Move featured image in archives
         remove_action('genesis_entry_content', 'genesis_do_post_image', 8);
@@ -59,31 +59,31 @@ class ThemeSetup
         add_image_size('featured-posts', 60, 60, true);
 
         // Change default avatar
-        add_filter('avatar_defaults', $this->newgravatar(...));
+        add_filter('avatar_defaults', [$this, 'newgravatar']);
 
         // Add Footer menu
-        add_action('genesis_footer', $this->power_of_families_footer_menu(...), 0);
+        add_action('genesis_footer', [$this, 'power_of_families_footer_menu'], 0);
 
         // Add Copyright to the footer
         remove_action('genesis_footer', 'genesis_do_footer');
-        add_action('genesis_footer', $this->power_of_families_footer(...));
+        add_action('genesis_footer', [$this, 'power_of_families_footer']);
 
         // Add Favicons
-        add_action('wp_head', $this->pre_load_favicon(...));
-        add_action('admin_head', $this->pre_load_favicon(...));
+        add_action('wp_head', [$this, 'pre_load_favicon']);
+        add_action('admin_head', [$this, 'pre_load_favicon']);
 
         // Setup Widget areas
-        add_action('widgets_init', $this->createWidgets(...));
+        add_action('widgets_init', [$this, 'createWidgets']);
 
         // Add login bar
         if (!is_user_logged_in()) {
-            add_action('genesis_before_header', $this->login_bar(...), 10);
+            add_action('genesis_before_header', [$this, 'login_bar'], 10);
         }
 
         // Hide Sharing buttons on protected pages
         // @todo: Need to update this for Groups instead of wishlist member
-        add_filter('get_post_metadata', $this->hide_on_protected_pages(...), 10, 4);
-        add_filter('get_page_metadata', $this->hide_on_protected_pages(...), 10, 4);
+        add_filter('get_post_metadata', [$this, 'hide_on_protected_pages'], 10, 4);
+        add_filter('get_page_metadata', [$this, 'hide_on_protected_pages'], 10, 4);
 
         // Remove sidebar on single product pages
         add_action('wp', function () {
@@ -93,7 +93,7 @@ class ThemeSetup
         });
 
         // Add Javascript and stylesheets
-        add_action('wp_enqueue_scripts', $this->custom_load_styles_and_scripts(...), 0);
+        add_action('wp_enqueue_scripts', [$this, 'custom_load_styles_and_scripts'], 0);
     }
 
     public function custom_load_styles_and_scripts(): void
@@ -163,9 +163,9 @@ class ThemeSetup
     /**
      * Hide the admin bar for subscribers.
      *
-     * @param \WP_User $current_user The current user object.
+     * @param \WP_User|null $current_user The current user object.
      */
-    public function hideAdminBarFromSubscribers(\WP_User $current_user): bool
+    public function hideAdminBarFromSubscribers(?\WP_User $current_user = null): bool
     {
         if ($current_user && $current_user->exists()) {
             $user_roles = $current_user->roles;
@@ -261,8 +261,8 @@ class ThemeSetup
             'description' => __('This is the right home featured content section.', 'news'),
         ));
 
-        add_action('genesis_before_content', $this->home_large_featured(...));
-        add_action('genesis_before_content', $this->home_featured_widgets(...));
+        add_action('genesis_before_content', [$this, 'home_large_featured']);
+        add_action('genesis_before_content', [$this, 'home_featured_widgets']);
     }
 
     public function home_large_featured(): void
@@ -359,5 +359,6 @@ class ThemeSetup
         if ($meta_key === 'essb_off' && in_array($object_id, $this->get_protected_pages())) {
             return 'true';
         }
+        return $metadata;
     }
 }

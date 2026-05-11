@@ -19,10 +19,10 @@ class My_Programs
         }
 
         //Actions
-        add_action('wp_enqueue_scripts', $this->enqueue_scripts(...));
+        add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
         //Filters
         //Short codes
-        add_shortcode("pof_programs", $this->show_programs(...));
+        add_shortcode("pof_programs", [$this, 'show_programs']);
     }
 
     public function enqueue_scripts() : void

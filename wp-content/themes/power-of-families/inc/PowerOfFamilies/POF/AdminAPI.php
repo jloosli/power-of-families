@@ -9,7 +9,7 @@ class AdminAPI {
 	 * Constructor function
 	 */
 	public function __construct () {
-		add_action( 'save_post', $this->save_meta_boxes(...), 10, 1 );
+		add_action( 'save_post', [$this, 'save_meta_boxes'], 10, 1 );
 	}
 
 	/**
@@ -232,7 +232,7 @@ class AdminAPI {
 
 		// Generate each metabox
 		foreach ( $post_types as $post_type ) {
-			add_meta_box( $id, $title, $this->meta_box_content(...), $post_type, $context, $priority, $callback_args );
+			add_meta_box( $id, $title, [$this, 'meta_box_content'], $post_type, $context, $priority, $callback_args );
 		}
 	}
 

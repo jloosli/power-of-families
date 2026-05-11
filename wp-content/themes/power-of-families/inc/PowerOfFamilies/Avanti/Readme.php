@@ -10,12 +10,12 @@ class Readme
 
     public function __construct()
     {
-        add_action('admin_menu', $this->registerCustomPage(...));
+        add_action('admin_menu', [$this, 'registerCustomPage']);
     }
 
     public function registerCustomPage(): void
     {
-        add_menu_page('About The Template', 'About', 'manage_options', 'readme', $this->customPageOutput(...),
+        add_menu_page('About The Template', 'About', 'manage_options', 'readme', [$this, 'customPageOutput'],
             'dashicons-info', NULL);
     }
 

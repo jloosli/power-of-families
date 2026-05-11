@@ -60,7 +60,7 @@ class PowerOfFamiliesPrograms
         $this->settings = new Settings($this);
 
         // Load admin JS & CSS
-        add_action('admin_enqueue_scripts', $this->admin_register_scripts(...), 10, 1);
+        add_action('admin_enqueue_scripts', [$this, 'admin_register_scripts'], 10, 1);
 
         // Load API for generic admin functions
         if (is_admin()) {

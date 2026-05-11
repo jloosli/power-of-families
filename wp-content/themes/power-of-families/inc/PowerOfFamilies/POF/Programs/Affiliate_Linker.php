@@ -24,8 +24,8 @@ class Affiliate_Linker
         $this->affiliate_id = get_option('pof_amazon_affiliate_id');
 
         //Actions
-        add_action('wp', $this->activation(...));
-        add_action('wp_ajax_pof_affiliates_run', $this->add_amazon_ajax(...));
+        add_action('wp', [$this, 'activation']);
+        add_action('wp_ajax_pof_affiliates_run', [$this, 'add_amazon_ajax']);
 
         //Filters
 
