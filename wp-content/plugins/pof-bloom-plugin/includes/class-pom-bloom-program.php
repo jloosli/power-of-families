@@ -108,8 +108,10 @@ class POM_Bloom_Program {
         $result = array( 'success' => false );
         switch ( $_POST['route'] ) {
             case 'preferences':
-                update_user_meta( get_current_user_id(), $this->parent->_token . 'preference_level', sanitize_text_field( $_POST['preference'] ) );
-                $result = array( 'success' => true );
+                if ( isset( $_POST['preference'] ) ) {
+                    update_user_meta( get_current_user_id(), $this->parent->_token . 'preference_level', sanitize_text_field( wp_unslash( $_POST['preference'] ) ) );
+                    $result = array( 'success' => true );
+                }
                 break;
             case 'assessments':
                 $user               = get_current_user_id();
