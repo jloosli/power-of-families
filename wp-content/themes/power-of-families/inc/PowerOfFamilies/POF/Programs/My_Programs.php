@@ -8,9 +8,9 @@ namespace PowerOfFamilies\POF\Programs;
 class My_Programs
 {
 
-    public static $settingsInstance;
+    public static mixed $settingsInstance = null;
 
-    function __construct($parent = null)
+    public function __construct($parent = null)
     {
         $this->parent = $parent;
 
@@ -22,39 +22,32 @@ class My_Programs
         add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
         //Filters
         //Short codes
-        add_shortcode("pof_programs", array($this, "show_programs"));
-        //Scripts
-//        $this->add_users();
-
-//        add_action('wp_loaded', [$this, 'add_users']);
-
+        add_shortcode("pof_programs", [$this, 'show_programs']);
     }
 
-    function enqueue_scripts()
+    public function enqueue_scripts() : void
     {
-        wp_enqueue_script($this->parent->token . '-frontend');
+        wp_enqueue_script($this->parent::TOKEN . '-frontend');
 
     }
 
     /**
      * Create shortcode for POF Programs
      */
-    function show_programs($atts)
+    public function show_programs($atts) : string
     {
-        /** @var $showtitle bool
-         * @var $title           string
-         * @var $notloggedin     string
-         * @var $nosubscriptions string
-         */
-        extract(shortcode_atts(array(
-            'showtitle' => "true",
-            'title' => 'My Programs',
-            'notloggedin' => "Sorry. You need to log in to view your Programs.",
-            'nosubscriptions' => "You haven\'t subscribed to any Programs. Go check out some of <a href='/store'>our Programs</a> and see what may be of use to you."
-        ), $atts));
+        $atts = shortcode_atts( [
+            'showtitle'       => 'true',
+            'title'           => 'My Programs',
+            'notloggedin'     => 'Sorry. You need to log in to view your Programs.',
+            'nosubscriptions' => "You haven't subscribed to any Programs. Go check out some of <a href='/store'>our Programs</a> and see what may be of use to you.",
+        ], $atts );
+        $showtitle       = $atts['showtitle'];
+        $title           = esc_html( $atts['title'] );
+        $notloggedin     = wp_kses_post( $atts['notloggedin'] );
+        $nosubscriptions = wp_kses_post( $atts['nosubscriptions'] );
         $title = $showtitle == "true" ? "<h2>$title</h2>" : "";
         $output = "<div id='pof_userprograms'>$title\n";
-        $output .= "<style>#pof_userprograms .program {display: block; clear: both;}</style>";
         if (is_user_logged_in()) {
             $progs = $this->getCurrentUserPrograms(get_current_user_id());
             if ($progs) {
@@ -62,9 +55,14 @@ class My_Programs
                     $meta = $this->getProgramMetaFromDescription($prog->description);
                     $image = '';
                     if (!empty($meta->image)) {
-                        $image = sprintf("<img class='alignleft' src='%s' width='88' height='88' />", $meta->image);
+                        $image = sprintf("<img class='alignleft' src='%s' width='88' height='88' />", esc_url($meta->image));
                     }
-                    $output .= sprintf("<div class='program'><a href='%s'>%s%s</a></div>", !empty($meta->home) ? $meta->home : '', $image, stripslashes($prog->name));
+                    $output .= sprintf(
+                        "<div class='program'><a href='%s'>%s%s</a></div>",
+                        esc_url( !empty($meta->home) ? $meta->home : '' ),
+                        $image,
+                        esc_html( stripslashes($prog->name) )
+                    );
                 }
                 $output .= "</div>";
             } else {
@@ -78,7 +76,7 @@ class My_Programs
         return $output;
     }
 
-    private function getProgramMetaFromDescription($description)
+    private function getProgramMetaFromDescription( string $description ) : \stdClass
     {
         $meta = new \stdClass();
         $lines = explode("\n", $description);
@@ -93,7 +91,7 @@ class My_Programs
         return $meta;
     }
 
-    private function getCurrentUserPrograms($user_id = null)
+    private function getCurrentUserPrograms( ?int $user_id = null ) : array
     {
         if (!$user_id) {
             $user_id = get_current_user_id();
@@ -116,32 +114,6 @@ class My_Programs
             }
         }
         return $the_programs;
-    }
-
-    function add_users()
-    {
-        if (($handle = fopen(dirname(__FILE__) . '/../../../members_20171103_164946.csv', 'r'))) {
-            $line = 0;
-            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
-                if ($line++ == 0) {
-                    continue;
-                }
-                $username = $data[0];
-                $levels = explode("\n", $data[5]);
-                $user = \get_user_by('login', $username);
-                if ($user) {
-                    foreach ($levels as $level) {
-                        $the_group = \Groups_Group::read_by_name($level);
-                        \Groups_User_Group::create([
-                            'user_id' => $user->ID,
-                            'group_id' => $the_group->group_id
-                        ]);
-                    }
-                }
-
-
-            }
-        }
     }
 
 }

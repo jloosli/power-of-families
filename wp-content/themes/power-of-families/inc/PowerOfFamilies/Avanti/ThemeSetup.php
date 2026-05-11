@@ -9,26 +9,22 @@ class ThemeSetup
     const RUNNING_DEV = 2 ** 1;
     public int $run_location;
 
-    function __construct()
+    public function __construct()
     {
     }
 
-    function init()
+    public function init(): void
     {
         $this->child_theme_setup();
         $this->hideAdminBarFromSubscribers(wp_get_current_user());
         $this->display_author_box_on_single_posts();
     }
 
-    function child_theme_setup()
+    public function child_theme_setup(): void
     {
         if (!defined('PHPUNIT_RUNNING')) {
             require_once get_template_directory() . '/lib/init.php';
         }
-        // //* Child theme (do not remove)
-        // define('CHILD_THEME_NAME', 'Power of Families');
-        // define('CHILD_THEME_URL', 'http://avantidevelopment.com/');
-
         $this->register_theme_support();
 
         /* Move primary menu into header */
@@ -73,8 +69,8 @@ class ThemeSetup
         add_action('genesis_footer', [$this, 'power_of_families_footer']);
 
         // Add Favicons
-        add_filter('genesis_pre_load_favicon', [$this, 'pre_load_favicon']);
-        add_filter('admin_head', [$this, 'pre_load_favicon']);
+        add_action('wp_head', [$this, 'pre_load_favicon']);
+        add_action('admin_head', [$this, 'pre_load_favicon']);
 
         // Setup Widget areas
         add_action('widgets_init', [$this, 'createWidgets']);
@@ -83,10 +79,6 @@ class ThemeSetup
         if (!is_user_logged_in()) {
             add_action('genesis_before_header', [$this, 'login_bar'], 10);
         }
-        //        add_filter( 'wp_nav_menu_items', [$this, 'genesis_search_secondary_nav_menu'], 10, 2 );
-
-        // Update category header
-        // add_action('genesis_before_loop', [$this, 'themeprefix_category_header']);
 
         // Hide Sharing buttons on protected pages
         // @todo: Need to update this for Groups instead of wishlist member
@@ -104,7 +96,7 @@ class ThemeSetup
         add_action('wp_enqueue_scripts', [$this, 'custom_load_styles_and_scripts'], 0);
     }
 
-    function custom_load_styles_and_scripts()
+    public function custom_load_styles_and_scripts(): void
     {
         $js_asset = require get_theme_file_path('dist/main.ts.asset.php');
         wp_enqueue_script(
@@ -114,16 +106,16 @@ class ThemeSetup
             $js_asset['version']
         );
 
-        wp_enqueue_style('custom-google-fonts', 'https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,600,700|Playfair+Display:400,700', false);
+        wp_enqueue_style('custom-google-fonts', 'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Playfair+Display:wght@400;700&display=swap', false);
         wp_enqueue_style(
             'power_of_families_styles',
             get_stylesheet_directory_uri() . '/dist/main.ts.css',
-            $js_asset['dependencies'],
+            [],
             $js_asset['version']
         );
     }
 
-    function register_theme_support()
+    public function register_theme_support(): void
     {
         $theme_supports = genesis_get_config('theme-supports');
 
@@ -132,14 +124,14 @@ class ThemeSetup
         }
     }
 
-    function power_of_families_footer()
+    public function power_of_families_footer(): void
     {
 ?>
-        <p>&copy; Copyright 2017 - <?php echo date("Y") ?> <a href="https://poweroffamilies.com">Power of Families</a>
+        <p>&copy; Copyright 2017 - <?php echo esc_html( date( 'Y' ) ) ?> <a href="https://poweroffamilies.com">Power of Families</a>
     <?php
     }
 
-    function power_of_families_footer_menu()
+    public function power_of_families_footer_menu(): void
     {
         $args = array(
             'theme_location' => 'tertiary',
@@ -153,15 +145,15 @@ class ThemeSetup
         echo '</div>';
     }
 
-    function newgravatar($avatar_defaults)
+    public function newgravatar(array $avatar_defaults): array
     {
-        $myavatar = get_stylesheet_directory_uri() . '/images/default_avatar.jpg';
+        $myavatar = get_stylesheet_directory_uri() . '/assets/images/default_avatar.jpg';
         $avatar_defaults[$myavatar] = "Power of Families Avatar";
 
         return $avatar_defaults;
     }
 
-    function wpsites_post_author_avatars()
+    public function wpsites_post_author_avatars(): void
     {
         if (is_single()) {
             echo get_avatar(get_the_author_meta('email'), 60);
@@ -171,9 +163,9 @@ class ThemeSetup
     /**
      * Hide the admin bar for subscribers.
      *
-     * @param \WP_User $current_user The current user object.
+     * @param \WP_User|null $current_user The current user object.
      */
-    function hideAdminBarFromSubscribers($current_user)
+    public function hideAdminBarFromSubscribers(?\WP_User $current_user = null): bool
     {
         if ($current_user && $current_user->exists()) {
             $user_roles = $current_user->roles;
@@ -185,7 +177,7 @@ class ThemeSetup
         return true;
     }
 
-    function be_follow_icons($menu, $args)
+    public function be_follow_icons($menu, $args): string
     {
         //Top menu
         $args = (array)$args;
@@ -208,7 +200,7 @@ class ThemeSetup
     }
 
 
-    function pre_load_favicon()
+    public function pre_load_favicon(): void
     {
         $favicon_directory = get_stylesheet_directory_uri() . '/assets/images/favicon/';
 
@@ -228,7 +220,7 @@ class ThemeSetup
             . '<link rel="icon" type="image/png" href="' . $favicon_directory . 'favicon-128.png" sizes="128x128" />';
     }
 
-    function display_author_box_on_single_posts()
+    public function display_author_box_on_single_posts(): void
     {
         add_filter('get_the_author_genesis_author_box_single', '__return_true');
         remove_action('genesis_after_entry', 'genesis_do_author_box_single', 8);
@@ -236,7 +228,7 @@ class ThemeSetup
     }
 
 
-    function sp_post_info_filter($post_info)
+    public function sp_post_info_filter(string $post_info): string
     {
         if (is_single()) {
             $post_info = 'by [post_author_posts_link] on [post_date format="M j, Y"] [post_comments] [post_edit] [post_categories sep=", " before="Posted in: "]';
@@ -246,7 +238,7 @@ class ThemeSetup
         return $post_info;
     }
 
-    function createWidgets()
+    public function createWidgets(): void
     {
         genesis_register_sidebar(array(
             'id' => 'home_large_featured',
@@ -273,7 +265,7 @@ class ThemeSetup
         add_action('genesis_before_content', [$this, 'home_featured_widgets']);
     }
 
-    function home_large_featured()
+    public function home_large_featured(): void
     {
         if (is_home()) {
             genesis_widget_area('home_large_featured', array(
@@ -284,7 +276,7 @@ class ThemeSetup
     }
 
 
-    function home_featured_widgets()
+    public function home_featured_widgets(): void
     {
         if (is_home()) {
             echo '<div class="home-featured-widgets"><div class="wrap"><h2 class="panel-title">What\'s New</h2>';
@@ -304,11 +296,13 @@ class ThemeSetup
         }
     }
 
-    function login_bar()
+    public function login_bar(): void
     {
 
         echo '<div class="login-bar collapse" id="login-bar"><div class="wrap">';
-        $request = isset($_GET['wlfrom']) ? $_GET['wlfrom'] : $_SERVER['REQUEST_URI'];
+        $request = isset( $_GET['wlfrom'] )
+            ? esc_url_raw( wp_validate_redirect( sanitize_url( wp_unslash( $_GET['wlfrom'] ) ), home_url() ) )
+            : esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) );
         $args = array(
             'echo' => true,
             //'redirect'       => $request,
@@ -338,32 +332,7 @@ class ThemeSetup
 <span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button></div></div>';
     }
 
-    function genesis_search_secondary_nav_menu($menu, \stdClass $args)
-    {
-        if ('secondary' != $args->theme_location) {
-            return $menu;
-        }
-
-        if (genesis_get_option('nav_extras')) {
-            return $menu;
-        }
-
-        $menu .= sprintf('<div class="secondary-search">%s</div>', __(genesis_search_form()));
-
-
-        return $menu;
-    }
-
-    function themeprefix_category_header()
-    {
-        if (is_category()) {
-            echo '<h1 class="archive-title">Posts in the "';
-            echo single_cat_title();
-            echo '" category:</h1>';
-        }
-    }
-
-    private function get_protected_pages()
+    private function get_protected_pages(): array
     {
         if (false === ($ids = get_transient('pof_protected_pages'))) {
             $ids = [];
@@ -385,10 +354,11 @@ class ThemeSetup
         return $ids;
     }
 
-    function hide_on_protected_pages($metadata, $object_id, $meta_key, $single)
+    public function hide_on_protected_pages($metadata, $object_id, $meta_key, $single): mixed
     {
         if ($meta_key === 'essb_off' && in_array($object_id, $this->get_protected_pages())) {
             return 'true';
         }
+        return $metadata;
     }
 }

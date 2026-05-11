@@ -17,15 +17,15 @@ function POF_Affiliate_Linker_CRON()
 
 class Affiliate_Linker
 {
-    public static $settingsInstance;
+    public static ?Affiliate_Linker_Settings $settingsInstance = null;
 
-    function __construct()
+    public function __construct()
     {
         $this->affiliate_id = get_option('pof_amazon_affiliate_id');
 
         //Actions
-        add_action('wp', array($this, 'activation'));
-        add_action('wp_ajax_pof_affiliates_run', array($this, 'add_amazon_ajax'));
+        add_action('wp', [$this, 'activation']);
+        add_action('wp_ajax_pof_affiliates_run', [$this, 'add_amazon_ajax']);
 
         //Filters
 
@@ -35,7 +35,7 @@ class Affiliate_Linker
 
     }
 
-    public static function getSettingsInstance()
+    public static function getSettingsInstance() : Affiliate_Linker_Settings
     {
         if (is_null(self::$settingsInstance)) {
             self::$settingsInstance = new Affiliate_Linker_Settings();
@@ -45,22 +45,7 @@ class Affiliate_Linker
 
     }
 
-    function clear_all_crons($hook)
-    {
-        $before = $crons = _get_cron_array();
-
-        if (empty($crons)) {
-            return;
-        }
-        foreach ($crons as $timestamp => $cron) {
-            if (!empty($cron[$hook])) {
-                unset($crons[$timestamp][$hook]);
-            }
-        }
-        _set_cron_array($crons);
-    }
-
-    function activation()
+    public function activation() : void
     {
         $cron = 'POF_Affiliate_Linker_CRON';
         if (!wp_next_scheduled($cron)) {
@@ -70,7 +55,7 @@ class Affiliate_Linker
 //        wp_clear_scheduled_hook($cron);
     }
 
-    public function add_amazon_tag($matches)
+    public function add_amazon_tag( array $matches ) : string
     {
 
         $url = parse_url($matches[2]); // split url into parts
@@ -82,14 +67,21 @@ class Affiliate_Linker
 
     }
 
-    function add_amazon_ajax()
+    public function add_amazon_ajax() : void
     {
-        header('Content-Type: application/json');
-        $this->add_amazon();
-        die;
+        check_ajax_referer( 'pof_affiliates_run', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => 'Insufficient permissions.' ], 403 );
+        }
+        wp_send_json( $this->add_amazon() );
     }
 
-    public function add_amazon()
+    /**
+     * Walk published posts, append the affiliate tag to Amazon URLs.
+     * Returns a summary; does not terminate execution so the daily cron
+     * (POF_Affiliate_Linker_CRON) can invoke this without wp_die().
+     */
+    public function add_amazon() : array
     {
 
         global $wpdb;
@@ -122,11 +114,15 @@ sql
                 );
             }
         }
-        echo json_encode([
+        return [
             'success' => true,
-            'message' => sprintf("Replaced %d urls in %d posts (%0.2f%%)", $changeCount, count($has_amazon),
-                count($has_amazon)>0 ? $changeCount / count($has_amazon):0)
-        ]);
+            'message' => sprintf(
+                'Replaced %d urls in %d posts (%0.2f%%)',
+                $changeCount,
+                count($has_amazon),
+                count($has_amazon) > 0 ? $changeCount / count($has_amazon) : 0
+            ),
+        ];
 
     }
 

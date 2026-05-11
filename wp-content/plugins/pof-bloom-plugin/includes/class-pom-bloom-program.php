@@ -67,9 +67,6 @@ class POM_Bloom_Program {
         $event = 'bloom_create_goalset_event';
         $bloom_cron = 'pom_bloom_create_goalset';
         if(wp_next_scheduled($event)) {
-//            $timestamp = wp_next_scheduled($event);
-//            wp_unschedule_event($timestamp, $event);
-//            error_log('unset ' . $event);
         }
         if ( !( wp_next_scheduled( $event ) ) ) {
             wp_schedule_event( time(), 'daily', $event );
@@ -107,14 +104,17 @@ class POM_Bloom_Program {
     }
 
     public function ajax_callback() {
+        check_ajax_referer( 'pom_bloom_nonce', 'nonce' );
         $result = array( 'success' => false );
         switch ( $_POST['route'] ) {
             case 'preferences':
-                update_user_meta( $_POST['user'], $this->parent->_token . 'preference_level', $_POST['preference'] );
-                $result = array( 'success' => true );
+                if ( isset( $_POST['preference'] ) ) {
+                    update_user_meta( get_current_user_id(), $this->parent->_token . 'preference_level', sanitize_text_field( wp_unslash( $_POST['preference'] ) ) );
+                    $result = array( 'success' => true );
+                }
                 break;
             case 'assessments':
-                $user               = (int) $_POST['user'];
+                $user               = get_current_user_id();
                 $average            = [ 'sum' => 0, 'count' => 0 ];
                 $assessment_results = array_map( function ( $a ) use ( &$average ) {
                     if ( (int) $a['value'] > 0 ) {
@@ -146,7 +146,7 @@ class POM_Bloom_Program {
                         array(
                             'taxonomy'         => 'bloom-categories',
                             'field'            => 'id',
-                            'terms'            => $_POST['category_id'],
+                            'terms'            => absint( $_POST['category_id'] ),
                             'include_children' => false
                         )
                     )
@@ -164,10 +164,10 @@ class POM_Bloom_Program {
                 ];
                 break;
             case 'add_goals':
-                $opts = $_POST;
-                $data = array();
-                parse_str( $opts['data'], $data );
-                $goalCount = count( $data['goals'] );
+                $current_user = get_current_user_id();
+                $data         = array();
+                parse_str( wp_unslash( $_POST['data'] ?? '' ), $data );
+                $goalCount = isset( $data['goals'] ) ? count( $data['goals'] ) : 0;
                 $goals     = [ ];
                 for ( $i = 0; $i < $goalCount; $i ++ ) {
                     $goals[] = [
@@ -177,59 +177,88 @@ class POM_Bloom_Program {
                         'per_week'      => $data['per_week'][ $i ]
                     ];
                 }
-                array_map( function ( $goal ) use ( $opts, $data ) {
+                array_map( function ( $goal ) use ( $current_user, $data ) {
                     $post    = [
-                        'post_title'  => $goal['goal'],
-                        'post_author' => $opts['user'],
+                        'post_title'  => sanitize_text_field( $goal['goal'] ),
+                        'post_author' => $current_user,
                         'tax_input'   => array(
-                            'bloom-categories' => array( $goal['category_id'] ),
-                            'bloom-goalsets'   => array( $data['goalset'] )
+                            'bloom-categories' => array( absint( $goal['category_id'] ) ),
+                            'bloom-goalsets'   => array( absint( $data['goalset'] ) )
                         ),
                         'post_status' => 'publish',
                         'post_type'   => 'bloom-user-goals'
                     ];
                     $goal_id = wp_insert_post( $post, true );
-                    add_post_meta( $goal_id, 'per_week', $goal['per_week'] );
-                    add_post_meta( $goal_id, 'suggested_id', $goal['suggested_id'] );
+                    add_post_meta( $goal_id, 'per_week', absint( $goal['per_week'] ) );
+                    add_post_meta( $goal_id, 'suggested_id', absint( $goal['suggestion_id'] ) );
                 }, $goals );
                 // Serendipity
                 $post        = [
                     'post_title'  => '',
-                    'post_author' => $opts['user'],
+                    'post_author' => $current_user,
                     'post_status' => 'publish',
                     'post_type'   => 'bloom-user-goals',
                     'tax_input'   => array(
-                        'bloom-goalsets' => array( $data['goalset'] )
+                        'bloom-goalsets' => array( absint( $data['goalset'] ) )
                     ),
 
                 ];
-                $is_advanced = get_user_meta( get_current_user_id(), $this->parent->_token . 'preference_level', true ) === 'advanced';
+                $is_advanced = get_user_meta( $current_user, $this->parent->_token . 'preference_level', true ) === 'advanced';
                 for ( $i = $is_advanced ? 2 : 1; $i > 0; $i -- ) {
                     $goal_id = wp_insert_post( $post, true );
                 }
                 $result['success'] = true;
                 break;
             case 'update_goals':
-                $opts      = $_POST;
-                $completed = get_post_meta( $opts['goal'], 'completed', true );
+                $goal_id = absint( $_POST['goal'] ?? 0 );
+                if ( ! $this->user_owns_bloom_goal( $goal_id ) ) {
+                    $result = array( 'success' => false, 'error' => 'forbidden' );
+                    break;
+                }
+                $completed = get_post_meta( $goal_id, 'completed', true );
                 if ( empty( $completed ) ) {
                     $completed = [ ];
                 }
-                $completed[ $opts['day'] ] = $opts['set'] === 'true';
-                update_post_meta( $opts['goal'], 'completed', $completed );
+                $set = isset( $_POST['set'] ) && $_POST['set'] === 'true';
+                $completed[ sanitize_key( $_POST['day'] ?? '' ) ] = $set;
+                update_post_meta( $goal_id, 'completed', $completed );
                 $result['success'] = true;
-                $result['set']     = $opts['set'] === 'true';
+                $result['set']     = $set;
                 break;
             case 'update_serendipity':
+                $goal_id = absint( $_POST['id'] ?? 0 );
+                if ( ! $this->user_owns_bloom_goal( $goal_id ) ) {
+                    $result = array( 'success' => false, 'error' => 'forbidden' );
+                    break;
+                }
                 $args              = [
-                    'ID'         => $_POST['id'],
-                    'post_title' => $_POST['serendipity']
+                    'ID'         => $goal_id,
+                    'post_title' => sanitize_text_field( wp_unslash( $_POST['serendipity'] ?? '' ) )
                 ];
                 $update            = wp_update_post( $args );
                 $result['success'] = true;
                 break;
         }
         die( json_encode( $result ) );
+    }
+
+    /**
+     * Authorize a write against a bloom-user-goals post: the post must
+     * exist, be the expected post type, and either be authored by the
+     * current user or be editable via standard WP capabilities.
+     */
+    protected function user_owns_bloom_goal( int $goal_id ) : bool {
+        if ( ! $goal_id ) {
+            return false;
+        }
+        $post = get_post( $goal_id );
+        if ( ! $post || $post->post_type !== 'bloom-user-goals' ) {
+            return false;
+        }
+        if ( (int) $post->post_author === get_current_user_id() ) {
+            return true;
+        }
+        return current_user_can( 'edit_post', $goal_id );
     }
 
     protected function getRoute() {
@@ -275,7 +304,8 @@ class POM_Bloom_Program {
             'POM_BLOOM',
             array(
                 'ajax_url'     => admin_url( 'admin-ajax.php' ),
-                'current_user' => get_current_user_id()
+                'current_user' => get_current_user_id(),
+                'nonce'        => wp_create_nonce( 'pom_bloom_nonce' )
             )
         );
     }
@@ -487,7 +517,6 @@ class POM_Bloom_Program {
             $goalset = date( "Y-m-d" );
         }
         wp_insert_term( $goalset, 'bloom-goalsets' );
-        error_log( "BLOOM: Inserted $goalset" );
     }
 
     protected function getLatestGoalset() {
@@ -718,251 +747,4 @@ MESSAGE;
 
     }
 
-    protected function getOldBloomDB() {
-        if ( empty( $this->oldBloom ) ) {
-            $this->oldBloom = new wpdb( 'root', 'root', 'powerofmoms_blm', 'localhost' );
-        }
-
-        return $this->oldBloom;
-    }
-
-    protected function removeAllPostTypes( $post_type ) {
-        $posts = get_posts( [
-            'post_type'      => $post_type,
-            'posts_per_page' => - 1
-        ] );
-        array_map( function ( $post ) {
-            $deleted = wp_delete_post( $post->ID, true );
-        }, $posts );
-    }
-
-    protected function removeCategories( $termType ) {
-        $terms = get_terms( $termType, [
-            'hide_empty' => false
-        ] );
-        array_map( function ( $term ) use ( $termType ) {
-            wp_delete_term( $term->term_id, $termType );
-        }, $terms );
-    }
-
-    protected function getOldBloomCategories() {
-        $oldbloom = $this->getOldBloomDB();
-        $sql      = <<<SQL
-SELECT *
-FROM `pom_gls_cats`;
-SQL;
-        $results  = $oldbloom->get_results( $sql, OBJECT );
-
-        return $results;
-    }
-
-    protected function addCategories( $categories, $parent = null ) {
-        array_map( function ( $category ) use ( $parent, $categories ) {
-            $args = [ 'slug' => $category->order . '-' . sanitize_title( $category->category ) ];
-            if ( !is_null( $parent ) ) {
-                $parent_obj     = end( array_filter( $categories, function ( $cat ) use ( $parent ) {
-                    return $cat->id === $parent;
-                } ) );
-                $parent         = get_term_by( 'name', $parent_obj->category, 'bloom-categories' );
-                $args['parent'] = $parent->term_id;
-            }
-            $term = wp_insert_term( $category->category, 'bloom-categories', $args );
-            $this->addCategories( $categories, $category->id );
-        }, array_filter( $categories, function ( $cat ) use ( $parent ) {
-            return $cat->parent === $parent;
-        } ) );
-    }
-
-    protected function addSuggestions() {
-        $oldbloom = $this->getOldBloomDB();
-        $sql      = <<<SQL
-SELECT *
-FROM `pom_gls_recomendations`
-LEFT JOIN `pom_gls_cats` ON `pom_gls_cats`.id = `pom_gls_recomendations`.cat_id;
-SQL;
-        $results  = $oldbloom->get_results( $sql, OBJECT );
-        $posts    = [ ];
-        foreach ( $results as $recommendation ) {
-            $theCat = end( array_filter( $this->oldCats(), function ( $catGroup ) use ( $recommendation ) {
-                return $catGroup['old']->id === $recommendation->id;
-            } ) );
-            $post   = [
-                'post_title'  => $recommendation->recommendation,
-                'post_type'   => 'bloom_suggested',
-                'post_status' => 'publish',
-                'tax_input'   => array( 'bloom-categories' => array( $theCat['new']->term_id ) )
-            ];
-            if ( is_null( $theCat['new']->term_id ) ) {
-                var_dump( $recommendation );
-                die;
-            }
-            $posts[] = [
-                'post' => $post,
-                'meta' => [ 'key' => 'bloom_per_week', 'value' => $recommendation->per_week ]
-            ];
-        }
-        array_map( function ( $post ) {
-            $post_id = wp_insert_post( $post['post'] );
-            add_post_meta( $post_id, $post['meta']['key'], $post['meta']['value'] );
-        }, $posts );
-
-    }
-
-    protected function addAssessmentQuestions() {
-        $categories = $this->oldCats();
-        $oldbloom   = $this->getOldBloomDB();
-        $sql        = <<<SQL
-SELECT *
-FROM `pom_gls_a_quests`
-LEFT JOIN `pom_gls_cats` ON `pom_gls_cats`.id = `pom_gls_a_quests`.category_id;
-SQL;
-        $results    = $oldbloom->get_results( $sql, OBJECT );
-        array_map( function ( $q ) use ( $categories ) {
-            $theCat    = end( array_filter( $categories, function ( $catGroup ) use ( $q ) {
-                return $catGroup['old']->id === $q->category_id;
-            } ) );
-            $theCat_id = $theCat['new']->term_id;
-            $post      = [
-                'post_title'  => $q->question,
-                'post_type'   => 'bloom-assessments',
-                'post_status' => 'publish',
-                'slug'        => $q->order . '-' . sanitize_title( $q->question ),
-                'tax_input'   => array( 'bloom-categories' => array( $theCat_id ) )
-            ];
-            $post_id   = wp_insert_post( $post, true );
-        }, $results );
-    }
-
-    protected function addGoalsets() {
-        $oldbloom = $this->getOldBloomDB();
-        $sql      = <<<SQL
-SELECT *
-FROM `pom_gls_goalsets`;
-SQL;
-        $results  = $oldbloom->get_results( $sql, OBJECT );
-        array_map( function ( $set ) {
-            wp_insert_term( $set->date, 'bloom-goalsets' );
-        }, $results );
-    }
-
-    protected function addAssessments() {
-        $oldbloom  = $this->getOldBloomDB();
-        $sql       = <<<SQL
-SELECT * FROM `pom_gls_a_user`
-LEFT JOIN pom_gls_a_quests ON pom_gls_a_user.quest_id = pom_gls_a_quests.id
-ORDER BY `user_id`;
-SQL;
-        $results   = $oldbloom->get_results( $sql, OBJECT );
-        $organized = [ ];
-        array_map( function ( $q ) use ( &$organized ) {
-            $organized[ $q->user_id ][ $q->timestamp ][ $q->question ] = $q->response;
-        }, $results );
-
-        foreach ( $organized as $user_id => $assessments ) {
-            foreach ( $assessments as $assessment => $questions ) {
-                $a       = [ ];
-                $average = [ 'sum' => 0, 'count' => 0 ];
-                foreach ( $questions as $question => $response ) {
-                    $theQuestion = get_page_by_title( $question, OBJECT, 'bloom-assessments' );
-                    $a[]         = [
-                        'q'      => $theQuestion->ID,
-                        'rating' => $response
-                    ];
-                    if ( (int) $response > 0 ) {
-                        $average['sum'] += (int) $response;
-                        $average['count'] ++;
-                    }
-                }
-                $new_assessment = [
-                    'assessment_date'    => $assessment,
-                    'average'            => $average['count'] > 0 ? round( $average['sum'] / $average['count'], 1 ) : 0,
-                    'assessment_results' => $a
-                ];
-                add_user_meta( $user_id, $this->parent->_token . '_assessment', $new_assessment );
-            }
-
-        }
-    }
-
-    protected function addGoals() {
-        $oldbloom = $this->getOldBloomDB();
-        $sql      = <<<SQL
-SELECT *
-FROM `pom_gls_goals`
-LEFT JOIN pom_gls_cats ON pom_gls_cats.id = pom_gls_goals.cat_id;
-SQL;
-        $results  = $oldbloom->get_results( $sql, OBJECT );
-        array_map( function ( $goal ) {
-            $taxonomies['bloom-goalsets'] = array( $goal->goalset );
-            if ( (int) $goal->rec_id !== - 1 ) {
-                $args                           = [
-                    'name__like' => $goal->category,
-                    'hide_empty' => false
-                ];
-                $theCat                         = get_terms( 'bloom-categories', $args );
-                $taxonomies['bloom-categories'] = array( $theCat[0]->term_id );
-            }
-
-
-            $args = [
-                'post_title'  => $goal->goal,
-                'post_author' => $goal->user_id,
-                'post_status' => 'publish',
-                'post_type'   => 'bloom-user-goals',
-                'tax_input'   => $taxonomies
-            ];
-            $item = wp_insert_post( $args );
-            add_post_meta( $item, 'bloom-per-week', $goal->per_week );
-            $completed = array(
-                'mon' => $goal->set_mon === "1",
-                'tue' => $goal->set_tue === "1",
-                'wed' => $goal->set_wed === "1",
-                'thu' => $goal->set_thu === "1",
-                'fri' => $goal->set_fri === "1",
-                'sat' => $goal->set_sat === "1",
-                'sun' => $goal->set_sun === "1",
-            );
-            add_post_meta( $item, 'completed', $completed );
-            if ( (int) $goal->rec_id !== - 1 ) {
-                add_post_meta( $item, 'suggested_id', $goal->rec_id );
-            }
-        }, $results );
-
-    }
-
-
-    /**
-     * Returns a comparison of old categories to new terms
-     * @return array
-     */
-    protected function oldCats() {
-        $oldbloom = $this->getOldBloomDB();
-        $sql      = <<<SQL
-SELECT *
-FROM `pom_gls_cats`;
-SQL;
-        $results  = $oldbloom->get_results( $sql, OBJECT );
-
-        $terms   = get_terms( 'bloom-categories',
-            array(
-                'hide_empty' => false,
-                'orderby'    => 'slug',
-                'order'      => 'ASC'
-            )
-        );
-        $matches = [ ];
-        foreach ( $terms as $term ) {
-            $matches[ $term->name ] = array(
-                'new' => $term,
-                'old' => end( array_filter( $results, function ( $cat ) use ( $term ) {
-                    return strtolower( $cat->category ) === strtolower( $term->name );
-                } ) )
-            );
-            if ( $matches[ $term->name ]['old'] === array() ) {
-                die( $term->name );
-            }
-        }
-
-        return $matches;
-    }
 }

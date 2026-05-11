@@ -9,12 +9,10 @@
 
 namespace PowerOfFamilies\Avanti;
 
-global $product;
-
 class WooCommerce
 {
 
-    function __construct()
+    public function __construct()
     {
 
         add_action('woocommerce_after_shop_loop_item_title', [$this, 'woocommerce_after_shop_loop_item_title_short_description'], 5);
@@ -60,9 +58,9 @@ class WooCommerce
         remove_action('woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20);
     }
 
-    function remove_elements_from_header_of_family_coaching_group_product_page()
+    public function remove_elements_from_header_of_family_coaching_group_product_page(): void
     {
-        $ids = array(62545);
+        $ids = array_map('absint', explode(',', get_option('pof_family_coaching_product_ids', '62545')));
         if (!function_exists('is_product') || !function_exists('wc_get_product')) return;
         $product = wc_get_product();
         if (is_product() && $product && in_array($product->get_id(), $ids)) {
@@ -87,7 +85,7 @@ class WooCommerce
                 }
             }
 
-            function woocommerce_after_shop_loop_item_title_short_description()
+            public function woocommerce_after_shop_loop_item_title_short_description(): void
             {
                 global $product;
                 $excerpt = $product->get_short_description();
@@ -99,19 +97,19 @@ class WooCommerce
     <?php
             }
 
-            function remove_loop_button()
+            public function remove_loop_button(): void
             {
                 remove_action('woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10);
             }
 
-            function replace_add_to_cart()
+            public function replace_add_to_cart(): void
             {
                 global $product;
                 $link = $product->get_permalink();
-                echo do_shortcode('<br><a class="button" href="' . esc_attr($link) . '">Learn More</a>');
+                echo do_shortcode('<br><a class="button" href="' . esc_url($link) . '">Learn More</a>');
             }
 
-            function change_billing_details_to_your_details($translated_text, $text = '', $domain = '')
+            public function change_billing_details_to_your_details($translated_text, $text = '', $domain = ''): string
             {
                 remove_filter(current_filter(), __FUNCTION__);
                 switch (strtolower($translated_text)) {
@@ -122,12 +120,12 @@ class WooCommerce
                 return $translated_text;
             }
 
-            function returning_customer_to_returning_member()
+            public function returning_customer_to_returning_member(): string
             {
                 return 'Returning Member?';
             }
 
-            function remove_unnecessary_billing_fields($fields = [])
+            public function remove_unnecessary_billing_fields($fields = []): array
             {
                 if (is_user_logged_in()) {
                     unset($fields['billing_first_name']);
@@ -146,27 +144,27 @@ class WooCommerce
             }
 
 
-            function alter_woocommerce_checkout_fields($fields)
+            public function alter_woocommerce_checkout_fields($fields): array
             {
                 unset($fields['order']['order_comments']);
                 return $fields;
             }
 
-            function remove_order_notes($fields)
+            public function remove_order_notes($fields): array
             {
                 unset($fields['order']['order_comments']);
                 return $fields;
             }
 
-            function add_text_to_checkout()
+            public function add_text_to_checkout(): void
             {
                 if (is_user_logged_in()) return;
-                echo "If you already have an account on Power of Families, use the link at the top of this page to log in before continuing. Otherwise, we'll 
-need to quickly create an account for you. Your email will be your username and you choose your password. You will use your username/email 
+                echo "If you already have an account on Power of Families, use the link at the top of this page to log in before continuing. Otherwise, we'll
+need to quickly create an account for you. Your email will be your username and you choose your password. You will use your username/email
 and password to log in and access your materials whenever you wish.";
             }
 
-            function custom_woocommerce_auto_complete_order($order_id)
+            public function custom_woocommerce_auto_complete_order($order_id): void
             {
                 if (!$order_id) {
                     return;
@@ -176,7 +174,7 @@ and password to log in and access your materials whenever you wish.";
                 $order->update_status('completed');
             }
 
-            function change_billing_field_strings($translated_text, $text, $domain)
+            public function change_billing_field_strings($translated_text, $text, $domain): string
             {
                 switch ($translated_text) {
                     case 'Billing details':
@@ -186,12 +184,12 @@ and password to log in and access your materials whenever you wish.";
                 return $translated_text;
             }
 
-            function change_return_customer_message()
+            public function change_return_customer_message(): string
             {
                 return 'Returning Member?';
             }
 
-            function add_my_programs_message()
+            public function add_my_programs_message(): void
             {
     ?>
         <div class="my-programs-after-order-message">

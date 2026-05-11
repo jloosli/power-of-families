@@ -3,7 +3,6 @@
 if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
-DEFINE( 'SCRIPT_DEBUG', 1 );
 
 class POM_Bloom {
 
@@ -286,7 +285,6 @@ class POM_Bloom {
     public function enqueue_scripts() {
         wp_register_script( $this->_token . '-frontend', $this->build_url . 'frontend.js', array( 'jquery' ), $this->_version );
         wp_register_script('jquery-dotdotdot', esc_url($this->assets_url) . 'js/jQuery.dotdotdot-master/src/js/jquery.dotdotdot.min.js',array('jquery'), $this->_version);
-//		wp_enqueue_script( $this->_token . '-frontend' );
     } // End enqueue_scripts ()
 
     /**
@@ -297,7 +295,6 @@ class POM_Bloom {
      */
     public function admin_enqueue_styles( $hook = '' ) {
         wp_register_style( $this->_token . '-admin', esc_url( $this->assets_url ) . 'css/admin.css', array(), $this->_version );
-//		wp_enqueue_style( $this->_token . '-admin' );
     } // End admin_enqueue_styles ()
 
     /**
@@ -420,21 +417,6 @@ CREATE TABLE $table_name (
 ASSESSMENT_TABLE;
                     require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
                     dbDelta( $sql );
-
-//                    $table_name = $wpdb->prefix . 'bloom_goalsets';
-//                    $sql        = <<<GOALSETS_TABLE
-//CREATE TABLE $table_name (
-//    id mediumint(9) NOT NULL AUTO_INCREMENT,
-//    user_id mediumint(9) NOT NULL,
-//    goalset date DEFAULT '0000-00-00' NOT NULL,
-//    question_id mediumint(9) DEFAULT NULL NULL,
-//    question TEXT DEFAULT '' NOT NULL,
-//    per_week tinyint(1) DEFAULT 1 NOT NULL,
-//    completed INT(9) DEFAULT 0 NOT NULL,
-//    UNIQUE KEY id (id)
-//    );
-//GOALSETS_TABLE;
-//                    dbDelta( $sql );
 
                     update_option( $this->_token . '_version', "1.01" );
 

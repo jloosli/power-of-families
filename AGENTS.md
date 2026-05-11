@@ -9,7 +9,26 @@ wp-content/themes/power-of-families/   ← custom Genesis child theme (your main
 wp-content/plugins/pof-bloom-plugin/   ← custom Bloom plugin
 wordpress/                             ← WP core (git-ignored, pulled separately)
 docker-compose.yml                     ← local dev environment
+docker-compose.worktree.yml            ← optional override: share main project's DB
 ```
+
+## Worktree setup
+
+When working in a `git worktree` (under `.claude/worktrees/`), share the
+main project's running database container instead of standing up a
+separate DB per worktree (saves disk + import time):
+
+```sh
+ln -s docker-compose.worktree.yml docker-compose.override.yml
+docker compose up -d wordpress    # site at http://localhost:8081
+```
+
+Prereq: the main project's db container must be running
+(`cd ~/projects/power-of-families && docker compose up -d db`).
+
+Caveat: writes from the worktree mutate the shared site DB. PHPUnit
+creates a separate `wordpress_tests` schema on the same mysql instance,
+so test runs are isolated from site data.
 
 ## Commands
 

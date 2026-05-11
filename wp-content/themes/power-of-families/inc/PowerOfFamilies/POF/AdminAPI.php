@@ -9,7 +9,7 @@ class AdminAPI {
 	 * Constructor function
 	 */
 	public function __construct () {
-		add_action( 'save_post', array( $this, 'save_meta_boxes' ), 10, 1 );
+		add_action( 'save_post', [$this, 'save_meta_boxes'], 10, 1 );
 	}
 
 	/**
@@ -19,7 +19,7 @@ class AdminAPI {
 	 * @param  boolean $echo  Whether to echo the field HTML or return it
 	 * @return void
 	 */
-	public function display_field ( $data = array(), $post = false, $echo = true ) {
+	public function display_field ( array $data = [], $post = false, bool $echo = true ) {
 
 		// Get field info
 		if ( isset( $data['field'] ) ) {
@@ -174,25 +174,18 @@ class AdminAPI {
 
 		}
 
-		switch( $field['type'] ) {
+		if ( in_array( $field['type'], [ 'checkbox_multi', 'radio', 'select_multi' ], true ) ) {
+			$html .= '<br/><span class="description">' . $field['description'] . '</span>';
+		} else {
+			if ( ! $post ) {
+				$html .= '<label for="' . esc_attr( $field['id'] ) . '">' . "\n";
+			}
 
-			case 'checkbox_multi':
-			case 'radio':
-			case 'select_multi':
-				$html .= '<br/><span class="description">' . $field['description'] . '</span>';
-			break;
+			$html .= '<span class="description">' . $field['description'] . '</span>' . "\n";
 
-			default:
-				if ( ! $post ) {
-					$html .= '<label for="' . esc_attr( $field['id'] ) . '">' . "\n";
-				}
-
-				$html .= '<span class="description">' . $field['description'] . '</span>' . "\n";
-
-				if ( ! $post ) {
-					$html .= '</label>' . "\n";
-				}
-			break;
+			if ( ! $post ) {
+				$html .= '</label>' . "\n";
+			}
 		}
 
 		if ( ! $echo ) {
@@ -209,7 +202,7 @@ class AdminAPI {
 	 * @param  string $type Type of field to validate
 	 * @return string       Validated value
 	 */
-	public function validate_field ( $data = '', $type = 'text' ) {
+	public function validate_field ( string $data = '', string $type = 'text' ) : string {
 
 		switch( $type ) {
 			case 'text': $data = esc_attr( $data ); break;
@@ -230,7 +223,7 @@ class AdminAPI {
 	 * @param array  $callback_args Any axtra arguments that will be passed to the display function for this metabox
 	 * @return void
 	 */
-	public function add_meta_box ( $id = '', $title = '', $post_types = array(), $context = 'advanced', $priority = 'default', $callback_args = null ) {
+	public function add_meta_box ( $id = '', $title = '', $post_types = array(), $context = 'advanced', $priority = 'default', $callback_args = null ) : void {
 
 		// Get post type(s)
 		if ( ! is_array( $post_types ) ) {
@@ -239,7 +232,7 @@ class AdminAPI {
 
 		// Generate each metabox
 		foreach ( $post_types as $post_type ) {
-			add_meta_box( $id, $title, array( $this, 'meta_box_content' ), $post_type, $context, $priority, $callback_args );
+			add_meta_box( $id, $title, [$this, 'meta_box_content'], $post_type, $context, $priority, $callback_args );
 		}
 	}
 
@@ -249,13 +242,14 @@ class AdminAPI {
 	 * @param  array  $args Arguments unique to this metabox
 	 * @return void
 	 */
-	public function meta_box_content ( $post, $args ) {
+	public function meta_box_content ( $post, array $args ) : void {
 
 		$fields = apply_filters( $post->post_type . '_custom_fields', array(), $post->post_type );
 
 		if ( ! is_array( $fields ) || 0 == count( $fields ) ) return;
 
 		echo '<div class="custom-field-panel">' . "\n";
+		wp_nonce_field( 'pof_save_meta', 'pof_meta_nonce' );
 
 		foreach ( $fields as $field ) {
 
@@ -281,7 +275,7 @@ class AdminAPI {
 	 * @param  object $post  Post object
 	 * @return void
 	 */
-	public function display_meta_box_field ( $field = array(), $post ) {
+	public function display_meta_box_field ( array $field = [], $post = null ) : void {
 
 		if ( ! is_array( $field ) || 0 == count( $field ) ) return;
 
@@ -295,7 +289,17 @@ class AdminAPI {
 	 * @param  integer $post_id Post ID
 	 * @return void
 	 */
-	public function save_meta_boxes ( $post_id = 0 ) {
+	public function save_meta_boxes ( int $post_id = 0 ) : void {
+
+		if ( ! isset( $_POST['pof_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pof_meta_nonce'] ) ), 'pof_save_meta' ) ) {
+			return;
+		}
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return;
+		}
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
 
 		if ( ! $post_id ) return;
 
@@ -306,8 +310,8 @@ class AdminAPI {
 		if ( ! is_array( $fields ) || 0 == count( $fields ) ) return;
 
 		foreach ( $fields as $field ) {
-			if ( isset( $_REQUEST[ $field['id'] ] ) ) {
-				update_post_meta( $post_id, $field['id'], $this->validate_field( $_REQUEST[ $field['id'] ], $field['type'] ) );
+			if ( isset( $_POST[ $field['id'] ] ) ) {
+				update_post_meta( $post_id, $field['id'], $this->validate_field( wp_unslash( $_POST[ $field['id'] ] ), $field['type'] ) );
 			} else {
 				update_post_meta( $post_id, $field['id'], '' );
 			}

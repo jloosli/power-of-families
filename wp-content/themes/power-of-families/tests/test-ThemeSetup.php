@@ -90,7 +90,8 @@ class test_ThemeSetup extends WP_UnitTestCase {
         // Genesis filters.
         $this->assertNotFalse( has_filter( 'genesis_nav_items', [ $this->theme_setup, 'be_follow_icons' ] ) );
         $this->assertNotFalse( has_filter( 'genesis_post_info', [ $this->theme_setup, 'sp_post_info_filter' ] ) );
-        $this->assertNotFalse( has_filter( 'genesis_pre_load_favicon', [ $this->theme_setup, 'pre_load_favicon' ] ) );
+        $this->assertNotFalse( has_action( 'wp_head', [ $this->theme_setup, 'pre_load_favicon' ] ) );
+        $this->assertNotFalse( has_action( 'admin_head', [ $this->theme_setup, 'pre_load_favicon' ] ) );
     }
 
     public function test_display_author_box_registers_hooks() {
@@ -318,30 +319,6 @@ class test_ThemeSetup extends WP_UnitTestCase {
 
         $this->assertCount( 2, $result );
         $this->assertContains( 'Power of Families Avatar', $result );
-    }
-
-    // -------------------------------------------------------------------------
-    // Secondary nav search form
-    // -------------------------------------------------------------------------
-
-    public function test_genesis_search_secondary_nav_non_secondary_location_unchanged() {
-        $menu   = '<li>Item</li>';
-        $args   = (object) [ 'theme_location' => 'primary' ];
-
-        $result = $this->theme_setup->genesis_search_secondary_nav_menu( $menu, $args );
-
-        $this->assertSame( $menu, $result );
-    }
-
-    public function test_genesis_search_secondary_nav_appends_search_form() {
-        // genesis_get_option() stub returns '' (falsy), so the early return is skipped.
-        $menu   = '<li>Item</li>';
-        $args   = (object) [ 'theme_location' => 'secondary' ];
-
-        $result = $this->theme_setup->genesis_search_secondary_nav_menu( $menu, $args );
-
-        $this->assertStringContainsString( 'secondary-search', $result );
-        $this->assertStringContainsString( 'search-form', $result );
     }
 
     // -------------------------------------------------------------------------
