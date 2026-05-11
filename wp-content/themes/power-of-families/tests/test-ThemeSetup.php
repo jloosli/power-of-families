@@ -233,9 +233,26 @@ class test_ThemeSetup extends WP_UnitTestCase {
         $this->assertSame( '', $output );
     }
 
-    public function test_home_large_featured_outputs_wrapper_when_home() {
+    public function test_home_large_featured_outputs_nothing_when_sidebar_inactive() {
+        // Production behaviour: no active widgets = no output, even on home.
         $this->factory->post->create();
         $this->go_to( '/' );
+        $this->theme_setup->createWidgets();
+
+        ob_start();
+        $this->theme_setup->home_large_featured();
+        $output = ob_get_clean();
+
+        $this->assertSame( '', $output );
+    }
+
+    public function test_home_large_featured_outputs_wrapper_when_sidebar_active() {
+        $this->factory->post->create();
+        $this->go_to( '/' );
+        $this->theme_setup->createWidgets();
+        // Activate the sidebar (widget IDs need not be real; dynamic_sidebar
+        // silently skips unregistered IDs, but is_active_sidebar() returns true).
+        wp_set_sidebars_widgets( [ 'home_large_featured' => [ 'stub-widget' ] ] );
 
         ob_start();
         $this->theme_setup->home_large_featured();
@@ -252,9 +269,33 @@ class test_ThemeSetup extends WP_UnitTestCase {
         $this->assertSame( '', $output );
     }
 
-    public function test_home_featured_widgets_outputs_three_widget_areas_when_home() {
+    public function test_home_featured_widgets_outputs_only_outer_wrapper_when_sidebars_inactive() {
+        // Method echoes the outer wrapper directly, so it appears regardless
+        // of widget activation. Inner per-area wrappers come from
+        // genesis_widget_area() and stay hidden until widgets are active.
         $this->factory->post->create();
         $this->go_to( '/' );
+        $this->theme_setup->createWidgets();
+
+        ob_start();
+        $this->theme_setup->home_featured_widgets();
+        $output = ob_get_clean();
+
+        $this->assertStringContainsString( 'home-featured-widgets', $output );
+        $this->assertStringNotContainsString( 'home-featured-widget-1', $output );
+        $this->assertStringNotContainsString( 'home-featured-widget-2', $output );
+        $this->assertStringNotContainsString( 'home-featured-widget-3', $output );
+    }
+
+    public function test_home_featured_widgets_outputs_three_widget_areas_when_sidebars_active() {
+        $this->factory->post->create();
+        $this->go_to( '/' );
+        $this->theme_setup->createWidgets();
+        wp_set_sidebars_widgets( [
+            'home_left'   => [ 'stub-widget' ],
+            'home_middle' => [ 'stub-widget' ],
+            'home_right'  => [ 'stub-widget' ],
+        ] );
 
         ob_start();
         $this->theme_setup->home_featured_widgets();

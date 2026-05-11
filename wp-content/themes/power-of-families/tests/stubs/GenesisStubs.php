@@ -23,11 +23,14 @@ if ( ! defined( 'PHPUNIT_RUNNING' ) ) {
 if ( ! function_exists( 'genesis_register_sidebar' ) ) {
     /**
      * Register a Genesis sidebar/widget area.
-     * No-op in tests; the theme calls this during widgets_init.
+     * Delegates to register_sidebar() so tests can exercise widget areas
+     * (e.g. by activating them via wp_set_sidebars_widgets()).
      *
      * @param array $args Sidebar arguments.
      */
-    function genesis_register_sidebar( $args = [] ) {}
+    function genesis_register_sidebar( $args = [] ) {
+        return register_sidebar( $args );
+    }
 }
 
 if ( ! function_exists( 'genesis_get_config' ) ) {
@@ -112,14 +115,23 @@ if ( ! function_exists( 'genesis_search_form' ) ) {
 if ( ! function_exists( 'genesis_widget_area' ) ) {
     /**
      * Output a registered Genesis widget area.
-     * Echoes the before/after wrappers so output-capture tests can assert on them.
+     * Mirrors real Genesis: bail when the sidebar isn't active so tests
+     * exercise the same code path as production. Tests that need wrappers
+     * to render must register the sidebar AND activate it (e.g. with
+     * wp_set_sidebars_widgets()).
      *
      * @param string $id   Widget area ID.
      * @param array  $args Output arguments (before, after).
+     * @return bool
      */
     function genesis_widget_area( $id, $args = [] ) {
+        if ( ! $id || ! is_active_sidebar( $id ) ) {
+            return false;
+        }
         echo isset( $args['before'] ) ? $args['before'] : '';
+        dynamic_sidebar( $id );
         echo isset( $args['after'] ) ? $args['after'] : '';
+        return true;
     }
 }
 
