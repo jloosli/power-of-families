@@ -1,0 +1,52 @@
+# Worktree override: route this worktree's services at the main project's
+# running database container (power-of-families-db-1) instead of standing up
+# a separate DB per worktree.
+#
+# Activate in a worktree with:
+#     ln -s docker-compose.worktree.yml docker-compose.override.yml
+#
+# Prerequisite: main project's db container must be running.
+#     (cd ~/projects/power-of-families && docker compose up -d db)
+#
+# Caveat: writes go to the shared DB. Test runs create a separate
+# `wordpress_tests` schema on the same mysql instance, so PHPUnit is safe
+# but site mutations affect main's data.
+
+services:
+    wordpress:
+        environment:
+            WORDPRESS_DB_HOST: power-of-families-db-1
+        networks:
+            - default
+            - main_db
+
+    wpcli:
+        environment:
+            WORDPRESS_DB_HOST: power-of-families-db-1
+        networks:
+            - default
+            - main_db
+
+    phpmyadmin:
+        environment:
+            PMA_HOST: power-of-families-db-1
+        networks:
+            - default
+            - main_db
+
+    test:
+        environment:
+            TEST_DB_HOST: power-of-families-db-1
+        networks:
+            - default
+            - main_db
+
+    db:
+        image: alpine
+        command: ["echo", "db skipped — using main project's power-of-families-db-1"]
+        restart: "no"
+
+networks:
+    main_db:
+        name: power-of-families_default
+        external: true

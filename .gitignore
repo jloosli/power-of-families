@@ -11,6 +11,10 @@ node_modules
 .env
 .env.local
 
+# Local docker-compose override (symlink to docker-compose.worktree.yml in
+# worktrees to share main's DB; otherwise leave absent)
+docker-compose.override.yml
+
 db-backups
 
 .idea
