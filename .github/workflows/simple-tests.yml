@@ -22,13 +22,13 @@ jobs:
         runs-on: ubuntu-24.04
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
 
             - name: Check PHP version is consistent across config
               run: bin/check-php-version
 
             - name: Set up Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v6
               with:
                   node-version: ${{ env.NODE_VERSION }}
                   cache: 'npm'
@@ -52,7 +52,7 @@ jobs:
                   docker compose run --rm test ci --coverage-enabled --generate-reports --coverage-dir coverage --test-reports-dir test-reports
 
             - name: Upload test results
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               if: always()
               with:
                   name: test-results-${{ github.run_number }}
@@ -78,10 +78,10 @@ jobs:
             DEST_PATH: ${{ secrets.DEST_PATH }}
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
 
             - name: Set up Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v6
               with:
                   node-version: ${{ env.NODE_VERSION }}
                   cache: 'npm'
