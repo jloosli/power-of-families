@@ -23,7 +23,7 @@ echo -e "${BLUE}🔍 Verifying database isolation...${NC}"
 
 # Wait for database to be ready
 echo -e "${YELLOW}⏳ Waiting for database to be ready...${NC}"
-until docker-compose exec -T db mysqladmin ping -h"localhost" -u"$TEST_DB_USER" -p"$TEST_DB_PASSWORD" --silent 2>/dev/null; do
+until docker compose exec -T db mysqladmin ping -h"localhost" -u"$TEST_DB_USER" -p"$TEST_DB_PASSWORD" --silent 2>/dev/null; do
     echo -e "${YELLOW}   Waiting for database...${NC}"
     sleep 2
 done
@@ -34,7 +34,7 @@ echo -e "${GREEN}✅ Database connection established${NC}"
 echo -e "${YELLOW}📊 Checking database existence...${NC}"
 
 # Check test database
-if docker-compose exec -T db mysql -u"$TEST_DB_USER" -p"$TEST_DB_PASSWORD" -e "USE \`$TEST_DB_NAME\`;" 2>/dev/null; then
+if docker compose exec -T db mysql -u"$TEST_DB_USER" -p"$TEST_DB_PASSWORD" -e "USE \`$TEST_DB_NAME\`;" 2>/dev/null; then
     echo -e "${GREEN}   ✅ Test database ($TEST_DB_NAME) exists${NC}"
 else
     echo -e "${RED}   ❌ Test database ($TEST_DB_NAME) does not exist${NC}"
@@ -42,7 +42,7 @@ else
 fi
 
 # Check development database
-if docker-compose exec -T db mysql -u"$TEST_DB_USER" -p"$TEST_DB_PASSWORD" -e "USE \`$DEV_DB_NAME\`;" 2>/dev/null; then
+if docker compose exec -T db mysql -u"$TEST_DB_USER" -p"$TEST_DB_PASSWORD" -e "USE \`$DEV_DB_NAME\`;" 2>/dev/null; then
     echo -e "${GREEN}   ✅ Development database ($DEV_DB_NAME) exists${NC}"
 else
     echo -e "${YELLOW}   ⚠️  Development database ($DEV_DB_NAME) does not exist (this is OK for testing)${NC}"

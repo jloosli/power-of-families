@@ -130,7 +130,7 @@ log_verbose() {
 # Wait for database to be ready
 wait_for_database() {
     log_info "Waiting for database to be ready..."
-    until docker-compose exec -T db mysqladmin ping -h"localhost" -u"$TEST_DB_USER" -p"$TEST_DB_PASSWORD" --silent 2>/dev/null; do
+    until docker compose exec -T db mysqladmin ping -h"localhost" -u"$TEST_DB_USER" -p"$TEST_DB_PASSWORD" --silent 2>/dev/null; do
         log_verbose "   Waiting for database..."
         sleep 2
     done
@@ -256,7 +256,7 @@ try {
 EOF
 
     # Run the verification script
-    if docker-compose run --rm test php /tmp/verify-isolation.php; then
+    if docker compose run --rm test php /tmp/verify-isolation.php; then
         log_success "Verification completed successfully"
         return 0
     else
@@ -274,7 +274,7 @@ generate_report() {
         log_info "Generating report file: $report_file"
         
         # Run verification and save to file
-        docker-compose run --rm test php /tmp/verify-isolation.php > "$report_file"
+        docker compose run --rm test php /tmp/verify-isolation.php > "$report_file"
         
         if [ $? -eq 0 ]; then
             log_success "Report generated: $report_file"

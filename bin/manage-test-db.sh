@@ -203,7 +203,7 @@ handle_status() {
     log_info "Checking test database status..."
     
     # Check if database is running
-    if docker-compose ps db | grep -q "Up"; then
+    if docker compose ps db | grep -q "Up"; then
         log_success "Database container is running"
     else
         log_warning "Database container is not running"
@@ -222,7 +222,7 @@ handle_status() {
     fi
     
     # Check if test container exists
-    if docker-compose ps test | grep -q "Up"; then
+    if docker compose ps test | grep -q "Up"; then
         log_success "Test container is running"
     elif docker images | grep -q "power-of-families_test"; then
         log_info "Test container image exists but is not running"

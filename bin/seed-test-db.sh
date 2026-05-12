@@ -229,7 +229,7 @@ try {
 EOF
 
     # Run the seeding script
-    if docker-compose run --rm test php /tmp/seed-database.php; then
+    if docker compose run --rm test php /tmp/seed-database.php; then
         log_success "Database seeded successfully"
     else
         log_error "Database seeding failed"
@@ -301,7 +301,7 @@ if ($errors > 0) {
 }
 EOF
 
-    if docker-compose run --rm test php /tmp/verify-data.php; then
+    if docker compose run --rm test php /tmp/verify-data.php; then
         log_success "Data integrity verified"
     else
         log_error "Data integrity verification failed"
@@ -385,7 +385,7 @@ main() {
     echo ""
     echo -e "${BLUE}💡 Next steps:${NC}"
     echo -e "  Run tests: ${GREEN}npm run test:php${NC}"
-    echo -e "  Check data: ${GREEN}docker-compose run --rm test wp-cli post list${NC}"
+    echo -e "  Check data: ${GREEN}docker compose run --rm test wp-cli post list${NC}"
     echo -e "  Clean up: ${GREEN}bash bin/cleanup-test-db.sh${NC}"
 }
 

@@ -489,7 +489,7 @@ generate_test_data() {
     log_info "Generating test data for development..."
     
     # Run the enhanced test data seeder
-    if docker-compose run --rm test php -r "
+    if docker compose run --rm test php -r "
         require_once '/tmp/wordpress-tests-lib/includes/functions.php';
         require_once dirname(__DIR__) . '/wp-content/themes/power-of-families/functions.php';
         require_once dirname(__DIR__) . '/wp-content/themes/power-of-families/tests/seeders/EnhancedTestDataSeeder.php';
@@ -540,7 +540,7 @@ show_file_coverage() {
     log_info "Showing coverage for: $file_path"
     
     # Run coverage analysis for specific file
-    if docker-compose run --rm test phpunit --configuration phpunit.xml --coverage-text --filter "$file_path"; then
+    if docker compose run --rm test phpunit --configuration phpunit.xml --coverage-text --filter "$file_path"; then
         log_success "Coverage analysis completed"
     else
         log_error "Coverage analysis failed"
@@ -555,7 +555,7 @@ run_performance_tests() {
     local start_time=$(date +%s)
     
     # Run tests with performance monitoring
-    if docker-compose run --rm test phpunit --configuration phpunit.xml --verbose; then
+    if docker compose run --rm test phpunit --configuration phpunit.xml --verbose; then
         local end_time=$(date +%s)
         local duration=$((end_time - start_time))
         
@@ -572,7 +572,7 @@ run_memory_tests() {
     log_info "Running memory usage tests..."
     
     # Run tests with memory monitoring
-    if docker-compose run --rm test php -d memory_limit=2G phpunit --configuration phpunit.xml --verbose; then
+    if docker compose run --rm test php -d memory_limit=2G phpunit --configuration phpunit.xml --verbose; then
         log_success "Memory tests completed"
         log_info "Check test output for memory usage information"
     else

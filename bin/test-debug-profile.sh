@@ -145,7 +145,7 @@ log_verbose() {
 
 # Build PHPUnit command with debugging
 build_debug_command() {
-    local phpunit_cmd="docker-compose run --rm"
+    local phpunit_cmd="docker compose run --rm"
     phpunit_cmd="$phpunit_cmd -e XDEBUG_MODE=debug"
     phpunit_cmd="$phpunit_cmd -e XDEBUG_CONFIG=client_host=$DEBUG_HOST client_port=$DEBUG_PORT idekey=docker"
     phpunit_cmd="$phpunit_cmd -e XDEBUG_START_WITH_REQUEST=yes"
@@ -166,7 +166,7 @@ build_debug_command() {
 
 # Build PHPUnit command with profiling
 build_profile_command() {
-    local phpunit_cmd="docker-compose run --rm"
+    local phpunit_cmd="docker compose run --rm"
     phpunit_cmd="$phpunit_cmd -e XDEBUG_MODE=profile"
     phpunit_cmd="$phpunit_cmd -e XDEBUG_OUTPUT_DIR=$PROFILE_OUTPUT_DIR"
     phpunit_cmd="$phpunit_cmd -e XDEBUG_PROFILER_ENABLE=1"
@@ -187,7 +187,7 @@ build_profile_command() {
 
 # Build PHPUnit command with coverage
 build_coverage_command() {
-    local phpunit_cmd="docker-compose run --rm"
+    local phpunit_cmd="docker compose run --rm"
     phpunit_cmd="$phpunit_cmd -e XDEBUG_MODE=coverage"
     phpunit_cmd="$phpunit_cmd test"
     phpunit_cmd="$phpunit_cmd php -d memory_limit=$MEMORY_LIMIT"
@@ -425,7 +425,7 @@ setup_debug_environment() {
     mkdir -p "$PROFILE_OUTPUT_DIR"
     
     # Check if xDebug is available
-    if docker-compose run --rm test php -m | grep -q xdebug; then
+    if docker compose run --rm test php -m | grep -q xdebug; then
         log_success "xDebug extension is available"
     else
         log_error "xDebug extension is not available"
@@ -434,7 +434,7 @@ setup_debug_environment() {
     
     # Test debug connection
     log_info "Testing debug connection..."
-    if docker-compose run --rm test php -r "
+    if docker compose run --rm test php -r "
         if (function_exists('xdebug_info')) {
             echo 'xDebug is properly configured' . PHP_EOL;
         } else {
@@ -457,7 +457,7 @@ setup_profile_environment() {
     mkdir -p "$PROFILE_OUTPUT_DIR"
     
     # Check if xDebug is available
-    if docker-compose run --rm test php -m | grep -q xdebug; then
+    if docker compose run --rm test php -m | grep -q xdebug; then
         log_success "xDebug extension is available"
     else
         log_error "xDebug extension is not available"
@@ -466,7 +466,7 @@ setup_profile_environment() {
     
     # Test profile configuration
     log_info "Testing profile configuration..."
-    if docker-compose run --rm test php -r "
+    if docker compose run --rm test php -r "
         if (ini_get('xdebug.mode') && strpos(ini_get('xdebug.mode'), 'profile') !== false) {
             echo 'Profile mode is properly configured' . PHP_EOL;
         } else {

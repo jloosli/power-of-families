@@ -160,16 +160,16 @@ check_docker() {
     return 0
 }
 
-# Check if docker-compose is available
+# Check if docker compose is available
 check_docker_compose() {
-    log_verbose "Checking docker-compose availability..."
+    log_verbose "Checking docker compose availability..."
     
-    if ! command -v docker-compose >/dev/null 2>&1; then
-        log_error "docker-compose is not available"
+    if ! docker compose version >/dev/null 2>&1; then
+        log_error "docker compose is not available"
         return 1
     fi
     
-    log_success "docker-compose is available"
+    log_success "docker compose is available"
     return 0
 }
 
@@ -177,7 +177,7 @@ check_docker_compose() {
 check_test_container() {
     log_verbose "Checking test container..."
     
-    if docker-compose ps test >/dev/null 2>&1; then
+    if docker compose ps test >/dev/null 2>&1; then
         log_success "Test container is configured"
         return 0
     else
@@ -190,7 +190,7 @@ check_test_container() {
 check_test_database() {
     log_verbose "Checking test database..."
     
-    if docker-compose exec -T db mysqladmin ping -h"localhost" -u"root" -p"password" --silent 2>/dev/null; then
+    if docker compose exec -T db mysqladmin ping -h"localhost" -u"root" -p"password" --silent 2>/dev/null; then
         log_success "Test database is accessible"
         return 0
     else
@@ -273,7 +273,7 @@ setup_test_environment() {
     
     # Build test container
     log_info "Building test container..."
-    if docker-compose build test; then
+    if docker compose build test; then
         log_success "Test container built"
     else
         log_error "Failed to build test container"
@@ -317,8 +317,8 @@ teardown_test_environment() {
     
     # Stop test containers
     log_info "Stopping test containers..."
-    docker-compose stop test 2>/dev/null || true
-    docker-compose stop db 2>/dev/null || true
+    docker compose stop test 2>/dev/null || true
+    docker compose stop db 2>/dev/null || true
     
     log_success "Test containers stopped"
     
@@ -415,7 +415,7 @@ validate_environment() {
         validation_passed=false
     fi
     
-    # Check docker-compose
+    # Check docker compose
     if ! check_docker_compose; then
         validation_passed=false
     fi
