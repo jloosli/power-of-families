@@ -152,16 +152,18 @@ execute_ci_tests() {
     # Run PHPUnit with coverage and reporting for CI/CD
     local phpunit_cmd="phpunit --configuration phpunit.xml"
     
-    # Add coverage flags if coverage is enabled
+    # Write coverage and reports to /var/www/html/{coverage,test-reports},
+    # which are bind-mounted to ./coverage and ./test-reports on the host.
+    # Using absolute paths here because CWD is the theme directory, so
+    # `coverage/clover.xml` would otherwise resolve under the theme tree.
     if [[ "$COMMON_OPTIONS" == *"--coverage-enabled"* ]]; then
-        phpunit_cmd="$phpunit_cmd --coverage-clover=coverage/clover.xml"
-        phpunit_cmd="$phpunit_cmd --coverage-html=coverage/html"
+        phpunit_cmd="$phpunit_cmd --coverage-clover=/var/www/html/coverage/clover.xml"
+        phpunit_cmd="$phpunit_cmd --coverage-html=/var/www/html/coverage/html"
         phpunit_cmd="$phpunit_cmd --coverage-text"
     fi
-    
-    # Add reporting flags if reports are enabled
+
     if [[ "$COMMON_OPTIONS" == *"--generate-reports"* ]]; then
-        phpunit_cmd="$phpunit_cmd --log-junit=test-reports/junit.xml"
+        phpunit_cmd="$phpunit_cmd --log-junit=/var/www/html/test-reports/junit.xml"
     fi
     
     # Execute the command
