@@ -76,10 +76,10 @@ class My_Programs
         return $output;
     }
 
-    private function getProgramMetaFromDescription( string $description ) : \stdClass
+    private function getProgramMetaFromDescription( ?string $description ) : \stdClass
     {
         $meta = new \stdClass();
-        $lines = explode("\n", $description);
+        $lines = explode("\n", $description ?? '');
         foreach ($lines as $line) {
             $parts = array_map('trim', explode(":", $line));
             if (count($parts) >= 2) {
