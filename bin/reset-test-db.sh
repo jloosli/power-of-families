@@ -26,7 +26,7 @@ bash bin/cleanup-test-db.sh
 
 # Step 2: Stop and restart database container
 echo -e "${YELLOW}📋 Step 2: Restarting database container...${NC}"
-docker-compose restart db
+docker compose restart db
 
 # Wait for database to be ready
 echo -e "${YELLOW}⏳ Waiting for database to be ready...${NC}"
@@ -44,11 +44,11 @@ echo -e "${YELLOW}📋 Step 4: Cleaning up Docker environment...${NC}"
 
 # Stop test containers
 echo -e "${YELLOW}   Stopping test containers...${NC}"
-docker-compose stop test 2>/dev/null || true
+docker compose stop test 2>/dev/null || true
 
 # Remove test containers
 echo -e "${YELLOW}   Removing test containers...${NC}"
-docker-compose rm -f test 2>/dev/null || true
+docker compose rm -f test 2>/dev/null || true
 
 # Clean up unused Docker resources
 echo -e "${YELLOW}   Cleaning up unused Docker resources...${NC}"
@@ -56,7 +56,7 @@ docker system prune -f --volumes 2>/dev/null || true
 
 # Step 5: Rebuild test container
 echo -e "${YELLOW}📋 Step 5: Rebuilding test container...${NC}"
-docker-compose build test
+docker compose build test
 
 # Step 6: Verify test environment
 echo -e "${YELLOW}📋 Step 6: Verifying test environment...${NC}"
@@ -73,7 +73,7 @@ fi
 
 # Test container build
 echo -e "${YELLOW}   Testing container build...${NC}"
-docker-compose run --rm test php --version > /dev/null 2>&1
+docker compose run --rm test php --version > /dev/null 2>&1
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}   ✅ Test container working${NC}"
 else
@@ -83,7 +83,7 @@ fi
 
 # Step 7: Run basic test to verify everything works
 echo -e "${YELLOW}📋 Step 7: Running basic test verification...${NC}"
-if docker-compose run --rm test phpunit --version > /dev/null 2>&1; then
+if docker compose run --rm test phpunit --version > /dev/null 2>&1; then
     echo -e "${GREEN}   ✅ PHPUnit available${NC}"
 else
     echo -e "${RED}   ❌ PHPUnit not available${NC}"
@@ -99,5 +99,5 @@ echo -e "   Verification: ${GREEN}Passed${NC}"
 echo ""
 echo -e "${BLUE}💡 Next steps:${NC}"
 echo -e "   Run tests: ${GREEN}npm run test:php${NC}"
-echo -e "   Debug tests: ${GREEN}docker-compose run --rm test --mode debug${NC}"
-echo -e "   Coverage: ${GREEN}docker-compose run --rm test --mode coverage${NC}"
+echo -e "   Debug tests: ${GREEN}docker compose run --rm test --mode debug${NC}"
+echo -e "   Coverage: ${GREEN}docker compose run --rm test --mode coverage${NC}"

@@ -140,7 +140,7 @@ monitor_performance() {
     
     # Start test execution in background
     log_info "Starting test execution..."
-    docker-compose run --rm test php -d memory_limit="$MEMORY_LIMIT" phpunit --configuration phpunit.xml --verbose > "$metrics_file" 2>&1 &
+    docker compose run --rm test php -d memory_limit="$MEMORY_LIMIT" phpunit --configuration phpunit.xml --verbose > "$metrics_file" 2>&1 &
     local test_pid=$!
     
     # Monitor performance
@@ -251,7 +251,7 @@ run_benchmarks() {
         local start_memory=$(free -m | grep Mem | awk '{print $3}')
         
         # Run tests
-        if docker-compose run --rm test php -d memory_limit="$MEMORY_LIMIT" phpunit --configuration phpunit.xml >/dev/null 2>&1; then
+        if docker compose run --rm test php -d memory_limit="$MEMORY_LIMIT" phpunit --configuration phpunit.xml >/dev/null 2>&1; then
             local end_time=$(date +%s.%N)
             local end_memory=$(free -m | grep Mem | awk '{print $3}')
             
@@ -305,7 +305,7 @@ test_memory_usage() {
     
     log_info "Running tests with memory monitoring..."
     
-    if docker-compose run --rm test php -d memory_limit="$MEMORY_LIMIT" phpunit --configuration phpunit.xml --verbose 2>&1 | tee "$memory_log"; then
+    if docker compose run --rm test php -d memory_limit="$MEMORY_LIMIT" phpunit --configuration phpunit.xml --verbose 2>&1 | tee "$memory_log"; then
         log_success "Memory usage test completed"
         
         # Analyze memory usage
@@ -351,7 +351,7 @@ test_cpu_usage() {
     local monitor_pid=$!
     
     # Run tests
-    if docker-compose run --rm test php -d memory_limit="$MEMORY_LIMIT" phpunit --configuration phpunit.xml >/dev/null 2>&1; then
+    if docker compose run --rm test php -d memory_limit="$MEMORY_LIMIT" phpunit --configuration phpunit.xml >/dev/null 2>&1; then
         # Stop monitoring
         kill $monitor_pid 2>/dev/null || true
         wait $monitor_pid 2>/dev/null || true
@@ -395,7 +395,7 @@ identify_slow_tests() {
     
     log_info "Running tests with timing analysis..."
     
-    if docker-compose run --rm test php -d memory_limit="$MEMORY_LIMIT" phpunit --configuration phpunit.xml --verbose 2>&1 | tee "$timing_log"; then
+    if docker compose run --rm test php -d memory_limit="$MEMORY_LIMIT" phpunit --configuration phpunit.xml --verbose 2>&1 | tee "$timing_log"; then
         log_success "Slow test analysis completed"
         
         # Extract slow tests
@@ -446,7 +446,7 @@ check_memory_leaks() {
         local start_memory=$(free -m | grep Mem | awk '{print $3}')
         
         # Run tests
-        if docker-compose run --rm test php -d memory_limit="$MEMORY_LIMIT" phpunit --configuration phpunit.xml >/dev/null 2>&1; then
+        if docker compose run --rm test php -d memory_limit="$MEMORY_LIMIT" phpunit --configuration phpunit.xml >/dev/null 2>&1; then
             local end_memory=$(free -m | grep Mem | awk '{print $3}')
             local memory_diff=$((end_memory - start_memory))
             
@@ -487,9 +487,9 @@ generate_performance_report() {
     local report_file="${OUTPUT_FILE:-test-performance-report-$(date +%Y%m%d-%H%M%S).html}"
     
     # Collect performance data
-    local total_tests=$(docker-compose run --rm test phpunit --configuration phpunit.xml 2>&1 | grep -o "Tests: [0-9]*" | tail -1 | grep -o "[0-9]*" || echo "0")
-    local total_time=$(docker-compose run --rm test phpunit --configuration phpunit.xml 2>&1 | grep -o "Time: [0-9.]*" | tail -1 | grep -o "[0-9.]*" || echo "0")
-    local peak_memory=$(docker-compose run --rm test phpunit --configuration phpunit.xml 2>&1 | grep -o "Peak memory: [0-9.]*" | tail -1 | grep -o "[0-9.]*" || echo "0")
+    local total_tests=$(docker compose run --rm test phpunit --configuration phpunit.xml 2>&1 | grep -o "Tests: [0-9]*" | tail -1 | grep -o "[0-9]*" || echo "0")
+    local total_time=$(docker compose run --rm test phpunit --configuration phpunit.xml 2>&1 | grep -o "Time: [0-9.]*" | tail -1 | grep -o "[0-9.]*" || echo "0")
+    local peak_memory=$(docker compose run --rm test phpunit --configuration phpunit.xml 2>&1 | grep -o "Peak memory: [0-9.]*" | tail -1 | grep -o "[0-9.]*" || echo "0")
     
     # Generate HTML report
     cat > "$report_file" << EOF
@@ -563,8 +563,8 @@ suggest_optimizations() {
     echo ""
     
     # Run basic performance analysis
-    local total_tests=$(docker-compose run --rm test phpunit --configuration phpunit.xml 2>&1 | grep -o "Tests: [0-9]*" | tail -1 | grep -o "[0-9]*" || echo "0")
-    local total_time=$(docker-compose run --rm test phpunit --configuration phpunit.xml 2>&1 | grep -o "Time: [0-9.]*" | tail -1 | grep -o "[0-9.]*" || echo "0")
+    local total_tests=$(docker compose run --rm test phpunit --configuration phpunit.xml 2>&1 | grep -o "Tests: [0-9]*" | tail -1 | grep -o "[0-9]*" || echo "0")
+    local total_time=$(docker compose run --rm test phpunit --configuration phpunit.xml 2>&1 | grep -o "Time: [0-9.]*" | tail -1 | grep -o "[0-9.]*" || echo "0")
     
     echo -e "${WHITE}💡 Performance Optimization Suggestions${NC}"
     echo "====================================="

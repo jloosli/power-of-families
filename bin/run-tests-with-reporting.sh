@@ -217,7 +217,7 @@ initialize_test_environment() {
 
 # Build PHPUnit command
 build_phpunit_command() {
-    local phpunit_cmd="docker-compose run --rm test"
+    local phpunit_cmd="docker compose run --rm test"
     
     # Add memory limit
     phpunit_cmd="$phpunit_cmd php -d memory_limit=$MEMORY_LIMIT"

@@ -9,7 +9,7 @@ echo "🔍 Testing xDebug configuration in WordPress container..."
 
 # Check if xDebug is loaded
 echo "📋 Checking if xDebug extension is loaded..."
-docker-compose exec wordpress php -m | grep -i xdebug || {
+docker compose exec wordpress php -m | grep -i xdebug || {
     echo "❌ xDebug extension not found!"
     exit 1
 }
@@ -18,7 +18,7 @@ echo "✅ xDebug extension is loaded"
 
 # Check xDebug configuration
 echo "📋 Checking xDebug configuration..."
-docker-compose exec wordpress php -r "
+docker compose exec wordpress php -r "
 \$config = ini_get_all('xdebug');
 echo 'xDebug Configuration:' . PHP_EOL;
 echo 'Mode: ' . (\$config['xdebug.mode']['global_value'] ?? 'not set') . PHP_EOL;
@@ -30,7 +30,7 @@ echo 'Log Level: ' . (\$config['xdebug.log_level']['global_value'] ?? 'not set')
 
 # Test xDebug functions
 echo "📋 Testing xDebug functions..."
-docker-compose exec wordpress php -r "
+docker compose exec wordpress php -r "
 if (function_exists('xdebug_info')) {
     echo '✅ xdebug_info() function available' . PHP_EOL;
 } else {
@@ -46,7 +46,7 @@ if (function_exists('xdebug_break')) {
 
 # Check if profiling is enabled
 echo "📋 Checking profiling configuration..."
-docker-compose exec wordpress php -r "
+docker compose exec wordpress php -r "
 \$profiler_enabled = ini_get('xdebug.profiler_enable');
 \$profiler_trigger = ini_get('xdebug.profiler_enable_trigger');
 echo 'Profiler enabled: ' . (\$profiler_enabled ? 'Yes' : 'No') . PHP_EOL;
@@ -55,7 +55,7 @@ echo 'Profiler trigger: ' . (\$profiler_trigger ? 'Yes' : 'No') . PHP_EOL;
 
 # Test coverage functionality
 echo "📋 Testing coverage functionality..."
-docker-compose exec wordpress php -r "
+docker compose exec wordpress php -r "
 if (function_exists('xdebug_start_code_coverage')) {
     echo '✅ Code coverage functions available' . PHP_EOL;
     xdebug_start_code_coverage(XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE);

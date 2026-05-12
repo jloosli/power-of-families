@@ -156,7 +156,7 @@ display_status() {
 
 # Build PHPUnit command
 build_phpunit_command() {
-    local phpunit_cmd="docker-compose run --rm test"
+    local phpunit_cmd="docker compose run --rm test"
     
     # Set environment variables
     local env_vars=""

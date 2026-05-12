@@ -78,7 +78,7 @@ log_error() {
 
 # Build PHPUnit command
 build_phpunit_command() {
-    local phpunit_cmd="docker-compose run --rm test phpunit --configuration phpunit.xml"
+    local phpunit_cmd="docker compose run --rm test phpunit --configuration phpunit.xml"
     
     # Add test filter
     if [ -n "$TEST_FILTER" ]; then

@@ -316,7 +316,7 @@ show_troubleshooting() {
     echo "   Problem: Tests fail to execute"
     echo "   Solution:"
     echo "   • Check Docker is running: docker info"
-    echo "   • Verify test container: docker-compose ps test"
+    echo "   • Verify test container: docker compose ps test"
     echo "   • Check test environment: bin/test-env-manager.sh status"
     echo ""
     
@@ -504,7 +504,7 @@ show_environment_setup() {
     echo "   cd wp-content/themes/power-of-families"
     echo ""
     echo -e "${CYAN}2. Start Docker Services${NC}"
-    echo "   docker-compose up -d"
+    echo "   docker compose up -d"
     echo ""
     echo -e "${CYAN}3. Setup Test Environment${NC}"
     echo "   bin/test-env-manager.sh setup"
@@ -534,7 +534,7 @@ show_environment_setup() {
     
     echo -e "${YELLOW}Troubleshooting Setup:${NC}"
     echo "• Check Docker status: docker info"
-    echo "• Check container status: docker-compose ps"
+    echo "• Check container status: docker compose ps"
     echo "• Check environment: bin/test-env-manager.sh status"
     echo "• Validate setup: bin/test-env-manager.sh validate"
     echo ""
