@@ -44,6 +44,7 @@
         <testsuite name="Theme Test Suite">
             <file>./tests/test-sample.php</file>
             <file>./tests/test-ThemeSetup.php</file>
+            <file>./tests/test-MyPrograms.php</file>
         </testsuite>
     </testsuites>
 
