@@ -280,15 +280,11 @@ setup_test_environment() {
         return 1
     fi
     
-    # Setup test database
-    log_info "Setting up test database..."
-    if bin/setup-test-db.sh; then
-        log_success "Test database setup complete"
-    else
-        log_error "Failed to setup test database"
-        return 1
-    fi
-    
+    # Note: the test database is created by bin/install-wp-tests.sh inside the
+    # test container during `docker compose run --rm test ci`, so a host-side
+    # setup step is not needed (and would fail on runners whose mysql client
+    # cannot reach the db service).
+
     # Initialize coverage thresholds
     log_info "Initializing coverage thresholds..."
     if bin/manage-coverage-thresholds.sh init; then
