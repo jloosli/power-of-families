@@ -1,34 +1,25 @@
 <?php
 
 namespace PowerOfFamilies\POF\Programs;
-/**
- * Helper utilities for diplaying My Programs
- * @property \POF\Power_of_Families_Programs parent
- */
+
 class My_Programs
 {
 
     public static mixed $settingsInstance = null;
 
-    public function __construct($parent = null)
+    public function __construct(private ?string $token = null)
     {
-        $this->parent = $parent;
-
         if (!defined('GROUPS_ADMINISTRATOR_OVERRIDE')) {
             define('GROUPS_ADMINISTRATOR_OVERRIDE', true);
         }
 
-        //Actions
         add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
-        //Filters
-        //Short codes
         add_shortcode("pof_programs", [$this, 'show_programs']);
     }
 
     public function enqueue_scripts() : void
     {
-        wp_enqueue_script($this->parent::TOKEN . '-frontend');
-
+        wp_enqueue_script($this->token . '-frontend');
     }
 
     /**

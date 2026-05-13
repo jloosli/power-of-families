@@ -10,12 +10,14 @@ class Settings
 {
 
     /**
-     * The main plugin object.
-     * @var    Power_of_Families_Programs
-     * @access   public
-     * @since    1.0.0
+     * Settings page slug / option prefix root.
      */
-    public ?PowerOfFamiliesPrograms $parent = null;
+    public string $token;
+
+    /**
+     * Renderer used as the callback for add_settings_field.
+     */
+    public ?AdminAPI $renderer;
 
     /**
      * Prefix for plugin settings.
@@ -42,9 +44,10 @@ class Settings
     public array $programs = [];
 
 
-    public function __construct($parent)
+    public function __construct(string $token, ?AdminAPI $renderer = null)
     {
-        $this->parent = $parent;
+        $this->token = $token;
+        $this->renderer = $renderer;
 
         $this->base = 'pof_';
 
@@ -81,7 +84,7 @@ class Settings
             __('POF Settings', 'power-of-families-programs'),
             __('POF Settings', 'power-of-families-programs'),
             'manage_options',
-            $this->parent::TOKEN . '_settings',
+            $this->token . '_settings',
             [$this, 'settings_page']
         );
     }
@@ -113,7 +116,7 @@ class Settings
                 array_key_exists( $program, $this->getAvailablePrograms() )
             ) {
                 $ClassName = '\PowerOfFamilies\POF\Programs\\' . $program;
-                $programs[$program] = new $ClassName($this->parent);
+                $programs[$program] = new $ClassName($this->token);
             }
         }
         return $programs;
@@ -155,7 +158,7 @@ class Settings
             }
         }
 
-        $settings = apply_filters($this->parent::TOKEN . '_settings_fields', $settings);
+        $settings = apply_filters($this->token . '_settings_fields', $settings);
 
         return $settings;
     }
@@ -185,7 +188,7 @@ class Settings
                 }
 
                 // Add section to page
-                add_settings_section($section, $data['title'], [$this, 'settings_section'], $this->parent::TOKEN . '_settings');
+                add_settings_section($section, $data['title'], [$this, 'settings_section'], $this->token . '_settings');
 
                 foreach ($data['fields'] as $field) {
 
@@ -197,13 +200,13 @@ class Settings
 
                     // Register field
                     $option_name = $this->base . $field['id'];
-                    register_setting($this->parent::TOKEN . '_settings', $option_name, $validation);
+                    register_setting($this->token . '_settings', $option_name, $validation);
 
                     // Add field to page
                     add_settings_field($field['id'], $field['label'], array(
-                        $this->parent->admin,
+                        $this->renderer,
                         'display_field'
-                    ), $this->parent::TOKEN . '_settings', $section, array(
+                    ), $this->token . '_settings', $section, array(
                         'field' => $field,
                         'prefix' => $this->base
                     ));
@@ -230,7 +233,7 @@ class Settings
     {
 
         // Build page HTML
-        $html = '<div class="wrap" id="' . $this->parent::TOKEN . '_settings">' . "\n";
+        $html = '<div class="wrap" id="' . $this->token . '_settings">' . "\n";
         $html .= '<h2>' . __('POF Settings', 'power-of-families-programs') . '</h2>' . "\n";
 
         $tab = '';
@@ -277,8 +280,8 @@ class Settings
 
         // Get settings fields
         ob_start();
-        settings_fields($this->parent::TOKEN . '_settings');
-        do_settings_sections($this->parent::TOKEN . '_settings');
+        settings_fields($this->token . '_settings');
+        do_settings_sections($this->token . '_settings');
         $html .= ob_get_clean();
 
         $html .= '<p class="submit">' . "\n";

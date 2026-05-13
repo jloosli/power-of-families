@@ -42,11 +42,9 @@ class PowerOfFamiliesPrograms
     public $assets_url;
 
     /**
-     * @var bool|AdminAPI
-     * @access public
-     * @since 3.0.0
+     * Renderer for admin settings fields; null outside admin context.
      */
-    public bool|AdminAPI $admin = false;
+    public ?AdminAPI $admin = null;
 
     /**
      * Constructor function.
@@ -56,16 +54,14 @@ class PowerOfFamiliesPrograms
      */
     public function __construct()
     {
-        // Load Settings
-        $this->settings = new Settings($this);
-
-        // Load admin JS & CSS
-        add_action('admin_enqueue_scripts', [$this, 'admin_register_scripts'], 10, 1);
-
-        // Load API for generic admin functions
+        // Renderer must exist before Settings so register_settings can bind to it.
         if (is_admin()) {
             $this->admin = new AdminAPI();
         }
+
+        $this->settings = new Settings(self::TOKEN, $this->admin);
+
+        add_action('admin_enqueue_scripts', [$this, 'admin_register_scripts'], 10, 1);
     }
 
     /**
