@@ -7,11 +7,11 @@
  */
 class test_NavCustomizations extends WP_UnitTestCase {
 
-    private ?\PowerOfFamilies\Avanti\NavCustomizations $nav;
+    private ?\PowerOfFamilies\NavCustomizations $nav;
 
     protected function setUp(): void {
         parent::setUp();
-        $this->nav = new \PowerOfFamilies\Avanti\NavCustomizations();
+        $this->nav = new \PowerOfFamilies\NavCustomizations();
     }
 
     protected function tearDown(): void {

@@ -7,7 +7,7 @@
  * Time: 9:51 AM
  */
 
-namespace PowerOfFamilies\POF\Programs;
+namespace PowerOfFamilies\Programs;
 function POF_Affiliate_Linker_CRON()
 {
     $linker = new Affiliate_Linker();

@@ -7,11 +7,11 @@
  */
 class test_HomepageWidgets extends WP_UnitTestCase {
 
-    private ?\PowerOfFamilies\Avanti\HomepageWidgets $widgets;
+    private ?\PowerOfFamilies\HomepageWidgets $widgets;
 
     protected function setUp(): void {
         parent::setUp();
-        $this->widgets = new \PowerOfFamilies\Avanti\HomepageWidgets();
+        $this->widgets = new \PowerOfFamilies\HomepageWidgets();
     }
 
     protected function tearDown(): void {

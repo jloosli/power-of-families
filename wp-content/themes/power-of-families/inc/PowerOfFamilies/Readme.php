@@ -1,6 +1,6 @@
 <?php
 
-namespace PowerOfFamilies\Avanti;
+namespace PowerOfFamilies;
 
 /**
  * Create a readme page for the admin side of the site

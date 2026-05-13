@@ -7,11 +7,11 @@
  */
 class test_SharingControls extends WP_UnitTestCase {
 
-    private ?\PowerOfFamilies\Avanti\SharingControls $sharing;
+    private ?\PowerOfFamilies\SharingControls $sharing;
 
     protected function setUp(): void {
         parent::setUp();
-        $this->sharing = new \PowerOfFamilies\Avanti\SharingControls();
+        $this->sharing = new \PowerOfFamilies\SharingControls();
     }
 
     protected function tearDown(): void {

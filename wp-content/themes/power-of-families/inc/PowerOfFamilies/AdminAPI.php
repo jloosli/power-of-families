@@ -1,6 +1,6 @@
 <?php
 
-namespace PowerOfFamilies\POF;
+namespace PowerOfFamilies;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class AdminAPI {

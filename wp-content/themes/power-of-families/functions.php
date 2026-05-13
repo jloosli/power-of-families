@@ -1,13 +1,13 @@
 <?php
 require_once 'vendor/autoload.php';
 
-new \PowerOfFamilies\Avanti\ThemeBootstrap();
-new \PowerOfFamilies\Avanti\NavCustomizations();
-new \PowerOfFamilies\Avanti\PostDisplay();
-new \PowerOfFamilies\Avanti\HomepageWidgets();
-new \PowerOfFamilies\Avanti\SiteChrome();
-new \PowerOfFamilies\Avanti\SharingControls();
-new \PowerOfFamilies\Avanti\WooCommerce();
-new \PowerOfFamilies\Avanti\Readme();
+new \PowerOfFamilies\ThemeBootstrap();
+new \PowerOfFamilies\NavCustomizations();
+new \PowerOfFamilies\PostDisplay();
+new \PowerOfFamilies\HomepageWidgets();
+new \PowerOfFamilies\SiteChrome();
+new \PowerOfFamilies\SharingControls();
+new \PowerOfFamilies\WooCommerce();
+new \PowerOfFamilies\Readme();
 
-new \PowerOfFamilies\POF\PowerOfFamiliesPrograms();
+new \PowerOfFamilies\Programs();

@@ -7,11 +7,11 @@
  */
 class test_ThemeBootstrap extends WP_UnitTestCase {
 
-    private ?\PowerOfFamilies\Avanti\ThemeBootstrap $bootstrap;
+    private ?\PowerOfFamilies\ThemeBootstrap $bootstrap;
 
     protected function setUp(): void {
         parent::setUp();
-        $this->bootstrap = new \PowerOfFamilies\Avanti\ThemeBootstrap();
+        $this->bootstrap = new \PowerOfFamilies\ThemeBootstrap();
     }
 
     protected function tearDown(): void {
@@ -21,7 +21,7 @@ class test_ThemeBootstrap extends WP_UnitTestCase {
     }
 
     public function test_construct() {
-        $this->assertInstanceOf( \PowerOfFamilies\Avanti\ThemeBootstrap::class, $this->bootstrap );
+        $this->assertInstanceOf( \PowerOfFamilies\ThemeBootstrap::class, $this->bootstrap );
     }
 
     public function test_enqueue_assets_registers_script_and_style() {

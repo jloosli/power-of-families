@@ -1,6 +1,6 @@
 <?php
 
-namespace PowerOfFamilies\Avanti;
+namespace PowerOfFamilies;
 
 class NavCustomizations
 {

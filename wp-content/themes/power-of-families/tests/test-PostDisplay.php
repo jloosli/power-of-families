@@ -7,11 +7,11 @@
  */
 class test_PostDisplay extends WP_UnitTestCase {
 
-    private ?\PowerOfFamilies\Avanti\PostDisplay $display;
+    private ?\PowerOfFamilies\PostDisplay $display;
 
     protected function setUp(): void {
         parent::setUp();
-        $this->display = new \PowerOfFamilies\Avanti\PostDisplay();
+        $this->display = new \PowerOfFamilies\PostDisplay();
     }
 
     protected function tearDown(): void {

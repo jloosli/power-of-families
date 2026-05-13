@@ -7,14 +7,14 @@
  */
 class test_MyPrograms extends WP_UnitTestCase {
 
-    private \PowerOfFamilies\POF\Programs\My_Programs $my_programs;
+    private \PowerOfFamilies\Programs\My_Programs $my_programs;
     private ReflectionMethod $parse_description;
 
     protected function setUp(): void {
         parent::setUp();
-        $this->my_programs = new \PowerOfFamilies\POF\Programs\My_Programs();
+        $this->my_programs = new \PowerOfFamilies\Programs\My_Programs();
         $this->parse_description = new ReflectionMethod(
-            \PowerOfFamilies\POF\Programs\My_Programs::class,
+            \PowerOfFamilies\Programs\My_Programs::class,
             'getProgramMetaFromDescription'
         );
         $this->parse_description->setAccessible( true );

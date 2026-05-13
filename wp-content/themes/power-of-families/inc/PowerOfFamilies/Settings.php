@@ -1,6 +1,6 @@
 <?php
 
-namespace PowerOfFamilies\POF;
+namespace PowerOfFamilies;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -115,7 +115,7 @@ class Settings
                 in_array( $program, $allowed, true ) &&
                 array_key_exists( $program, $this->getAvailablePrograms() )
             ) {
-                $ClassName = '\PowerOfFamilies\POF\Programs\\' . $program;
+                $ClassName = '\PowerOfFamilies\Programs\\' . $program;
                 // Some program classes accept the token (e.g. for script handle
                 // namespacing), others take no constructor args. Inspect the
                 // ctor and pass the token only when it's expected so we don't

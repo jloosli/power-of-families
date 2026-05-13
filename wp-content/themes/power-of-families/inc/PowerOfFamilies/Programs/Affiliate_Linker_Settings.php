@@ -1,6 +1,6 @@
 <?php
 
-namespace PowerOfFamilies\POF\Programs;
+namespace PowerOfFamilies\Programs;
 class Affiliate_Linker_Settings {
 
     public function __construct() {

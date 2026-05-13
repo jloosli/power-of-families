@@ -7,11 +7,11 @@
  */
 class test_SiteChrome extends WP_UnitTestCase {
 
-    private ?\PowerOfFamilies\Avanti\SiteChrome $chrome;
+    private ?\PowerOfFamilies\SiteChrome $chrome;
 
     protected function setUp(): void {
         parent::setUp();
-        $this->chrome = new \PowerOfFamilies\Avanti\SiteChrome();
+        $this->chrome = new \PowerOfFamilies\SiteChrome();
     }
 
     protected function tearDown(): void {

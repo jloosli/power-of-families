@@ -1,6 +1,6 @@
 <?php
 
-namespace PowerOfFamilies\POF;
+namespace PowerOfFamilies;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
  *
  * @since 1.0.0
  */
-class PowerOfFamiliesPrograms
+class Programs
 {
 
     /**
