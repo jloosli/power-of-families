@@ -1,7 +1,7 @@
 <?php
 
 namespace PowerOfFamilies\Programs;
-class Affiliate_Linker_Settings {
+class AffiliateLinkerSettings {
 
     public function __construct() {
 //        add_action( 'pof_programs_settings_admin_end', array( $this, 'add_script' ) );

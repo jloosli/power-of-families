@@ -2,7 +2,7 @@
 
 namespace PowerOfFamilies\Programs;
 
-class My_Programs
+class MyPrograms
 {
 
     public static mixed $settingsInstance = null;

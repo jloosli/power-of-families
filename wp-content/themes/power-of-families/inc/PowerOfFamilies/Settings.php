@@ -95,9 +95,12 @@ class Settings
      */
     private function getAvailablePrograms(): array
     {
+        // Outer keys match values stored in the pof_active_programs option
+        // and must stay stable for backward compatibility; the `class` field
+        // is the actual PHP class name in the PowerOfFamilies\Programs namespace.
         return [
-            'Affiliate_Linker' => ['name' => 'Affiliate Linker', 'has-settings' => true],
-            'My_Programs'      => ['name' => 'My Programs',      'has-settings' => false],
+            'Affiliate_Linker' => ['class' => 'AffiliateLinker', 'name' => 'Affiliate Linker', 'has-settings' => true],
+            'My_Programs'      => ['class' => 'MyPrograms',      'name' => 'My Programs',      'has-settings' => false],
         ];
     }
 
@@ -108,14 +111,11 @@ class Settings
 
     public function loadActivePrograms(): array
     {
-        $allowed = [ 'Affiliate_Linker', 'My_Programs' ];
+        $available = $this->getAvailablePrograms();
         $programs = [];
         foreach ($this->getActivePrograms() as $program) {
-            if (
-                in_array( $program, $allowed, true ) &&
-                array_key_exists( $program, $this->getAvailablePrograms() )
-            ) {
-                $ClassName = '\PowerOfFamilies\Programs\\' . $program;
+            if (array_key_exists($program, $available)) {
+                $ClassName = '\PowerOfFamilies\Programs\\' . $available[$program]['class'];
                 // Some program classes accept the token (e.g. for script handle
                 // namespacing), others take no constructor args. Inspect the
                 // ctor and pass the token only when it's expected so we don't

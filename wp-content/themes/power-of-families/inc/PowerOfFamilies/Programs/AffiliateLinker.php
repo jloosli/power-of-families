@@ -1,23 +1,17 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: jloosli
- * Date: 12/10/14
- * Time: 9:51 AM
- */
-
 namespace PowerOfFamilies\Programs;
+
 function POF_Affiliate_Linker_CRON()
 {
-    $linker = new Affiliate_Linker();
+    $linker = new AffiliateLinker();
     return $linker->add_amazon();
 }
 
 
-class Affiliate_Linker
+class AffiliateLinker
 {
-    public static ?Affiliate_Linker_Settings $settingsInstance = null;
+    public static ?AffiliateLinkerSettings $settingsInstance = null;
 
     public function __construct()
     {
@@ -35,10 +29,10 @@ class Affiliate_Linker
 
     }
 
-    public static function getSettingsInstance() : Affiliate_Linker_Settings
+    public static function getSettingsInstance() : AffiliateLinkerSettings
     {
         if (is_null(self::$settingsInstance)) {
-            self::$settingsInstance = new Affiliate_Linker_Settings();
+            self::$settingsInstance = new AffiliateLinkerSettings();
         }
 
         return self::$settingsInstance;
