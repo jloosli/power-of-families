@@ -1,38 +1,24 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: jloosli
- * Date: 12/10/14
- * Time: 9:51 AM
- */
-
 namespace PowerOfFamilies\POF\Programs;
-function POF_Affiliate_Linker_CRON()
-{
-    $linker = new Affiliate_Linker();
-    return $linker->add_amazon();
-}
-
 
 class Affiliate_Linker
 {
     public static ?Affiliate_Linker_Settings $settingsInstance = null;
 
+    public string $affiliate_id = '';
+
     public function __construct()
     {
-        $this->affiliate_id = get_option('pof_amazon_affiliate_id');
+        $this->affiliate_id = (string) get_option('pof_amazon_affiliate_id');
 
-        //Actions
         add_action('wp', [$this, 'activation']);
         add_action('wp_ajax_pof_affiliates_run', [$this, 'add_amazon_ajax']);
-
-        //Filters
-
-        //Short codes
-
-        //Scripts
-
+        // Cron callback: wp_schedule_event() schedules the action hook,
+        // do_action() fires it on the daily tick, and this binding is what
+        // actually runs add_amazon(). Without it the scheduled cron is a
+        // no-op (no global function exists at the cron-hook name).
+        add_action('POF_Affiliate_Linker_CRON', [$this, 'add_amazon']);
     }
 
     public static function getSettingsInstance() : Affiliate_Linker_Settings
@@ -51,8 +37,6 @@ class Affiliate_Linker
         if (!wp_next_scheduled($cron)) {
             wp_schedule_event(time(), 'daily', $cron);
         }
-//        $this->clear_all_crons($cron);
-//        wp_clear_scheduled_hook($cron);
     }
 
     public function add_amazon_tag( array $matches ) : string

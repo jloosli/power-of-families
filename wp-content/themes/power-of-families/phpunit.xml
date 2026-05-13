@@ -45,6 +45,7 @@
             <file>./tests/test-sample.php</file>
             <file>./tests/test-ThemeSetup.php</file>
             <file>./tests/test-MyPrograms.php</file>
+            <file>./tests/test-Affiliate_Linker.php</file>
         </testsuite>
     </testsuites>
 
