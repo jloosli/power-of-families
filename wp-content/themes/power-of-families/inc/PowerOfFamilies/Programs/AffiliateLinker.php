@@ -4,14 +4,6 @@ namespace PowerOfFamilies\Programs;
 
 use PowerOfFamilies\HookRegistrar;
 
-function POF_Affiliate_Linker_CRON()
-{
-    $linker = new AffiliateLinker();
-    $linker->register();
-    return $linker->add_amazon();
-}
-
-
 class AffiliateLinker implements HookRegistrar
 {
     public static ?AffiliateLinkerSettings $settingsInstance = null;
@@ -24,6 +16,11 @@ class AffiliateLinker implements HookRegistrar
 
         add_action('wp', [$this, 'activation']);
         add_action('wp_ajax_pof_affiliates_run', [$this, 'add_amazon_ajax']);
+        // Cron callback: wp_schedule_event() schedules the action hook,
+        // do_action() fires it on the daily tick, and this binding is what
+        // actually runs add_amazon(). Without it the scheduled cron is a
+        // no-op (no global function exists at the cron-hook name).
+        add_action('POF_Affiliate_Linker_CRON', [$this, 'add_amazon']);
     }
 
     public static function getSettingsInstance() : AffiliateLinkerSettings
@@ -42,8 +39,6 @@ class AffiliateLinker implements HookRegistrar
         if (!wp_next_scheduled($cron)) {
             wp_schedule_event(time(), 'daily', $cron);
         }
-//        $this->clear_all_crons($cron);
-//        wp_clear_scheduled_hook($cron);
     }
 
     public function add_amazon_tag( array $matches ) : string
