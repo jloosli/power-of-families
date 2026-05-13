@@ -69,50 +69,6 @@ class PowerOfFamiliesPrograms
     }
 
     /**
-     * Wrapper function to register a new post type
-     *
-     * @param  string $post_type Post type name
-     * @param  string $plural Post type item plural name
-     * @param  string $single Post type item single name
-     * @param  string $description Description of post type
-     *
-     * @return object              Post type class object
-     */
-    public function register_post_type($post_type = '', $plural = '', $single = '', $description = ''): ?object
-    {
-
-        if (!$post_type || !$plural || !$single) {
-            return null;
-        }
-
-        $post_type = new Post_Type($post_type, $plural, $single, $description);
-
-        return $post_type;
-    }
-
-    /**
-     * Wrapper function to register a new taxonomy
-     *
-     * @param  string $taxonomy Taxonomy name
-     * @param  string $plural Taxonomy single name
-     * @param  string $single Taxonomy plural name
-     * @param  array $post_types Post types to which this taxonomy applies
-     *
-     * @return object             Taxonomy class object
-     */
-    public function register_taxonomy($taxonomy = '', $plural = '', $single = '', $post_types = array()): ?object
-    {
-
-        if (!$taxonomy || !$plural || !$single) {
-            return null;
-        }
-
-        $taxonomy = new Taxonomy($taxonomy, $plural, $single, $post_types);
-
-        return $taxonomy;
-    }
-
-    /**
      * Load admin Javascript.
      * @access  public
      * @since   1.0.0
@@ -129,27 +85,5 @@ class PowerOfFamiliesPrograms
         );
 
     }
-
-    /**
-     * Cloning is forbidden.
-     *
-     * @since 1.0.0
-     */
-    public function __clone(): void
-    {
-        _doing_it_wrong(__FUNCTION__, __('Cheatin&#8217; huh?'), '1.0.0');
-    } // End __clone ()
-
-    /**
-     * Unserializing instances of this class is forbidden.
-     *
-     * @since 1.0.0
-     */
-    public function __wakeup(): void
-    {
-        _doing_it_wrong(__FUNCTION__, __('Cheatin&#8217; huh?'), '1.0.0');
-    } // End __wakeup ()
-
-
 
 }

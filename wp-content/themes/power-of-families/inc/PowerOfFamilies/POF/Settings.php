@@ -10,14 +10,6 @@ class Settings
 {
 
     /**
-     * The single instance of Power_of_Moms_Programs_Settings.
-     * @var    object
-     * @access   private
-     * @since    1.0.0
-     */
-    private static ?self $_instance = null;
-
-    /**
      * The main plugin object.
      * @var    Power_of_Families_Programs
      * @access   public
@@ -298,44 +290,5 @@ class Settings
         echo $html;
         do_action('pof_programs_settings_admin_end');
     }
-
-    /**
-     * Main Power_of_Moms_Programs_Settings Instance
-     *
-     * Ensures only one instance of Power_of_Moms_Programs_Settings is loaded or can be loaded.
-     *
-     * @since 1.0.0
-     * @static
-     * @see   Power_of_Moms_Programs()
-     * @return Main Power_of_Moms_Programs_Settings instance
-     */
-    public static function instance($parent): static
-    {
-        if (is_null(self::$_instance)) {
-            self::$_instance = new self($parent);
-        }
-
-        return self::$_instance;
-    } // End instance()
-
-    /**
-     * Cloning is forbidden.
-     *
-     * @since 1.0.0
-     */
-    public function __clone(): void
-    {
-        _doing_it_wrong(__FUNCTION__, __('Cheatin&#8217; huh?'), '1.0.0');
-    } // End __clone()
-
-    /**
-     * Unserializing instances of this class is forbidden.
-     *
-     * @since 1.0.0
-     */
-    public function __wakeup(): void
-    {
-        _doing_it_wrong(__FUNCTION__, __('Cheatin&#8217; huh?'), '1.0.0');
-    } // End __wakeup()
 
 }
