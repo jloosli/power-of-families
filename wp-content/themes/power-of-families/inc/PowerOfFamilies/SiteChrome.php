@@ -2,9 +2,9 @@
 
 namespace PowerOfFamilies;
 
-class SiteChrome
+class SiteChrome implements HookRegistrar
 {
-    public function __construct()
+    public function register(): void
     {
         add_action('wp_head', [$this, 'pre_load_favicon']);
         add_action('admin_head', [$this, 'pre_load_favicon']);

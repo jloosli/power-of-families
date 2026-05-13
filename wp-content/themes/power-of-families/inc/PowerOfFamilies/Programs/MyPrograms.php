@@ -2,12 +2,16 @@
 
 namespace PowerOfFamilies\Programs;
 
-class MyPrograms
+use PowerOfFamilies\HookRegistrar;
+
+class MyPrograms implements HookRegistrar
 {
 
     public static mixed $settingsInstance = null;
 
-    public function __construct(private ?string $token = null)
+    public function __construct(private ?string $token = null) {}
+
+    public function register(): void
     {
         if (!defined('GROUPS_ADMINISTRATOR_OVERRIDE')) {
             define('GROUPS_ADMINISTRATOR_OVERRIDE', true);

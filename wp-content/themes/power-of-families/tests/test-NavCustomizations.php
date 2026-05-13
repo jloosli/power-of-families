@@ -12,6 +12,7 @@ class test_NavCustomizations extends WP_UnitTestCase {
     protected function setUp(): void {
         parent::setUp();
         $this->nav = new \PowerOfFamilies\NavCustomizations();
+        $this->nav->register();
     }
 
     protected function tearDown(): void {

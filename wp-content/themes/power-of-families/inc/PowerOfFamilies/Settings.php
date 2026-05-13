@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class Settings
+class Settings implements HookRegistrar
 {
 
     /**
@@ -48,21 +48,21 @@ class Settings
     {
         $this->token = $token;
         $this->renderer = $renderer;
-
         $this->base = 'pof_';
+        $this->programs = $this->loadActivePrograms();
+    }
 
-        // Initialise settings
+    public function register(): void
+    {
         add_action('init', [$this, 'init_settings'], 11);
-
-        // Register plugin settings
         add_action('admin_init', [$this, 'register_settings']);
-
-        // Add settings page to menu
         add_action('admin_menu', [$this, 'add_menu_item']);
 
-        // Load up active programs
-        $this->programs = $this->loadActivePrograms();
-
+        foreach ($this->programs as $program) {
+            if ($program instanceof HookRegistrar) {
+                $program->register();
+            }
+        }
     }
 
     /**

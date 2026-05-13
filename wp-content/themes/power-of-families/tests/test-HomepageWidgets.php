@@ -12,6 +12,7 @@ class test_HomepageWidgets extends WP_UnitTestCase {
     protected function setUp(): void {
         parent::setUp();
         $this->widgets = new \PowerOfFamilies\HomepageWidgets();
+        $this->widgets->register();
     }
 
     protected function tearDown(): void {

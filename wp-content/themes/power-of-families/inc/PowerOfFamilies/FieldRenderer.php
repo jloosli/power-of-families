@@ -3,12 +3,9 @@
 namespace PowerOfFamilies;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class FieldRenderer {
+class FieldRenderer implements HookRegistrar {
 
-	/**
-	 * Constructor function
-	 */
-	public function __construct () {
+	public function register(): void {
 		add_action( 'save_post', [$this, 'save_meta_boxes'], 10, 1 );
 	}
 

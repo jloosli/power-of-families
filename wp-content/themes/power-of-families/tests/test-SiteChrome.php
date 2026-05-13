@@ -12,6 +12,7 @@ class test_SiteChrome extends WP_UnitTestCase {
     protected function setUp(): void {
         parent::setUp();
         $this->chrome = new \PowerOfFamilies\SiteChrome();
+        $this->chrome->register();
     }
 
     protected function tearDown(): void {

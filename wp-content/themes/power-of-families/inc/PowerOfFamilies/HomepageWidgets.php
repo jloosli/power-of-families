@@ -2,9 +2,9 @@
 
 namespace PowerOfFamilies;
 
-class HomepageWidgets
+class HomepageWidgets implements HookRegistrar
 {
-    public function __construct()
+    public function register(): void
     {
         add_action('widgets_init', [$this, 'createWidgets']);
     }

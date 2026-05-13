@@ -5,10 +5,10 @@ namespace PowerOfFamilies;
 /**
  * Create a readme page for the admin side of the site
  */
-class Readme
+class Readme implements HookRegistrar
 {
 
-    public function __construct()
+    public function register(): void
     {
         add_action('admin_menu', [$this, 'registerCustomPage']);
     }

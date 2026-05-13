@@ -1,12 +1,13 @@
 <?php
 
 namespace PowerOfFamilies\Programs;
-class AffiliateLinkerSettings {
 
-    public function __construct() {
+use PowerOfFamilies\HookRegistrar;
+
+class AffiliateLinkerSettings implements HookRegistrar {
+
+    public function register(): void {
 //        add_action( 'pof_programs_settings_admin_end', array( $this, 'add_script' ) );
-        global $wp_scripts;
-
         add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'), 10, 1);
     }
 

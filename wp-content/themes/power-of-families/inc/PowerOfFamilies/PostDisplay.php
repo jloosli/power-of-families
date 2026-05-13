@@ -2,9 +2,9 @@
 
 namespace PowerOfFamilies;
 
-class PostDisplay
+class PostDisplay implements HookRegistrar
 {
-    public function __construct()
+    public function register(): void
     {
         add_filter('genesis_post_info', [$this, 'sp_post_info_filter']);
 

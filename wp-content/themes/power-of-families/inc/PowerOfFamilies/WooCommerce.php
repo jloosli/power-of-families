@@ -2,10 +2,10 @@
 
 namespace PowerOfFamilies;
 
-class WooCommerce
+class WooCommerce implements HookRegistrar
 {
 
-    public function __construct()
+    public function register(): void
     {
 
         add_action('woocommerce_after_shop_loop_item_title', [$this, 'woocommerce_after_shop_loop_item_title_short_description'], 5);

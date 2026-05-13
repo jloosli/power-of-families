@@ -12,6 +12,7 @@ class test_ThemeBootstrap extends WP_UnitTestCase {
     protected function setUp(): void {
         parent::setUp();
         $this->bootstrap = new \PowerOfFamilies\ThemeBootstrap();
+        $this->bootstrap->register();
     }
 
     protected function tearDown(): void {

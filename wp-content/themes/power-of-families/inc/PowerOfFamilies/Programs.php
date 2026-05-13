@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
  *
  * @since 1.0.0
  */
-class Programs
+class Programs implements HookRegistrar
 {
 
     /**
@@ -54,7 +54,12 @@ class Programs
         }
 
         $this->settings = new Settings(self::TOKEN, $this->fieldRenderer);
+    }
 
+    public function register(): void
+    {
+        $this->fieldRenderer?->register();
+        $this->settings->register();
         add_action('admin_enqueue_scripts', [$this, 'admin_register_scripts'], 10, 1);
     }
 

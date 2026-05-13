@@ -2,9 +2,9 @@
 
 namespace PowerOfFamilies;
 
-class SharingControls
+class SharingControls implements HookRegistrar
 {
-    public function __construct()
+    public function register(): void
     {
         // Hide sharing buttons on protected pages
         // @todo: Need to update this for Groups instead of wishlist member

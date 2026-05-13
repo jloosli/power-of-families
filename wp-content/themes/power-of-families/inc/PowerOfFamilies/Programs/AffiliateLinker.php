@@ -2,31 +2,28 @@
 
 namespace PowerOfFamilies\Programs;
 
+use PowerOfFamilies\HookRegistrar;
+
 function POF_Affiliate_Linker_CRON()
 {
     $linker = new AffiliateLinker();
+    $linker->register();
     return $linker->add_amazon();
 }
 
 
-class AffiliateLinker
+class AffiliateLinker implements HookRegistrar
 {
     public static ?AffiliateLinkerSettings $settingsInstance = null;
 
-    public function __construct()
-    {
-        $this->affiliate_id = get_option('pof_amazon_affiliate_id');
+    public string $affiliate_id = '';
 
-        //Actions
+    public function register(): void
+    {
+        $this->affiliate_id = (string) get_option('pof_amazon_affiliate_id');
+
         add_action('wp', [$this, 'activation']);
         add_action('wp_ajax_pof_affiliates_run', [$this, 'add_amazon_ajax']);
-
-        //Filters
-
-        //Short codes
-
-        //Scripts
-
     }
 
     public static function getSettingsInstance() : AffiliateLinkerSettings

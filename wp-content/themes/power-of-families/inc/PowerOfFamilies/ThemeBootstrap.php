@@ -2,9 +2,9 @@
 
 namespace PowerOfFamilies;
 
-class ThemeBootstrap
+class ThemeBootstrap implements HookRegistrar
 {
-    public function __construct()
+    public function register(): void
     {
         if (!defined('PHPUNIT_RUNNING')) {
             require_once get_template_directory() . '/lib/init.php';

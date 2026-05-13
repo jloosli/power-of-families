@@ -12,6 +12,7 @@ class test_SharingControls extends WP_UnitTestCase {
     protected function setUp(): void {
         parent::setUp();
         $this->sharing = new \PowerOfFamilies\SharingControls();
+        $this->sharing->register();
     }
 
     protected function tearDown(): void {

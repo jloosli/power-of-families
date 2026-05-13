@@ -12,6 +12,7 @@ class test_PostDisplay extends WP_UnitTestCase {
     protected function setUp(): void {
         parent::setUp();
         $this->display = new \PowerOfFamilies\PostDisplay();
+        $this->display->register();
     }
 
     protected function tearDown(): void {

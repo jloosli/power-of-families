@@ -2,9 +2,9 @@
 
 namespace PowerOfFamilies;
 
-class NavCustomizations
+class NavCustomizations implements HookRegistrar
 {
-    public function __construct()
+    public function register(): void
     {
         // Move primary menu into header
         // https://wpbeaches.com/switching-primary-menu-genesis-theme-header-right/
