@@ -44,22 +44,16 @@ class Programs
     /**
      * Renderer for admin settings fields; null outside admin context.
      */
-    public ?AdminAPI $admin = null;
+    public ?FieldRenderer $fieldRenderer = null;
 
-    /**
-     * Constructor function.
-     * @access  public
-     * @since   1.0.0
-     *
-     */
     public function __construct()
     {
         // Renderer must exist before Settings so register_settings can bind to it.
         if (is_admin()) {
-            $this->admin = new AdminAPI();
+            $this->fieldRenderer = new FieldRenderer();
         }
 
-        $this->settings = new Settings(self::TOKEN, $this->admin);
+        $this->settings = new Settings(self::TOKEN, $this->fieldRenderer);
 
         add_action('admin_enqueue_scripts', [$this, 'admin_register_scripts'], 10, 1);
     }

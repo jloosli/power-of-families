@@ -17,7 +17,7 @@ class Settings
     /**
      * Renderer used as the callback for add_settings_field.
      */
-    public ?AdminAPI $renderer;
+    public ?FieldRenderer $renderer;
 
     /**
      * Prefix for plugin settings.
@@ -44,7 +44,7 @@ class Settings
     public array $programs = [];
 
 
-    public function __construct(string $token, ?AdminAPI $renderer = null)
+    public function __construct(string $token, ?FieldRenderer $renderer = null)
     {
         $this->token = $token;
         $this->renderer = $renderer;
@@ -174,19 +174,33 @@ class Settings
      * Register plugin settings
      * @return void
      */
+    /**
+     * Read and validate the requested settings tab from $_POST/$_GET.
+     *
+     * Returns the section key only if it matches a known settings section
+     * (defined in $this->settings). Empty string otherwise. Prevents
+     * arbitrary user input from flowing into add_settings_section() and
+     * the rendered nav.
+     */
+    private function get_current_tab(): string
+    {
+        $allowed = is_array($this->settings) ? array_keys($this->settings) : [];
+
+        $tab = '';
+        if (!empty($_POST['tab'])) {
+            $tab = sanitize_text_field(wp_unslash($_POST['tab']));
+        } elseif (!empty($_GET['tab'])) {
+            $tab = sanitize_text_field(wp_unslash($_GET['tab']));
+        }
+
+        return in_array($tab, $allowed, true) ? $tab : '';
+    }
+
     public function register_settings(): void
     {
         if (is_array($this->settings)) {
 
-            // Check posted/selected tab
-            $current_section = '';
-            if (isset($_POST['tab']) && $_POST['tab']) {
-                $current_section = $_POST['tab'];
-            } else {
-                if (isset($_GET['tab']) && $_GET['tab']) {
-                    $current_section = $_GET['tab'];
-                }
-            }
+            $current_section = $this->get_current_tab();
 
             foreach ($this->settings as $section => $data) {
 
@@ -243,10 +257,7 @@ class Settings
         $html = '<div class="wrap" id="' . $this->token . '_settings">' . "\n";
         $html .= '<h2>' . __('POF Settings', 'power-of-families-programs') . '</h2>' . "\n";
 
-        $tab = '';
-        if (isset($_GET['tab']) && $_GET['tab']) {
-            $tab .= $_GET['tab'];
-        }
+        $tab = $this->get_current_tab();
 
         // Show page tabs
         if (is_array($this->settings) && 1 < count($this->settings)) {
@@ -256,16 +267,13 @@ class Settings
             $c = 0;
             foreach ($this->settings as $section => $data) {
 
-                // Set tab class
                 $class = 'nav-tab';
-                if (!isset($_GET['tab'])) {
-                    if (0 == $c) {
+                if ('' === $tab) {
+                    if (0 === $c) {
                         $class .= ' nav-tab-active';
                     }
-                } else {
-                    if (isset($_GET['tab']) && $section == $_GET['tab']) {
-                        $class .= ' nav-tab-active';
-                    }
+                } elseif ($section === $tab) {
+                    $class .= ' nav-tab-active';
                 }
 
                 // Set tab link

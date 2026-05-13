@@ -3,7 +3,7 @@
 namespace PowerOfFamilies;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class AdminAPI {
+class FieldRenderer {
 
 	/**
 	 * Constructor function
