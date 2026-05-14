@@ -19,6 +19,12 @@ class My_Programs
 
     public function enqueue_scripts() : void
     {
+        // Token is optional (e.g. when instantiated by tests). Without it we
+        // have no namespaced handle to enqueue, so bail rather than register a
+        // bogus "-frontend" script.
+        if (empty($this->token)) {
+            return;
+        }
         wp_enqueue_script($this->token . '-frontend');
     }
 

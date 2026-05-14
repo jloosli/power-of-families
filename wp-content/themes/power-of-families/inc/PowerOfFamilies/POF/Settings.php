@@ -116,7 +116,14 @@ class Settings
                 array_key_exists( $program, $this->getAvailablePrograms() )
             ) {
                 $ClassName = '\PowerOfFamilies\POF\Programs\\' . $program;
-                $programs[$program] = new $ClassName($this->token);
+                // Some program classes accept the token (e.g. for script handle
+                // namespacing), others take no constructor args. Inspect the
+                // ctor and pass the token only when it's expected so we don't
+                // emit "Too many arguments" warnings under PHP 8.4+.
+                $ctor = ( new \ReflectionClass( $ClassName ) )->getConstructor();
+                $programs[$program] = ( $ctor && $ctor->getNumberOfParameters() > 0 )
+                    ? new $ClassName( $this->token )
+                    : new $ClassName();
             }
         }
         return $programs;
