@@ -103,7 +103,8 @@ class WooCommerce
 
     public function change_billing_details_to_your_details($translated_text, $text = '', $domain = ''): string
     {
-        remove_filter(current_filter(), __FUNCTION__);
+        // Prevent re-entrancy when calling __() below. Must match the original add_filter() callable + priority.
+        remove_filter(current_filter(), [$this, __FUNCTION__], 20);
         switch (strtolower($translated_text)) {
             case 'billing details':
                 $translated_text = is_user_logged_in() ? '' : __('Your details', 'woocommerce');
