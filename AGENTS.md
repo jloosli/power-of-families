@@ -14,21 +14,33 @@ docker-compose.worktree.yml            ← optional override: share main project
 
 ## Worktree setup
 
-When working in a `git worktree` (under `.claude/worktrees/`), share the
-main project's running database container instead of standing up a
-separate DB per worktree (saves disk + import time):
+When working in a `git worktree` (under `.claude/worktrees/`), pick one of
+three DB-sharing patterns from
+[README → Sharing DB / WordPress data](README.md#sharing-db--wordpress-data-with-the-main-checkout):
+
+| | DB | When |
+|---|---|---|
+| **A** | own copy, populated by stdin-streaming main's dump | branch work that mutates DB |
+| **B** | main's running `db` container (compose override) | read-mostly, ok with shared writes |
+| **C** | symlinked `db-data` via `bin/use-worktree-data` | maximum sharing, only one `db` runs at a time |
+
+Quick recipe for **A** (recommended default — keeps main's data safe):
 
 ```sh
-ln -s docker-compose.worktree.yml docker-compose.override.yml
-docker compose up -d wordpress    # site at http://localhost:8081
+mv wordpress wordpress.pre-symlink && ln -s ~/projects/power-of-families/wordpress wordpress
+docker compose up -d db
+docker compose exec -T db sh -c \
+    'mariadb -u pofuser -ppofpass poweroffamilies' \
+    < ~/projects/power-of-families/db-backups/poweroffamilies.dump
+npm run build:theme                       # one-time, creates wp-content/themes/power-of-families/dist/
+docker compose up -d wordpress            # site at http://localhost:${WP_PORT:-8080}
 ```
 
-Prereq: the main project's db container must be running
-(`cd ~/projects/power-of-families && docker compose up -d db`).
-
-Caveat: writes from the worktree mutate the shared site DB. PHPUnit
-creates a separate `wordpress_tests` schema on the same mysql instance,
-so test runs are isolated from site data.
+In all three patterns, the worktree's `wp-content/themes/power-of-families`
+and `wp-content/plugins/pof-bloom-plugin` are bind-mounted on top of the
+shared WP install, so your theme/plugin code remains isolated to the
+worktree. PHPUnit always gets its own `wordpress_tests` schema regardless
+of which DB pattern you pick.
 
 ## Commands
 

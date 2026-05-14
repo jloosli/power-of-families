@@ -1,18 +1,11 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: jloosli
- * Date: 11/28/17
- * Time: 5:40 PM
- */
+namespace PowerOfFamilies;
 
-namespace PowerOfFamilies\Avanti;
-
-class WooCommerce
+class WooCommerce implements HookRegistrar
 {
 
-    public function __construct()
+    public function register(): void
     {
 
         add_action('woocommerce_after_shop_loop_item_title', [$this, 'woocommerce_after_shop_loop_item_title_short_description'], 5);
@@ -75,128 +68,128 @@ class WooCommerce
             remove_action('woocommerce_before_single_product_summary', 'woocommerce_show_product_sale_flash', 10);
             add_action('woocommerce_before_single_product_summary', function () {
                 // Hide the whole summary div (throws off spacing)
-?><style>
+                ?><style>
                     .woocommerce div.product div.summary {
                         display: none;
                     }
                 </style><?php
+            }, 25);
+        }
+    }
 
-                    }, 25);
-                }
-            }
-
-            public function woocommerce_after_shop_loop_item_title_short_description(): void
-            {
-                global $product;
-                $excerpt = $product->get_short_description();
-                if (!$excerpt) return;
-                        ?>
+    public function woocommerce_after_shop_loop_item_title_short_description(): void
+    {
+        global $product;
+        $excerpt = $product->get_short_description();
+        if (!$excerpt) return;
+        ?>
         <div itemprop="description">
             <?php echo apply_filters('woocommerce_short_description', $excerpt); ?>
         </div>
-    <?php
-            }
+        <?php
+    }
 
-            public function remove_loop_button(): void
-            {
-                remove_action('woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10);
-            }
+    public function remove_loop_button(): void
+    {
+        remove_action('woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10);
+    }
 
-            public function replace_add_to_cart(): void
-            {
-                global $product;
-                $link = $product->get_permalink();
-                echo do_shortcode('<br><a class="button" href="' . esc_url($link) . '">Learn More</a>');
-            }
+    public function replace_add_to_cart(): void
+    {
+        global $product;
+        $link = $product->get_permalink();
+        echo do_shortcode('<br><a class="button" href="' . esc_url($link) . '">Learn More</a>');
+    }
 
-            public function change_billing_details_to_your_details($translated_text, $text = '', $domain = ''): string
-            {
-                remove_filter(current_filter(), __FUNCTION__);
-                switch (strtolower($translated_text)) {
-                    case 'billing details':
-                        $translated_text = is_user_logged_in() ? '' : __('Your details', 'woocommerce');
-                        break;
-                }
-                return $translated_text;
-            }
+    public function change_billing_details_to_your_details($translated_text, $text = '', $domain = ''): string
+    {
+        // Prevent re-entrancy when calling __() below. Must match the original add_filter() callable + priority.
+        remove_filter(current_filter(), [$this, __FUNCTION__], 20);
+        switch (strtolower($translated_text)) {
+            case 'billing details':
+                $translated_text = is_user_logged_in() ? '' : __('Your details', 'woocommerce');
+                break;
+        }
+        return $translated_text;
+    }
 
-            public function returning_customer_to_returning_member(): string
-            {
-                return 'Returning Member?';
-            }
+    public function returning_customer_to_returning_member(): string
+    {
+        return 'Returning Member?';
+    }
 
-            public function remove_unnecessary_billing_fields($fields = []): array
-            {
-                if (is_user_logged_in()) {
-                    unset($fields['billing_first_name']);
-                    unset($fields['billing_last_name']);
-                    unset($fields['billing_email']);
-                }
-                unset($fields['billing_company']);
-                unset($fields['billing_address_1']);
-                unset($fields['billing_address_2']);
-                unset($fields['billing_state']);
-                unset($fields['billing_city']);
-                unset($fields['billing_phone']);
-                unset($fields['billing_postcode']);
-                unset($fields['billing_country']);
-                return $fields;
-            }
+    public function remove_unnecessary_billing_fields($fields = []): array
+    {
+        if (is_user_logged_in()) {
+            unset($fields['billing_first_name']);
+            unset($fields['billing_last_name']);
+            unset($fields['billing_email']);
+        }
+        unset($fields['billing_company']);
+        unset($fields['billing_address_1']);
+        unset($fields['billing_address_2']);
+        unset($fields['billing_state']);
+        unset($fields['billing_city']);
+        unset($fields['billing_phone']);
+        unset($fields['billing_postcode']);
+        unset($fields['billing_country']);
+        return $fields;
+    }
 
 
-            public function alter_woocommerce_checkout_fields($fields): array
-            {
-                unset($fields['order']['order_comments']);
-                return $fields;
-            }
+    public function alter_woocommerce_checkout_fields($fields): array
+    {
+        unset($fields['order']['order_comments']);
+        return $fields;
+    }
 
-            public function remove_order_notes($fields): array
-            {
-                unset($fields['order']['order_comments']);
-                return $fields;
-            }
+    public function remove_order_notes($fields): array
+    {
+        unset($fields['order']['order_comments']);
+        return $fields;
+    }
 
-            public function add_text_to_checkout(): void
-            {
-                if (is_user_logged_in()) return;
-                echo "If you already have an account on Power of Families, use the link at the top of this page to log in before continuing. Otherwise, we'll
+    public function add_text_to_checkout(): void
+    {
+        if (is_user_logged_in()) return;
+        echo "If you already have an account on Power of Families, use the link at the top of this page to log in before continuing. Otherwise, we'll
 need to quickly create an account for you. Your email will be your username and you choose your password. You will use your username/email
 and password to log in and access your materials whenever you wish.";
-            }
+    }
 
-            public function custom_woocommerce_auto_complete_order($order_id): void
-            {
-                if (!$order_id) {
-                    return;
-                }
+    public function custom_woocommerce_auto_complete_order($order_id): void
+    {
+        if (!$order_id) {
+            return;
+        }
 
-                $order = wc_get_order($order_id);
-                $order->update_status('completed');
-            }
+        $order = wc_get_order($order_id);
+        $order->update_status('completed');
+    }
 
-            public function change_billing_field_strings($translated_text, $text, $domain): string
-            {
-                switch ($translated_text) {
-                    case 'Billing details':
-                        $translated_text = is_user_logged_in() ? '' : __('Your Details', 'woocommerce');
-                        break;
-                }
-                return $translated_text;
-            }
+    public function change_billing_field_strings($translated_text, $text, $domain): string
+    {
+        switch ($translated_text) {
+            case 'Billing details':
+                $translated_text = is_user_logged_in() ? '' : __('Your Details', 'woocommerce');
+                break;
+        }
+        return $translated_text;
+    }
 
-            public function change_return_customer_message(): string
-            {
-                return 'Returning Member?';
-            }
+    public function change_return_customer_message(): string
+    {
+        return 'Returning Member?';
+    }
 
-            public function add_my_programs_message(): void
-            {
-    ?>
+    public function add_my_programs_message(): void
+    {
+        ?>
         <div class="my-programs-after-order-message">
             To access your new program now and in the future, be sure you are logged (in upper right corner
             of the website) then use the dropdown menu for "My Account" to click on "My Programs". You should
             then see an icon for your new program. Click on that icon to access your materials.
         </div>
-<?php
-            }
-        }
+        <?php
+    }
+}

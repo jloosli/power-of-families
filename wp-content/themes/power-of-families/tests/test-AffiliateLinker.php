@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tests for the Affiliate_Linker class.
+ * Tests for the AffiliateLinker class.
  *
  * Regression coverage: the daily cron hook (POF_Affiliate_Linker_CRON)
  * was scheduled but never wired to a callback, so the Amazon tagging
@@ -9,13 +9,14 @@
  *
  * @package Power_Of_Families
  */
-class test_Affiliate_Linker extends WP_UnitTestCase {
+class test_AffiliateLinker extends WP_UnitTestCase {
 
-    private ?\PowerOfFamilies\POF\Programs\Affiliate_Linker $linker;
+    private ?\PowerOfFamilies\Programs\AffiliateLinker $linker;
 
     protected function setUp(): void {
         parent::setUp();
-        $this->linker = new \PowerOfFamilies\POF\Programs\Affiliate_Linker();
+        $this->linker = new \PowerOfFamilies\Programs\AffiliateLinker();
+        $this->linker->register();
     }
 
     protected function tearDown(): void {
@@ -27,7 +28,7 @@ class test_Affiliate_Linker extends WP_UnitTestCase {
     public function test_cron_action_is_bound_to_add_amazon() {
         $this->assertNotFalse(
             has_action( 'POF_Affiliate_Linker_CRON', [ $this->linker, 'add_amazon' ] ),
-            'POF_Affiliate_Linker_CRON must be wired to Affiliate_Linker::add_amazon; otherwise scheduled cron fires are no-ops.'
+            'POF_Affiliate_Linker_CRON must be wired to AffiliateLinker::add_amazon; otherwise scheduled cron fires are no-ops.'
         );
     }
 
@@ -47,16 +48,5 @@ class test_Affiliate_Linker extends WP_UnitTestCase {
         $second = wp_next_scheduled( 'POF_Affiliate_Linker_CRON' );
 
         $this->assertSame( $first, $second, 'Re-running activation should not reschedule the cron.' );
-    }
-
-    /**
-     * Settings::loadActivePrograms() does `new $ClassName($this->parent)`,
-     * so the constructor must tolerate a parent argument. If it doesn't,
-     * PHP raises ArgumentCountError and the cron-hook wiring never runs.
-     */
-    public function test_constructor_accepts_parent_argument() {
-        $parent = new \stdClass();
-        $linker = new \PowerOfFamilies\POF\Programs\Affiliate_Linker( $parent );
-        $this->assertInstanceOf( \PowerOfFamilies\POF\Programs\Affiliate_Linker::class, $linker );
     }
 }

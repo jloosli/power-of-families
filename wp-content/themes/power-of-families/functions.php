@@ -1,8 +1,18 @@
 <?php
 require_once 'vendor/autoload.php';
-$theme_setup = new \PowerOfFamilies\Avanti\ThemeSetup();
-$theme_setup->init();
-new \PowerOfFamilies\Avanti\WooCommerce();
-new \PowerOfFamilies\Avanti\Readme();
 
-$PowerOfFamiliesPrograms = new \PowerOfFamilies\POF\PowerOfFamiliesPrograms();
+$features = [
+    new \PowerOfFamilies\ThemeBootstrap(),
+    new \PowerOfFamilies\NavCustomizations(),
+    new \PowerOfFamilies\PostDisplay(),
+    new \PowerOfFamilies\HomepageWidgets(),
+    new \PowerOfFamilies\SiteChrome(),
+    new \PowerOfFamilies\SharingControls(),
+    new \PowerOfFamilies\WooCommerce(),
+    new \PowerOfFamilies\Readme(),
+    new \PowerOfFamilies\Programs(),
+];
+
+foreach ($features as $feature) {
+    $feature->register();
+}

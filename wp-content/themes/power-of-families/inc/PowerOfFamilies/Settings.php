@@ -1,29 +1,23 @@
 <?php
 
-namespace PowerOfFamilies\POF;
+namespace PowerOfFamilies;
 
 if (!defined('ABSPATH')) {
     exit;
 }
 
-class Settings
+class Settings implements HookRegistrar
 {
 
     /**
-     * The single instance of Power_of_Moms_Programs_Settings.
-     * @var    object
-     * @access   private
-     * @since    1.0.0
+     * Settings page slug / option prefix root.
      */
-    private static ?self $_instance = null;
+    public string $token;
 
     /**
-     * The main plugin object.
-     * @var    Power_of_Families_Programs
-     * @access   public
-     * @since    1.0.0
+     * Renderer used as the callback for add_settings_field.
      */
-    public ?PowerOfFamiliesPrograms $parent = null;
+    public ?FieldRenderer $renderer;
 
     /**
      * Prefix for plugin settings.
@@ -50,24 +44,25 @@ class Settings
     public array $programs = [];
 
 
-    public function __construct($parent)
+    public function __construct(string $token, ?FieldRenderer $renderer = null)
     {
-        $this->parent = $parent;
-
+        $this->token = $token;
+        $this->renderer = $renderer;
         $this->base = 'pof_';
+        $this->programs = $this->loadActivePrograms();
+    }
 
-        // Initialise settings
+    public function register(): void
+    {
         add_action('init', [$this, 'init_settings'], 11);
-
-        // Register plugin settings
         add_action('admin_init', [$this, 'register_settings']);
-
-        // Add settings page to menu
         add_action('admin_menu', [$this, 'add_menu_item']);
 
-        // Load up active programs
-        $this->programs = $this->loadActivePrograms();
-
+        foreach ($this->programs as $program) {
+            if ($program instanceof HookRegistrar) {
+                $program->register();
+            }
+        }
     }
 
     /**
@@ -89,7 +84,7 @@ class Settings
             __('POF Settings', 'power-of-families-programs'),
             __('POF Settings', 'power-of-families-programs'),
             'manage_options',
-            $this->parent::TOKEN . '_settings',
+            $this->token . '_settings',
             [$this, 'settings_page']
         );
     }
@@ -100,9 +95,12 @@ class Settings
      */
     private function getAvailablePrograms(): array
     {
+        // Outer keys match values stored in the pof_active_programs option
+        // and must stay stable for backward compatibility; the `class` field
+        // is the actual PHP class name in the PowerOfFamilies\Programs namespace.
         return [
-            'Affiliate_Linker' => ['name' => 'Affiliate Linker', 'has-settings' => true],
-            'My_Programs'      => ['name' => 'My Programs',      'has-settings' => false],
+            'Affiliate_Linker' => ['class' => 'AffiliateLinker', 'name' => 'Affiliate Linker', 'has-settings' => true],
+            'My_Programs'      => ['class' => 'MyPrograms',      'name' => 'My Programs',      'has-settings' => false],
         ];
     }
 
@@ -113,15 +111,19 @@ class Settings
 
     public function loadActivePrograms(): array
     {
-        $allowed = [ 'Affiliate_Linker', 'My_Programs' ];
+        $available = $this->getAvailablePrograms();
         $programs = [];
         foreach ($this->getActivePrograms() as $program) {
-            if (
-                in_array( $program, $allowed, true ) &&
-                array_key_exists( $program, $this->getAvailablePrograms() )
-            ) {
-                $ClassName = '\PowerOfFamilies\POF\Programs\\' . $program;
-                $programs[$program] = new $ClassName($this->parent);
+            if (array_key_exists($program, $available)) {
+                $ClassName = '\PowerOfFamilies\Programs\\' . $available[$program]['class'];
+                // Some program classes accept the token (e.g. for script handle
+                // namespacing), others take no constructor args. Inspect the
+                // ctor and pass the token only when it's expected so we don't
+                // emit "Too many arguments" warnings under PHP 8.4+.
+                $ctor = ( new \ReflectionClass( $ClassName ) )->getConstructor();
+                $programs[$program] = ( $ctor && $ctor->getNumberOfParameters() > 0 )
+                    ? new $ClassName( $this->token )
+                    : new $ClassName();
             }
         }
         return $programs;
@@ -163,7 +165,7 @@ class Settings
             }
         }
 
-        $settings = apply_filters($this->parent::TOKEN . '_settings_fields', $settings);
+        $settings = apply_filters($this->token . '_settings_fields', $settings);
 
         return $settings;
     }
@@ -172,19 +174,33 @@ class Settings
      * Register plugin settings
      * @return void
      */
+    /**
+     * Read and validate the requested settings tab from $_POST/$_GET.
+     *
+     * Returns the section key only if it matches a known settings section
+     * (defined in $this->settings). Empty string otherwise. Prevents
+     * arbitrary user input from flowing into add_settings_section() and
+     * the rendered nav.
+     */
+    private function get_current_tab(): string
+    {
+        $allowed = is_array($this->settings) ? array_keys($this->settings) : [];
+
+        $tab = '';
+        if (!empty($_POST['tab'])) {
+            $tab = sanitize_text_field(wp_unslash($_POST['tab']));
+        } elseif (!empty($_GET['tab'])) {
+            $tab = sanitize_text_field(wp_unslash($_GET['tab']));
+        }
+
+        return in_array($tab, $allowed, true) ? $tab : '';
+    }
+
     public function register_settings(): void
     {
         if (is_array($this->settings)) {
 
-            // Check posted/selected tab
-            $current_section = '';
-            if (isset($_POST['tab']) && $_POST['tab']) {
-                $current_section = $_POST['tab'];
-            } else {
-                if (isset($_GET['tab']) && $_GET['tab']) {
-                    $current_section = $_GET['tab'];
-                }
-            }
+            $current_section = $this->get_current_tab();
 
             foreach ($this->settings as $section => $data) {
 
@@ -193,7 +209,7 @@ class Settings
                 }
 
                 // Add section to page
-                add_settings_section($section, $data['title'], [$this, 'settings_section'], $this->parent::TOKEN . '_settings');
+                add_settings_section($section, $data['title'], [$this, 'settings_section'], $this->token . '_settings');
 
                 foreach ($data['fields'] as $field) {
 
@@ -205,13 +221,13 @@ class Settings
 
                     // Register field
                     $option_name = $this->base . $field['id'];
-                    register_setting($this->parent::TOKEN . '_settings', $option_name, $validation);
+                    register_setting($this->token . '_settings', $option_name, $validation);
 
                     // Add field to page
                     add_settings_field($field['id'], $field['label'], array(
-                        $this->parent->admin,
+                        $this->renderer,
                         'display_field'
-                    ), $this->parent::TOKEN . '_settings', $section, array(
+                    ), $this->token . '_settings', $section, array(
                         'field' => $field,
                         'prefix' => $this->base
                     ));
@@ -238,13 +254,10 @@ class Settings
     {
 
         // Build page HTML
-        $html = '<div class="wrap" id="' . $this->parent::TOKEN . '_settings">' . "\n";
+        $html = '<div class="wrap" id="' . $this->token . '_settings">' . "\n";
         $html .= '<h2>' . __('POF Settings', 'power-of-families-programs') . '</h2>' . "\n";
 
-        $tab = '';
-        if (isset($_GET['tab']) && $_GET['tab']) {
-            $tab .= $_GET['tab'];
-        }
+        $tab = $this->get_current_tab();
 
         // Show page tabs
         if (is_array($this->settings) && 1 < count($this->settings)) {
@@ -254,16 +267,13 @@ class Settings
             $c = 0;
             foreach ($this->settings as $section => $data) {
 
-                // Set tab class
                 $class = 'nav-tab';
-                if (!isset($_GET['tab'])) {
-                    if (0 == $c) {
+                if ('' === $tab) {
+                    if (0 === $c) {
                         $class .= ' nav-tab-active';
                     }
-                } else {
-                    if (isset($_GET['tab']) && $section == $_GET['tab']) {
-                        $class .= ' nav-tab-active';
-                    }
+                } elseif ($section === $tab) {
+                    $class .= ' nav-tab-active';
                 }
 
                 // Set tab link
@@ -285,8 +295,8 @@ class Settings
 
         // Get settings fields
         ob_start();
-        settings_fields($this->parent::TOKEN . '_settings');
-        do_settings_sections($this->parent::TOKEN . '_settings');
+        settings_fields($this->token . '_settings');
+        do_settings_sections($this->token . '_settings');
         $html .= ob_get_clean();
 
         $html .= '<p class="submit">' . "\n";
@@ -298,44 +308,5 @@ class Settings
         echo $html;
         do_action('pof_programs_settings_admin_end');
     }
-
-    /**
-     * Main Power_of_Moms_Programs_Settings Instance
-     *
-     * Ensures only one instance of Power_of_Moms_Programs_Settings is loaded or can be loaded.
-     *
-     * @since 1.0.0
-     * @static
-     * @see   Power_of_Moms_Programs()
-     * @return Main Power_of_Moms_Programs_Settings instance
-     */
-    public static function instance($parent): static
-    {
-        if (is_null(self::$_instance)) {
-            self::$_instance = new self($parent);
-        }
-
-        return self::$_instance;
-    } // End instance()
-
-    /**
-     * Cloning is forbidden.
-     *
-     * @since 1.0.0
-     */
-    public function __clone(): void
-    {
-        _doing_it_wrong(__FUNCTION__, __('Cheatin&#8217; huh?'), '1.0.0');
-    } // End __clone()
-
-    /**
-     * Unserializing instances of this class is forbidden.
-     *
-     * @since 1.0.0
-     */
-    public function __wakeup(): void
-    {
-        _doing_it_wrong(__FUNCTION__, __('Cheatin&#8217; huh?'), '1.0.0');
-    } // End __wakeup()
 
 }

@@ -1,20 +1,20 @@
 <?php
 
 /**
- * Tests for the My_Programs class.
+ * Tests for the MyPrograms class.
  *
  * @package Power_Of_Families
  */
 class test_MyPrograms extends WP_UnitTestCase {
 
-    private \PowerOfFamilies\POF\Programs\My_Programs $my_programs;
+    private \PowerOfFamilies\Programs\MyPrograms $my_programs;
     private ReflectionMethod $parse_description;
 
     protected function setUp(): void {
         parent::setUp();
-        $this->my_programs = new \PowerOfFamilies\POF\Programs\My_Programs();
+        $this->my_programs = new \PowerOfFamilies\Programs\MyPrograms();
         $this->parse_description = new ReflectionMethod(
-            \PowerOfFamilies\POF\Programs\My_Programs::class,
+            \PowerOfFamilies\Programs\MyPrograms::class,
             'getProgramMetaFromDescription'
         );
         $this->parse_description->setAccessible( true );

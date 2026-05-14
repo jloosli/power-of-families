@@ -1,21 +1,16 @@
 <?php
 
-namespace PowerOfFamilies\POF\Programs;
+namespace PowerOfFamilies\Programs;
 
-class Affiliate_Linker
+use PowerOfFamilies\HookRegistrar;
+
+class AffiliateLinker implements HookRegistrar
 {
-    public static ?Affiliate_Linker_Settings $settingsInstance = null;
+    public static ?AffiliateLinkerSettings $settingsInstance = null;
 
     public string $affiliate_id = '';
 
-    /**
-     * Settings::loadActivePrograms() instantiates program classes as
-     * `new $ClassName($this->parent)`, so the constructor must accept a
-     * parent argument even though Affiliate_Linker doesn't use it. Without
-     * this, PHP raises ArgumentCountError when the program is activated
-     * and the cron-hook wiring below never runs.
-     */
-    public function __construct($parent = null)
+    public function register(): void
     {
         $this->affiliate_id = (string) get_option('pof_amazon_affiliate_id');
 
@@ -28,10 +23,10 @@ class Affiliate_Linker
         add_action('POF_Affiliate_Linker_CRON', [$this, 'add_amazon']);
     }
 
-    public static function getSettingsInstance() : Affiliate_Linker_Settings
+    public static function getSettingsInstance() : AffiliateLinkerSettings
     {
         if (is_null(self::$settingsInstance)) {
-            self::$settingsInstance = new Affiliate_Linker_Settings();
+            self::$settingsInstance = new AffiliateLinkerSettings();
         }
 
         return self::$settingsInstance;

@@ -15,7 +15,7 @@
  * @package Power_Of_Families
  */
 
-// Prevent ThemeSetup::child_theme_setup() from loading Genesis's lib/init.php.
+// Prevent ThemeBootstrap from loading Genesis's lib/init.php.
 if ( ! defined( 'PHPUNIT_RUNNING' ) ) {
     define( 'PHPUNIT_RUNNING', true );
 }

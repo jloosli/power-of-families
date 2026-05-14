@@ -1,34 +1,35 @@
 <?php
 
-namespace PowerOfFamilies\POF\Programs;
-/**
- * Helper utilities for diplaying My Programs
- * @property \POF\Power_of_Families_Programs parent
- */
-class My_Programs
+namespace PowerOfFamilies\Programs;
+
+use PowerOfFamilies\HookRegistrar;
+
+class MyPrograms implements HookRegistrar
 {
 
     public static mixed $settingsInstance = null;
 
-    public function __construct($parent = null)
-    {
-        $this->parent = $parent;
+    public function __construct(private ?string $token = null) {}
 
+    public function register(): void
+    {
         if (!defined('GROUPS_ADMINISTRATOR_OVERRIDE')) {
             define('GROUPS_ADMINISTRATOR_OVERRIDE', true);
         }
 
-        //Actions
         add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
-        //Filters
-        //Short codes
         add_shortcode("pof_programs", [$this, 'show_programs']);
     }
 
     public function enqueue_scripts() : void
     {
-        wp_enqueue_script($this->parent::TOKEN . '-frontend');
-
+        // Token is optional (e.g. when instantiated by tests). Without it we
+        // have no namespaced handle to enqueue, so bail rather than register a
+        // bogus "-frontend" script.
+        if (empty($this->token)) {
+            return;
+        }
+        wp_enqueue_script($this->token . '-frontend');
     }
 
     /**

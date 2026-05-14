@@ -43,9 +43,14 @@
     <testsuites>
         <testsuite name="Theme Test Suite">
             <file>./tests/test-sample.php</file>
-            <file>./tests/test-ThemeSetup.php</file>
+            <file>./tests/test-ThemeBootstrap.php</file>
+            <file>./tests/test-NavCustomizations.php</file>
+            <file>./tests/test-PostDisplay.php</file>
+            <file>./tests/test-HomepageWidgets.php</file>
+            <file>./tests/test-SiteChrome.php</file>
+            <file>./tests/test-SharingControls.php</file>
             <file>./tests/test-MyPrograms.php</file>
-            <file>./tests/test-Affiliate_Linker.php</file>
+            <file>./tests/test-AffiliateLinker.php</file>
         </testsuite>
     </testsuites>
 
