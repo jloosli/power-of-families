@@ -40,14 +40,14 @@
 		"test:docs": "bin/test-docs.sh"
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.55.0",
-		"@types/node": "^24.3.1",
-		"@wordpress/prettier-config": "^4.27.0",
+		"@playwright/test": "^1.60.0",
+		"@types/node": "^24.12.4",
+		"@wordpress/prettier-config": "^4.45.0",
 		"@wordpress/scripts": "^32.1.0",
 		"normalize.css": "^8.0.1",
 		"postcss": "^8.5.14",
-		"prettier": "^3.2.5",
-		"wp-types": "^4.68.1"
+		"prettier": "^3.8.3",
+		"wp-types": "^4.69.0"
 	},
 	"overrides": {
 		"serialize-javascript": "^7.0.5",
