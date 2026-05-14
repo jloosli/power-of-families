@@ -8,11 +8,12 @@ if (!defined('ABSPATH')) {
 
 
 /**
- * Main class for managing the Power of Families plugin programs.
+ * Composition root for the Power of Families admin programs feature.
  *
- * Handles registration of custom post types and taxonomies, loading of settings,
- * and enqueuing of admin scripts. This class serves as the core of the migrated
- * Power of Families plugin, providing integration points and administrative functionality.
+ * Wires the admin {@see Settings} screen and its {@see FieldRenderer},
+ * cascades `register()` to both, and enqueues the admin script bundle.
+ * Per-program post types and taxonomies are registered by the individual
+ * program classes loaded from `inc/programs/`, not by this class.
  *
  * @since 1.0.0
  */

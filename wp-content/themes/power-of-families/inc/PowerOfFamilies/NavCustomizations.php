@@ -23,7 +23,7 @@ class NavCustomizations implements HookRegistrar
     public function be_follow_icons($menu, $args): string
     {
         $args = (array)$args;
-        if ('primary' !== $args['theme_location']) {
+        if ('primary' !== ($args['theme_location'] ?? '')) {
             return $menu;
         }
         if (is_user_logged_in()) {
