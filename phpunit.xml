@@ -43,7 +43,13 @@
     <testsuites>
         <testsuite name="Theme Test Suite">
             <file>./power-of-families/tests/test-sample.php</file>
-            <file>./power-of-families/tests/test-ThemeSetup.php</file>
+            <file>./power-of-families/tests/test-ThemeBootstrap.php</file>
+            <file>./power-of-families/tests/test-NavCustomizations.php</file>
+            <file>./power-of-families/tests/test-PostDisplay.php</file>
+            <file>./power-of-families/tests/test-HomepageWidgets.php</file>
+            <file>./power-of-families/tests/test-SiteChrome.php</file>
+            <file>./power-of-families/tests/test-SharingControls.php</file>
+            <file>./power-of-families/tests/test-MyPrograms.php</file>
         </testsuite>
     </testsuites>
 
