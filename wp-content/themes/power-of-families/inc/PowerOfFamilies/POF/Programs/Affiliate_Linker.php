@@ -8,7 +8,14 @@ class Affiliate_Linker
 
     public string $affiliate_id = '';
 
-    public function __construct()
+    /**
+     * Settings::loadActivePrograms() instantiates program classes as
+     * `new $ClassName($this->parent)`, so the constructor must accept a
+     * parent argument even though Affiliate_Linker doesn't use it. Without
+     * this, PHP raises ArgumentCountError when the program is activated
+     * and the cron-hook wiring below never runs.
+     */
+    public function __construct($parent = null)
     {
         $this->affiliate_id = (string) get_option('pof_amazon_affiliate_id');
 

@@ -48,4 +48,15 @@ class test_Affiliate_Linker extends WP_UnitTestCase {
 
         $this->assertSame( $first, $second, 'Re-running activation should not reschedule the cron.' );
     }
+
+    /**
+     * Settings::loadActivePrograms() does `new $ClassName($this->parent)`,
+     * so the constructor must tolerate a parent argument. If it doesn't,
+     * PHP raises ArgumentCountError and the cron-hook wiring never runs.
+     */
+    public function test_constructor_accepts_parent_argument() {
+        $parent = new \stdClass();
+        $linker = new \PowerOfFamilies\POF\Programs\Affiliate_Linker( $parent );
+        $this->assertInstanceOf( \PowerOfFamilies\POF\Programs\Affiliate_Linker::class, $linker );
+    }
 }
