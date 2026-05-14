@@ -19,9 +19,11 @@ class SiteChrome
 
     public function footer_copyright(): void
     {
-?>
-        <p>&copy; Copyright 2017 - <?php echo esc_html( date( 'Y' ) ) ?> <a href="https://poweroffamilies.com">Power of Families</a>
-    <?php
+        printf(
+            '<p>&copy; Copyright 2017 - %s <a href="%s">Power of Families</a></p>',
+            esc_html( date( 'Y' ) ),
+            esc_url( 'https://poweroffamilies.com' )
+        );
     }
 
     public function pre_load_favicon(): void
@@ -48,11 +50,11 @@ class SiteChrome
     {
         echo '<div class="login-bar collapse" id="login-bar"><div class="wrap">';
         $request = isset( $_GET['wlfrom'] )
-            ? esc_url_raw( wp_validate_redirect( sanitize_url( wp_unslash( $_GET['wlfrom'] ) ), home_url() ) )
-            : esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) );
+            ? esc_url_raw( wp_validate_redirect( sanitize_url( wp_unslash( $_GET['wlfrom'] ) ), home_url( '/my-programs/' ) ) )
+            : home_url( '/my-programs/' );
         $args = [
             'echo' => true,
-            'redirect' => '\/my-programs\/',
+            'redirect' => $request,
             'form_id' => 'loginform',
             'label_username' => __('Username'),
             'label_password' => __('Password'),
