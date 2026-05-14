@@ -60,18 +60,62 @@ Then `docker compose up -d wordpress` from the worktree directory. Visit
 ### Sharing DB / WordPress data with the main checkout
 
 The DB volume is large (~1.6 GB) and re-running first-time setup in every
-worktree is wasteful. To reuse the data from the main project, run from
-inside the worktree:
+worktree is wasteful. Three patterns, depending on how isolated you want
+to be:
+
+| | DB | `wordpress/` install | Use when |
+|---|---|---|---|
+| **A. Independent DB, shared install** | own copy (stdin import) | symlink to main | branch work that may mutate DB — keep main's data safe |
+| **B. Live-shared DB** | main's running container | symlink to main | quick lookups / read-mostly work; ok with shared writes |
+| **C. Full symlink** | symlinked db-data | symlink to main | maximum sharing; only one stack's `db` may run at a time |
+
+In all three, the worktree's bind mounts of `wp-content/themes/power-of-families`
+and `wp-content/plugins/pof-bloom-plugin` overlay the shared WP install, so
+your theme/plugin code stays isolated to the worktree.
+
+#### Pattern A — independent DB via stdin import
+
+Streams main's dump directly into the worktree's `db` container — no copy
+of the 775 MB dump file lands on disk inside the worktree.
+
+```shell
+mv wordpress wordpress.pre-symlink && ln -s ~/projects/power-of-families/wordpress wordpress
+docker compose up -d db
+docker compose exec -T db sh -c \
+    'mariadb -u pofuser -ppofpass poweroffamilies' \
+    < ~/projects/power-of-families/db-backups/poweroffamilies.dump
+docker compose up -d wordpress
+```
+
+Then run the [one-time theme bootstrap](#one-time-theme-bootstrap) below.
+
+#### Pattern B — live-shared DB via compose override
+
+Worktree's `wordpress` and `test` services talk to the main checkout's
+running `db` container instead of starting their own.
+
+```shell
+ln -s docker-compose.worktree.yml docker-compose.override.yml
+ln -s ~/projects/power-of-families/wordpress wordpress   # if you also want main's WP install
+docker compose up -d wordpress
+```
+
+Prereq: the main checkout's `db` container must be running
+(`cd ~/projects/power-of-families && docker compose up -d db`). PHPUnit
+gets a separate `wordpress_tests` schema on the same mysql instance, so
+test runs stay isolated from site data — but ordinary site writes from the
+worktree mutate main's data.
+
+#### Pattern C — full symlink via `bin/use-worktree-data`
+
+Symlinks `db-data`, `db-backups`, and `wordpress` to the main checkout in
+one shot.
 
 ```shell
 bin/use-worktree-data
 # or, if your main project lives elsewhere:
 bin/use-worktree-data /path/to/power-of-families
 ```
-
-This symlinks `db-data`, `db-backups`, and `wordpress` to the main checkout
-so both stacks resolve to the same on-disk files. Docker bind mounts on
-macOS follow host symlinks correctly.
 
 > **Important:** only one `db` service may run at a time when `db-data` is
 > shared. Two MariaDB instances pointed at the same datadir will fail to
@@ -80,19 +124,24 @@ macOS follow host symlinks correctly.
 > edit `bin/use-worktree-data` to skip the `db-data` link and import the
 > dump from the shared `db-backups` into a per-worktree `db-data`.
 
-The compose file bind-mounts the worktree's `wp-content/themes/power-of-families`
-and `wp-content/plugins/pof-bloom-plugin` *on top of* the symlinked
-`wordpress/` install — that's how each worktree runs its own theme/plugin
-code. Side effect: `vendor/` and `dist/` aren't shared, so each new worktree
-needs a one-time bootstrap before pages will render:
+The script refuses to overwrite existing non-symlink directories at
+`db-data`, `db-backups`, or `wordpress`. Move or remove them first if a
+prior pattern already populated them.
+
+#### One-time theme bootstrap
+
+The worktree's own `wp-content/themes/power-of-families/{vendor,dist}` and
+`wp-content/plugins/pof-bloom-plugin/build` are gitignored and bind-mounted
+as-is, so a fresh worktree needs:
 
 ```shell
 docker compose run --rm composer install --no-dev   # creates theme vendor/
 npm run build:theme                                 # creates theme dist/*.asset.php
 ```
 
-Without the helper script, a fresh worktree gets empty bind mounts and you
-run the standard "First Time Setup" flow above to populate them.
+Without any of these patterns, a fresh worktree gets empty bind mounts and
+you'll need to run the standard "First Time Setup" flow above to populate
+them from scratch.
 
 ### Reference: Docker compose env overrides
 
