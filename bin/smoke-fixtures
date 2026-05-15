@@ -13,6 +13,34 @@ SMOKE_PASSWORD="${SMOKE_PASSWORD:-smoke-test-pw-change-me}"
 SMOKE_PRODUCT_SLUG="smoke-test-product"
 SMOKE_PRODUCT_TITLE="Smoke Test Product"
 
+# ---------------------------------------------------------------------
+# Members-plugin gating decision (resolved 2026-05-14, Task 4 of plan).
+#
+# Active plugin:      groups (v3.7.0) + groups-woocommerce (v3.0.0)
+#                     members (v3.2.18) is active but its content_permissions
+#                     feature is OFF (option members_settings.content_permissions=0),
+#                     so it is NOT enforcing any page-level access.
+#
+# Gating mechanism:   `groups` plugin, postmeta key `groups-read`, value = group_id.
+#                     When a logged-out (or non-member) visitor hits a gated page,
+#                     WordPress returns HTTP 404 — no redirect, just a hard 404.
+#                     71 published posts/pages are gated this way.
+#
+# Example gated page: "Joy School Materials" (ID 57829, slug joy-school-materials-2)
+#                     groups-read = 83 ("Joy School Lifetime") and 84 ("Joy School
+#                     Parent Materials").
+#                     Simplest group for test purposes: group_id=1 ("Registered"),
+#                     which is the base membership tier every registered user joins.
+#
+# Test strategy for
+#   Task 5:           Create a page (slug smoke-test-gated) with postmeta
+#                     groups-read = 1 (group "Registered"). The smoketest user
+#                     (role=subscriber) must also be added to group_id=1 via the
+#                     groups plugin user-group table (wp_groups_user_group) so the
+#                     logged-in smoke test sees the page content, while the
+#                     logged-out check gets a 404. No shortcodes needed; the gating
+#                     is purely meta-driven by the groups plugin at request time.
+# ---------------------------------------------------------------------
 wpcli() {
     docker compose run --rm -T wpcli "$@"
 }
