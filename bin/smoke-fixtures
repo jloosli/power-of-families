@@ -13,6 +13,11 @@ SMOKE_PASSWORD="${SMOKE_PASSWORD:-smoke-test-pw-change-me}"
 SMOKE_PRODUCT_SLUG="smoke-test-product"
 SMOKE_PRODUCT_TITLE="Smoke Test Product"
 
+SMOKE_GATED_SLUG="smoke-test-members-page"
+SMOKE_GATED_TITLE="Smoke Test Members Page"
+SMOKE_GATED_MARKER="MEMBERS_ONLY_MARKER"
+SMOKE_GROUP_ID="1"   # "Registered" group — base tier; see comment at top of file.
+
 # ---------------------------------------------------------------------
 # Members-plugin gating decision (resolved 2026-05-14, Task 4 of plan).
 #
@@ -88,10 +93,49 @@ ensure_product() {
         --user="$admin_id" >/dev/null
 }
 
+ensure_gated_page() {
+    # `wpcli post list --name=...` does not reliably filter by exact slug;
+    # query via $wpdb instead to get an exact match on post_name.
+    local existing
+    existing=$(wpcli eval \
+        "global \$wpdb; echo \$wpdb->get_var(\$wpdb->prepare(\"SELECT ID FROM wp_posts WHERE post_name = %s AND post_type = 'page' AND post_status = 'publish'\", '${SMOKE_GATED_SLUG}'));" \
+        2>/dev/null | tr -d '[:space:]')
+    if [[ -z "$existing" ]]; then
+        existing=$(wpcli post create \
+            --post_type=page \
+            --post_status=publish \
+            --post_title="$SMOKE_GATED_TITLE" \
+            --post_name="$SMOKE_GATED_SLUG" \
+            --post_content="Public preamble. $SMOKE_GATED_MARKER" \
+            --porcelain)
+    fi
+    # Ensure the groups-read meta is set to our target group. Idempotent
+    # via wp post meta update (creates or replaces).
+    wpcli post meta update "$existing" groups-read "$SMOKE_GROUP_ID" >/dev/null
+}
+
+ensure_user_in_group() {
+    # Add smoketest user to group_id=$SMOKE_GROUP_ID by inserting into
+    # the groups plugin's wp_groups_user_group mapping. Idempotent via
+    # INSERT IGNORE. Uses wpcli eval + $wpdb to avoid SSL issues with
+    # `wpcli db query` against MariaDB.
+    local user_id
+    user_id=$(wpcli user get "$SMOKE_USER_EMAIL" --field=ID 2>/dev/null | tr -d '[:space:]')
+    if [[ -z "$user_id" ]]; then
+        echo "ensure_user_in_group: smoketest user not found" >&2
+        exit 1
+    fi
+    wpcli eval "global \$wpdb; \$wpdb->query(\"INSERT IGNORE INTO wp_groups_user_group (user_id, group_id) VALUES (${user_id}, ${SMOKE_GROUP_ID})\");" >/dev/null
+}
+
 ensure_user
 ensure_product
+ensure_gated_page
+ensure_user_in_group
 
 echo "SMOKE_USER_EMAIL=$SMOKE_USER_EMAIL"
 echo "SMOKE_USER_LOGIN=$SMOKE_USER_LOGIN"
 echo "SMOKE_PASSWORD=$SMOKE_PASSWORD"
 echo "SMOKE_PRODUCT_SLUG=$SMOKE_PRODUCT_SLUG"
+echo "SMOKE_GATED_SLUG=$SMOKE_GATED_SLUG"
+echo "SMOKE_GATED_MARKER=$SMOKE_GATED_MARKER"
