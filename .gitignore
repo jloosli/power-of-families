@@ -45,3 +45,7 @@ test-reports/
 # xDebug logs and profiles
 xdebug-logs/
 xdebug-profiles/
+
+# Smoke testing artifacts
+tests/smoke/test-results/
+tests/smoke/playwright-report/

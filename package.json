@@ -37,7 +37,10 @@
 		"test:dev-helper": "bin/test-dev-helper.sh",
 		"test:env-manager": "bin/test-env-manager.sh",
 		"test:performance": "bin/test-performance-monitor.sh",
-		"test:docs": "bin/test-docs.sh"
+		"test:docs": "bin/test-docs.sh",
+		"smoke": "bin/smoke",
+		"smoke:fixtures": "bin/smoke-fixtures",
+		"smoke:install": "playwright install chromium"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.55.0",
