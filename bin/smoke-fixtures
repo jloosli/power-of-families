@@ -167,8 +167,15 @@ GATED_ID=$(wpcli eval \
 local_url() {
     # $1 = raw URL from wp post url (e.g. https://poweroffamilies.com/product/foo/)
     # Returns $SITE_URL + path (e.g. http://localhost:8081/product/foo/)
+    # Exits non-zero if the input isn't a recognizable absolute URL — that
+    # way a missing/garbled raw URL fails loudly here rather than producing
+    # a malformed http://localhost:8081// that 404s silently in Playwright.
     local raw path
     raw="$1"
+    if [[ ! "$raw" =~ ^https?://[^/]+/ ]]; then
+        echo "local_url: expected an absolute http(s) URL with a path, got: ${raw:-<empty>}" >&2
+        exit 1
+    fi
     path="${raw#http*://*/}"      # strip scheme + host
     path="/${path%/}/"            # ensure leading slash and trailing slash
     printf '%s%s' "$SITE_URL" "$path"
