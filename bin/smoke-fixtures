@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Idempotently seed test fixtures for bin/smoke. Each fixture checks before
+# creating, so this script is safe to re-run.
+#
+# Emits KEY=value lines on stdout so bin/smoke can `eval` / export them as
+# env vars for the Playwright suite.
+set -euo pipefail
+
+SMOKE_USER_EMAIL="smoketest@example.com"
+SMOKE_USER_LOGIN="smoketest"
+SMOKE_PASSWORD="${SMOKE_PASSWORD:-smoke-test-pw-change-me}"
+
+wpcli() {
+    docker compose run --rm -T wpcli "$@"
+}
+
+ensure_user() {
+    if wpcli user get "$SMOKE_USER_EMAIL" --field=ID >/dev/null 2>&1; then
+        return 0
+    fi
+    wpcli user create "$SMOKE_USER_LOGIN" "$SMOKE_USER_EMAIL" \
+        --role=subscriber \
+        --user_pass="$SMOKE_PASSWORD" \
+        --display_name="Smoke Test" >/dev/null
+}
+
+ensure_user
+
+echo "SMOKE_USER_EMAIL=$SMOKE_USER_EMAIL"
+echo "SMOKE_USER_LOGIN=$SMOKE_USER_LOGIN"
+echo "SMOKE_PASSWORD=$SMOKE_PASSWORD"
