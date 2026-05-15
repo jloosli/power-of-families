@@ -31,6 +31,11 @@ The repo already has Docker-based local WordPress and PHPUnit unit tests for the
 ## Workflow this enables
 
 ```shell
+# 0. Discover what's pending (no separate slug list to maintain)
+docker compose exec wpcli wp plugin list --update=available
+docker compose exec wpcli wp theme list --update=available
+docker compose exec wpcli wp core check-update
+
 # 1. Update one plugin locally
 docker compose exec wpcli wp plugin update <plugin-slug>
 
@@ -45,6 +50,8 @@ docker compose exec wpcli wp plugin install <plugin-slug> --version=<previous> -
 ```
 
 The same flow applies to Genesis parent-theme updates (`wp theme update genesis`) and WordPress core updates (`wp core update`).
+
+The smoke suite itself is plugin-agnostic — it never sees the slug of the plugin you just updated. It exercises user journeys and tails the PHP error log, so it catches breakage from any update.
 
 We deliberately do **not** wrap steps 1–3 into a single helper. Keeping the update step explicit reinforces the "one at a time" discipline.
 
@@ -160,7 +167,10 @@ Gitignored: `tests/smoke/test-results/`, `tests/smoke/playwright-report/`, Playw
 - `npm run smoke:fixtures` → `bin/smoke-fixtures` (rarely needed standalone)
 - `npm run smoke:install` → `npx playwright install chromium` (one-time browser download)
 
-**README addition:** a "Smoke Testing" section under "Ongoing Development" with the first-run setup (`npm run smoke:install`) and the update loop documented above.
+**README addition:** a "Smoke Testing" section under "Ongoing Development" containing:
+- First-run setup (`npm run smoke:install`).
+- The discovery commands (`wp plugin list --update=available`, `wp theme list --update=available`, `wp core check-update`) so the developer can see at a glance what needs updating without remembering the WP-CLI syntax.
+- The full update loop (discover → update locally → smoke → mirror to prod or revert) documented in the *Workflow this enables* section above.
 
 ## Open questions resolved during implementation
 
