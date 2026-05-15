@@ -125,7 +125,7 @@ ensure_user_in_group() {
         echo "ensure_user_in_group: smoketest user not found" >&2
         exit 1
     fi
-    wpcli eval "global \$wpdb; \$wpdb->query(\"INSERT IGNORE INTO wp_groups_user_group (user_id, group_id) VALUES (${user_id}, ${SMOKE_GROUP_ID})\");" >/dev/null
+    wpcli eval "global \$wpdb; \$wpdb->query(\$wpdb->prepare(\"INSERT IGNORE INTO wp_groups_user_group (user_id, group_id) VALUES (%d, %d)\", ${user_id}, ${SMOKE_GROUP_ID}));" >/dev/null
 }
 
 ensure_user
