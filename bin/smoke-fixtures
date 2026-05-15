@@ -48,6 +48,10 @@ ensure_product() {
     local admin_id
     admin_id=$(wpcli user list --role=administrator --field=ID --format=ids 2>/dev/null \
         | tr ' ' '\n' | head -1 | tr -d '[:space:]')
+    if [[ -z "$admin_id" ]]; then
+        echo "ensure_product: no administrator user found to authenticate the WooCommerce update" >&2
+        exit 1
+    fi
     # Make it a simple, purchasable product priced $1 with stock management off.
     wpcli wc product update "$id" \
         --type=simple \
