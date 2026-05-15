@@ -235,7 +235,7 @@ docker compose run --rm wpcli plugin update <slug>   # or theme update / core up
 npm run smoke
 
 # 3. If green, mirror to prod
-ssh pof 'wp plugin update <slug>'   # or however remote WP-CLI is invoked
+ssh pof 'cd ~/html && wp plugin update <slug>'   # WP install lives in ~/html on prod
 
 # 4. If red, revert locally
 docker compose run --rm wpcli plugin install <slug> --version=<previous> --force
