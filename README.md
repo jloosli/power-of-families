@@ -247,7 +247,15 @@ to also fail on PHP warnings / notices / deprecated calls.
 
 Test fixtures (a `smoketest@example.com` user, a `Smoke Test Product`,
 and a gated members page) are seeded idempotently by `bin/smoke-fixtures`
-on every run; no manual setup needed beyond `npm run smoke:install`.
+on every run; no manual setup needed beyond `npm run smoke:install`. The
+fixture script also sets `woocommerce_force_ssl_checkout=no` so the local
+HTTP-only stack can render `/checkout/` — a side effect that persists on
+the DB it runs against.
+
+Design rationale and the implementation plan live in
+[`docs/superpowers/specs/2026-05-14-update-smoke-testing-design.md`](docs/superpowers/specs/2026-05-14-update-smoke-testing-design.md)
+and
+[`docs/superpowers/plans/2026-05-14-update-smoke-testing.md`](docs/superpowers/plans/2026-05-14-update-smoke-testing.md).
 
 ## Miscellaneous
 
