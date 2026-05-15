@@ -46,6 +46,8 @@ test-reports/
 xdebug-logs/
 xdebug-profiles/
 
-# Smoke testing artifacts
+# Smoke testing artifacts (both cwd-relative and config-relative output dirs)
+test-results/
 tests/smoke/test-results/
+playwright-report/
 tests/smoke/playwright-report/

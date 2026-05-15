@@ -128,10 +128,19 @@ ensure_user_in_group() {
     wpcli eval "global \$wpdb; \$wpdb->query(\$wpdb->prepare(\"INSERT IGNORE INTO wp_groups_user_group (user_id, group_id) VALUES (%d, %d)\", ${user_id}, ${SMOKE_GROUP_ID}));" >/dev/null
 }
 
+ensure_woo_settings() {
+    # The local docker stack only serves HTTP (no HTTPS port exposed), so
+    # woocommerce_force_ssl_checkout must be off; otherwise /checkout/ redirects
+    # to https://localhost:PORT/checkout/ which no browser can reach in CI.
+    # This is idempotent — safe to run even if already set correctly.
+    wpcli option update woocommerce_force_ssl_checkout no >/dev/null
+}
+
 ensure_user
 ensure_product
 ensure_gated_page
 ensure_user_in_group
+ensure_woo_settings
 
 # ---------------------------------------------------------------------
 # Resolve URLs
