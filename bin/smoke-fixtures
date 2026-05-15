@@ -10,6 +10,9 @@ SMOKE_USER_EMAIL="smoketest@example.com"
 SMOKE_USER_LOGIN="smoketest"
 SMOKE_PASSWORD="${SMOKE_PASSWORD:-smoke-test-pw-change-me}"
 
+SMOKE_PRODUCT_SLUG="smoke-test-product"
+SMOKE_PRODUCT_TITLE="Smoke Test Product"
+
 wpcli() {
     docker compose run --rm -T wpcli "$@"
 }
@@ -24,8 +27,39 @@ ensure_user() {
         --display_name="Smoke Test" >/dev/null
 }
 
+ensure_product() {
+    local existing
+    existing=$(wpcli post list \
+        --post_type=product \
+        --name="$SMOKE_PRODUCT_SLUG" \
+        --field=ID \
+        --format=ids 2>/dev/null | tr -d '[:space:]')
+    if [[ -n "$existing" ]]; then
+        return 0
+    fi
+    local id
+    id=$(wpcli post create \
+        --post_type=product \
+        --post_status=publish \
+        --post_title="$SMOKE_PRODUCT_TITLE" \
+        --post_name="$SMOKE_PRODUCT_SLUG" \
+        --porcelain)
+    # Resolve an admin user ID (WooCommerce CLI requires a valid WP user).
+    local admin_id
+    admin_id=$(wpcli user list --role=administrator --field=ID --format=ids 2>/dev/null \
+        | tr ' ' '\n' | head -1 | tr -d '[:space:]')
+    # Make it a simple, purchasable product priced $1 with stock management off.
+    wpcli wc product update "$id" \
+        --type=simple \
+        --regular_price=1 \
+        --manage_stock=false \
+        --user="$admin_id" >/dev/null
+}
+
 ensure_user
+ensure_product
 
 echo "SMOKE_USER_EMAIL=$SMOKE_USER_EMAIL"
 echo "SMOKE_USER_LOGIN=$SMOKE_USER_LOGIN"
 echo "SMOKE_PASSWORD=$SMOKE_PASSWORD"
+echo "SMOKE_PRODUCT_SLUG=$SMOKE_PRODUCT_SLUG"
