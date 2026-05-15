@@ -133,9 +133,71 @@ ensure_product
 ensure_gated_page
 ensure_user_in_group
 
-echo "SMOKE_USER_EMAIL=$SMOKE_USER_EMAIL"
-echo "SMOKE_USER_LOGIN=$SMOKE_USER_LOGIN"
-echo "SMOKE_PASSWORD=$SMOKE_PASSWORD"
-echo "SMOKE_PRODUCT_SLUG=$SMOKE_PRODUCT_SLUG"
-echo "SMOKE_GATED_SLUG=$SMOKE_GATED_SLUG"
-echo "SMOKE_GATED_MARKER=$SMOKE_GATED_MARKER"
+# ---------------------------------------------------------------------
+# Resolve URLs
+# ---------------------------------------------------------------------
+WP_PORT_LOCAL="${WP_PORT:-8081}"
+SITE_URL="http://localhost:${WP_PORT_LOCAL}"
+
+LATEST_POST_ID=$(wpcli post list \
+    --post_type=post \
+    --post_status=publish \
+    --posts_per_page=1 \
+    --field=ID \
+    --format=ids 2>/dev/null | tr -d '[:space:]')
+
+if [[ -z "$LATEST_POST_ID" ]]; then
+    echo "ERROR: no published posts found — public-pages spec needs one" >&2
+    exit 1
+fi
+
+PRODUCT_ID=$(wpcli post list \
+    --post_type=product \
+    --name="$SMOKE_PRODUCT_SLUG" \
+    --field=ID \
+    --format=ids 2>/dev/null | tr -d '[:space:]')
+
+# Look up gated page ID via $wpdb (groups plugin filters it from wp post list).
+GATED_ID=$(wpcli eval \
+    "global \$wpdb; echo \$wpdb->get_var(\$wpdb->prepare(\"SELECT ID FROM wp_posts WHERE post_name = %s AND post_type = 'page' AND post_status = 'publish'\", '${SMOKE_GATED_SLUG}'));" \
+    2>/dev/null | tr -d '[:space:]')
+
+# wp post url returns URLs with the production domain; extract the path and
+# prepend SITE_URL so every URL points to the local dev environment.
+local_url() {
+    # $1 = raw URL from wp post url (e.g. https://poweroffamilies.com/product/foo/)
+    # Returns $SITE_URL + path (e.g. http://localhost:8081/product/foo/)
+    local raw path
+    raw="$1"
+    path="${raw#http*://*/}"      # strip scheme + host
+    path="/${path%/}/"            # ensure leading slash and trailing slash
+    printf '%s%s' "$SITE_URL" "$path"
+}
+
+raw_latest=$(wpcli post url "$LATEST_POST_ID" 2>/dev/null | tr -d '[:space:]')
+SMOKE_LATEST_POST_URL=$(local_url "$raw_latest")
+
+raw_product=$(wpcli post url "$PRODUCT_ID" 2>/dev/null | tr -d '[:space:]')
+SMOKE_PRODUCT_URL=$(local_url "$raw_product")
+
+# wp post url may return empty for a gated page because groups plugin filters
+# it from WP queries; fall back to constructing the URL from the slug.
+raw_gated=$(wpcli post url "$GATED_ID" 2>/dev/null | tr -d '[:space:]')
+if [[ -n "$raw_gated" ]]; then
+    SMOKE_GATED_URL=$(local_url "$raw_gated")
+else
+    SMOKE_GATED_URL="${SITE_URL}/${SMOKE_GATED_SLUG}/"
+fi
+
+cat <<EOF
+SMOKE_USER_EMAIL=$SMOKE_USER_EMAIL
+SMOKE_USER_LOGIN=$SMOKE_USER_LOGIN
+SMOKE_PASSWORD=$SMOKE_PASSWORD
+SMOKE_PRODUCT_SLUG=$SMOKE_PRODUCT_SLUG
+SMOKE_PRODUCT_URL=$SMOKE_PRODUCT_URL
+SMOKE_GATED_SLUG=$SMOKE_GATED_SLUG
+SMOKE_GATED_URL=$SMOKE_GATED_URL
+SMOKE_GATED_MARKER=$SMOKE_GATED_MARKER
+SMOKE_LATEST_POST_URL=$SMOKE_LATEST_POST_URL
+SITE_URL=$SITE_URL
+EOF
