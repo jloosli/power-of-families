@@ -59,8 +59,9 @@ services:
               source: ./wp-content/themes/power-of-families
               target: /var/www/html/wp-content/themes/power-of-families
             # Bump PHP memory_limit (image default 128M OOMs at boot with the
-            # full plugin set). The previous PHP_MEMORY_LIMIT env var below is
-            # not honored by the wordpress:cli image — this ini file is.
+            # full plugin set). PHP_MEMORY_LIMIT / WP_MEMORY_LIMIT env vars are
+            # not honored by the wordpress:cli image, so a php.ini override is
+            # the only mechanism that works.
             - ./docker/wp-cli.ini:/usr/local/etc/php/conf.d/zz-wp-cli.ini:ro
         working_dir: /var/www/html
         environment:

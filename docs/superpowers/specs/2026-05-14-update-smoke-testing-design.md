@@ -111,7 +111,7 @@ Smoke tests live under `tests/smoke/`, not the theme's `tests/`, because they're
 - `/shop/`
 - `SMOKE_PRODUCT_URL` (the seeded `smoke-test-product`)
 
-Each test: `goto(url)`, assert response status is 200, assert the page body does *not* contain `Fatal error`, `Warning:`, `Notice:`, `Parse error`, or the WP user-facing critical-error string `There has been a critical error on this website`.
+Each test: `goto(url)`, assert response status is 200, assert the page body does *not* contain `Fatal error`, `Parse error`, or the WP user-facing critical-error string `There has been a critical error on this website`. Warnings, notices, and deprecations are deliberately *not* asserted in the body — they're caught (when you want them) by the PHP error log tail's `--strict` mode in the next section, so the default smoke run doesn't fail on the baseline notice noise that a 30-plugin WP install typically carries.
 
 **`login-gated.spec.ts`** — single test:
 1. `goto(SMOKE_GATED_URL)` — assert `MEMBERS_ONLY_MARKER` is NOT visible (gating works).
