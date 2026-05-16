@@ -53,6 +53,7 @@ of which DB pattern you pick.
 | Watch theme | `npm run start:theme` |
 | Watch plugin | `npm run start:plugin` |
 | Run tests | `npm run test` |
+| Smoke-test the site after a plugin / theme / core update | `npm run smoke` (one-time setup: `npm run smoke:install`) |
 
 ## Key Facts
 

@@ -58,15 +58,17 @@ services:
             - type: bind
               source: ./wp-content/themes/power-of-families
               target: /var/www/html/wp-content/themes/power-of-families
+            # Bump PHP memory_limit (image default 128M OOMs at boot with the
+            # full plugin set). PHP_MEMORY_LIMIT / WP_MEMORY_LIMIT env vars are
+            # not honored by the wordpress:cli image, so a php.ini override is
+            # the only mechanism that works.
+            - ./docker/wp-cli.ini:/usr/local/etc/php/conf.d/zz-wp-cli.ini:ro
         working_dir: /var/www/html
         environment:
             WORDPRESS_DB_HOST: db
             WORDPRESS_DB_USER: pofuser
             WORDPRESS_DB_PASSWORD: pofpass
             WORDPRESS_DB_NAME: poweroffamilies
-            PHP_MEMORY_LIMIT: 20G
-            WP_MEMORY_LIMIT: 20G
-            WP_CLI_PHP_MEMORY_LIMIT: 4G
 
     db:
         image: mariadb:${MARIA_DB_VERSION:-10.11.14}

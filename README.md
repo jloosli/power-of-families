@@ -20,7 +20,7 @@
 1. Update WordPress and database to the latest version.
 1. Download the database backup: `npm run setup:db-download`
 1. Import the database: `npm run setup:db-import`
-   - You can also use [phpMyAdmin](http://localhost:8180) to upload the database. See [docker-compose.yml](docker-compose.yml) for credentials.
+    - You can also use [phpMyAdmin](http://localhost:8180) to upload the database. See [docker-compose.yml](docker-compose.yml) for credentials.
 1. Sync the genesis theme: `npm run setup:sync-themes`
 1. Sync the plugins: `npm run setup:sync-plugins`
 1. Install composer dependencies: `npm run setup:composer-install`
@@ -63,11 +63,11 @@ The DB volume is large (~1.6 GB) and re-running first-time setup in every
 worktree is wasteful. Three patterns, depending on how isolated you want
 to be:
 
-| | DB | `wordpress/` install | Use when |
-|---|---|---|---|
-| **A. Independent DB, shared install** | own copy (stdin import) | symlink to main | branch work that may mutate DB — keep main's data safe |
-| **B. Live-shared DB** | main's running container | symlink to main | quick lookups / read-mostly work; ok with shared writes |
-| **C. Full symlink** | symlinked db-data | symlink to main | maximum sharing; only one stack's `db` may run at a time |
+|                                       | DB                       | `wordpress/` install | Use when                                                 |
+| ------------------------------------- | ------------------------ | -------------------- | -------------------------------------------------------- |
+| **A. Independent DB, shared install** | own copy (stdin import)  | symlink to main      | branch work that may mutate DB — keep main's data safe   |
+| **B. Live-shared DB**                 | main's running container | symlink to main      | quick lookups / read-mostly work; ok with shared writes  |
+| **C. Full symlink**                   | symlinked db-data        | symlink to main      | maximum sharing; only one stack's `db` may run at a time |
 
 In all three, the worktree's bind mounts of `wp-content/themes/power-of-families`
 and `wp-content/plugins/pof-bloom-plugin` overlay the shared WP install, so
@@ -145,14 +145,14 @@ them from scratch.
 
 ### Reference: Docker compose env overrides
 
-| Var                | Default | Used in                    |
-| ------------------ | ------- | -------------------------- |
-| `WP_PORT`          | `8080`  | wordpress host port        |
-| `PHPMYADMIN_PORT`  | `8180`  | phpmyadmin host port       |
-| `XDEBUG_PORT`      | `9003`  | wordpress + test xDebug    |
-| `PHP_VERSION`      | `8.4`   | wordpress + test image     |
-| `MARIA_DB_VERSION` | `10.11.14` | db image                |
-| `WORDPRESS_DEBUG`  | `false` | `WORDPRESS_SCRIPT_DEBUG`   |
+| Var                | Default    | Used in                  |
+| ------------------ | ---------- | ------------------------ |
+| `WP_PORT`          | `8080`     | wordpress host port      |
+| `PHPMYADMIN_PORT`  | `8180`     | phpmyadmin host port     |
+| `XDEBUG_PORT`      | `9003`     | wordpress + test xDebug  |
+| `PHP_VERSION`      | `8.4`      | wordpress + test image   |
+| `MARIA_DB_VERSION` | `10.11.14` | db image                 |
+| `WORDPRESS_DEBUG`  | `false`    | `WORDPRESS_SCRIPT_DEBUG` |
 
 ### Bumping the PHP version
 
@@ -200,6 +200,62 @@ npm run build:plugin
 ```shell
 npm run build
 ```
+
+### Smoke Testing After Updates
+
+`bin/smoke` exercises the public site, members login + gated content, and
+the WooCommerce add-to-cart → checkout-render flow, then tails the
+WordPress container's PHP error log. Run it after each local plugin /
+theme / core update; only mirror an update to production once it's green.
+
+**One-time setup (per worktree, after first checkout):**
+
+```shell
+npm run smoke:install   # downloads Chromium
+```
+
+**Discovering pending updates:**
+
+```shell
+docker compose run --rm wpcli plugin list --update=available
+docker compose run --rm wpcli theme list --update=available
+docker compose run --rm wpcli core check-update
+```
+
+These commands print every plugin/theme/core update available — no slug
+list to maintain.
+
+**The update loop:**
+
+```shell
+# 1. Update one thing locally
+docker compose run --rm wpcli plugin update <slug>   # or theme update / core update
+
+# 2. Smoke test
+npm run smoke
+
+# 3. If green, mirror to prod
+ssh pof 'cd ~/html && wp plugin update <slug>'   # WP install lives in ~/html on prod
+
+# 4. If red, revert locally
+docker compose run --rm wpcli plugin install <slug> --version=<previous> --force
+```
+
+The smoke suite is plugin-agnostic — it never sees which plugin was just
+updated. Run it after any single update. Use `npm run smoke -- --strict`
+to also fail on PHP warnings / notices / deprecated calls.
+
+Test fixtures (a `smoketest@example.com` user, a `Smoke Test Product`,
+and a gated members page) are seeded idempotently by `bin/smoke-fixtures`
+on every run; no manual setup needed beyond `npm run smoke:install`. The
+fixture script also sets `woocommerce_force_ssl_checkout=no` so the local
+HTTP-only stack can render `/checkout/` — a side effect that persists on
+the DB it runs against.
+
+Design rationale and the implementation plan live in
+[`docs/superpowers/specs/2026-05-14-update-smoke-testing-design.md`](docs/superpowers/specs/2026-05-14-update-smoke-testing-design.md)
+and
+[`docs/superpowers/plans/2026-05-14-update-smoke-testing.md`](docs/superpowers/plans/2026-05-14-update-smoke-testing.md).
 
 ## Miscellaneous
 
