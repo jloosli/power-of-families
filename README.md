@@ -32,6 +32,23 @@
 
 1. Run tests: `npm run test:php`
 
+## Container runtime
+
+The stack works under both Docker Desktop and [Podman](https://podman.io)
+on macOS. Docker Desktop is the default and needs no extra setup. To use
+Podman, start the machine and point the docker CLI at its socket once per
+shell session:
+
+```shell
+podman machine start
+export DOCKER_HOST="unix://$(podman machine inspect podman-machine-default --format '{{.ConnectionInfo.PodmanSocket.Path}}')"
+```
+
+Every `docker compose …` command in this README routes through whichever
+socket `DOCKER_HOST` (or Docker Desktop's default) points at. All images
+in the stack have native `arm64` builds, so nothing runs under emulation
+on Apple Silicon.
+
 ## Running Multiple Worktrees in Parallel
 
 Each git worktree gets its own independent docker compose stack — Compose
