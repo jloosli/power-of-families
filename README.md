@@ -11,7 +11,7 @@
 > used hardcoded container names (`pof_wordpress`, `pof_db`, etc.) and ports.
 > If you have stale `pof_*` containers from before the refactor, run
 > `docker compose down` from your old project checkout (or
-> `docker rm -f pof_wordpress pof_db pof_phpmyadmin pof_wpcli pof_composer pof_test`)
+> `docker rm -f pof_wordpress pof_db pof_wpcli pof_composer pof_test`)
 > before bringing up the new stack.
 
 1. Run `docker compose up -d wordpress` to start the containers.
@@ -20,7 +20,6 @@
 1. Update WordPress and database to the latest version.
 1. Download the database backup: `npm run setup:db-download`
 1. Import the database: `npm run setup:db-import`
-    - You can also use [phpMyAdmin](http://localhost:8180) to upload the database. See [docker-compose.yml](docker-compose.yml) for credentials.
 1. Sync the genesis theme: `npm run setup:sync-themes`
 1. Sync the plugins: `npm run setup:sync-plugins`
 1. Install composer dependencies: `npm run setup:composer-install`
@@ -32,6 +31,23 @@
     ```
 
 1. Run tests: `npm run test:php`
+
+## Container runtime
+
+The stack works under both Docker Desktop and [Podman](https://podman.io)
+on macOS. Docker Desktop is the default and needs no extra setup. To use
+Podman, start the machine and point the docker CLI at its socket once per
+shell session:
+
+```shell
+podman machine start
+export DOCKER_HOST="unix://$(podman machine inspect podman-machine-default --format '{{.ConnectionInfo.PodmanSocket.Path}}')"
+```
+
+Every `docker compose …` command in this README routes through whichever
+socket `DOCKER_HOST` (or Docker Desktop's default) points at. All images
+in the stack have native `arm64` builds, so nothing runs under emulation
+on Apple Silicon.
 
 ## Running Multiple Worktrees in Parallel
 
@@ -50,7 +66,6 @@ in a (gitignored) `.env`:
 cp .env.example .env
 # then edit .env:
 # WP_PORT=8081
-# PHPMYADMIN_PORT=8181
 # XDEBUG_PORT=9103
 ```
 
@@ -148,8 +163,8 @@ them from scratch.
 | Var                | Default    | Used in                  |
 | ------------------ | ---------- | ------------------------ |
 | `WP_PORT`          | `8080`     | wordpress host port      |
-| `PHPMYADMIN_PORT`  | `8180`     | phpmyadmin host port     |
 | `XDEBUG_PORT`      | `9003`     | wordpress + test xDebug  |
+| `DB_PORT`          | `3306`     | db host port (for GUI clients) |
 | `PHP_VERSION`      | `8.4`      | wordpress + test image   |
 | `MARIA_DB_VERSION` | `10.11.14` | db image                 |
 | `WORDPRESS_DEBUG`  | `false`    | `WORDPRESS_SCRIPT_DEBUG` |

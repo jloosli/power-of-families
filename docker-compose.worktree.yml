@@ -27,13 +27,6 @@ services:
             - default
             - main_db
 
-    phpmyadmin:
-        environment:
-            PMA_HOST: power-of-families-db-1
-        networks:
-            - default
-            - main_db
-
     test:
         environment:
             TEST_DB_HOST: power-of-families-db-1
