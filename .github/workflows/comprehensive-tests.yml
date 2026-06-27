@@ -30,6 +30,10 @@ on:
 env:
     PHP_VERSION: '8.4'
     NODE_VERSION: '20'
+    # This nightly run reports coverage rather than gating on it. The test
+    # scripts honour these as the highest-precedence enforcement setting.
+    FAIL_ON_THRESHOLD_BREACH: 'false'
+    FAIL_ON_QUALITY_GATE_FAILURE: 'false'
 
 jobs:
     # Unit Tests
