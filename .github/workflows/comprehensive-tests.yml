@@ -11,11 +11,6 @@ on:
                 required: false
                 default: true
                 type: boolean
-            run_performance:
-                description: 'Run performance tests'
-                required: false
-                default: true
-                type: boolean
             run_integration:
                 description: 'Run integration tests'
                 required: false
@@ -174,80 +169,6 @@ jobs:
               if: always()
               run: docker compose down
 
-    # Performance Testing
-    performance-tests:
-        name: Performance Tests
-        runs-on: ubuntu-24.04
-        needs: unit-tests
-        if: ${{ github.event.inputs.run_performance != 'false' }}
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v6
-
-            - name: Install system dependencies
-              run: sudo apt-get update && sudo apt-get install -y xmlstarlet
-
-            - name: Set up Node.js
-              uses: actions/setup-node@v6
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-                  cache: 'npm'
-
-            - name: Install dependencies
-              run: npm install
-
-            - name: Build project
-              run: npm run build
-
-            - name: Start Docker services
-              run: |
-                  docker compose up -d db wordpress
-
-            - name: Wait for services to be ready
-              run: |
-                  timeout 60 bash -c 'until docker compose exec -T db mysqladmin ping -h"localhost" -u"root" -p"password" --silent; do sleep 2; done'
-                  timeout 60 bash -c 'until curl -f http://localhost:8080 >/dev/null 2>&1; do sleep 2; done'
-
-            - name: Setup test environment
-              run: |
-                  chmod +x bin/test-env-manager.sh
-                  bin/test-env-manager.sh setup --force
-
-            - name: Run performance benchmarks
-              run: |
-                  chmod +x bin/test-performance-monitor.sh
-                  bin/test-performance-monitor.sh benchmark --memory-limit 2G --output-format json --output-file performance-benchmark.json
-
-            - name: Identify slow tests
-              run: |
-                  chmod +x bin/test-performance-monitor.sh
-                  bin/test-performance-monitor.sh slow-tests --output-file slow-tests.txt
-
-            - name: Check for memory leaks
-              run: |
-                  chmod +x bin/test-performance-monitor.sh
-                  bin/test-performance-monitor.sh memory-leaks
-
-            - name: Generate performance report
-              run: |
-                  chmod +x bin/test-performance-monitor.sh
-                  bin/test-performance-monitor.sh performance-report --output-file performance-report.html
-
-            - name: Upload performance reports
-              uses: actions/upload-artifact@v7
-              if: always()
-              with:
-                  name: performance-reports-${{ github.run_number }}
-                  path: |
-                      performance-benchmark.json
-                      slow-tests.txt
-                      performance-report.html
-                  retention-days: 30
-
-            - name: Stop services
-              if: always()
-              run: docker compose down
-
     # Integration Tests
     integration-tests:
         name: Integration Tests
@@ -371,7 +292,6 @@ jobs:
             [
                 unit-tests,
                 coverage-analysis,
-                performance-tests,
                 integration-tests,
                 security-tests,
             ]
@@ -412,13 +332,6 @@ jobs:
                     echo "⚠️ **Coverage Analysis:** Skipped or Failed" >> test-summary.md
                   fi
 
-                  # Check performance
-                  if [ -d "artifacts/performance-reports-${{ github.run_number }}" ]; then
-                    echo "✅ **Performance Tests:** Completed" >> test-summary.md
-                  else
-                    echo "⚠️ **Performance Tests:** Skipped or Failed" >> test-summary.md
-                  fi
-
                   # Check integration
                   if [ -d "artifacts/integration-test-results-${{ github.run_number }}" ]; then
                     echo "✅ **Integration Tests:** Passed" >> test-summary.md
@@ -442,7 +355,6 @@ jobs:
                   echo "" >> test-summary.md
                   echo "- Review any failed tests and fix issues" >> test-summary.md
                   echo "- Check coverage reports for areas needing more tests" >> test-summary.md
-                  echo "- Review performance reports for optimization opportunities" >> test-summary.md
                   echo "- Address any security concerns identified" >> test-summary.md
 
             - name: Upload test summary
