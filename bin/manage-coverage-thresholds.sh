@@ -492,20 +492,20 @@ validate_quality_gates() {
     local min_threshold=$(jq -r '.thresholds.overall_coverage.minimum' "$THRESHOLDS_FILE")
     if (( $(echo "$overall_coverage >= $min_threshold" | bc -l) )); then
         log_success "Overall Coverage Gate: PASSED (${overall_coverage}% >= ${min_threshold}%)"
-        ((gates_passed++))
+        gates_passed=$((gates_passed + 1))
     else
         log_error "Overall Coverage Gate: FAILED (${overall_coverage}% < ${min_threshold}%)"
-        ((gates_failed++))
+        gates_failed=$((gates_failed + 1))
     fi
     
     # Check uncovered lines gate
     local max_uncovered=$(jq -r '.quality_gates.max_uncovered_lines' "$THRESHOLDS_FILE")
     if [ "$uncovered_lines" -le "$max_uncovered" ]; then
         log_success "Uncovered Lines Gate: PASSED (${uncovered_lines} <= ${max_uncovered})"
-        ((gates_passed++))
+        gates_passed=$((gates_passed + 1))
     else
         log_warning "Uncovered Lines Gate: WARNING (${uncovered_lines} > ${max_uncovered})"
-        ((gates_warned++))
+        gates_warned=$((gates_warned + 1))
     fi
     
     # Check low coverage files gate
@@ -514,10 +514,10 @@ validate_quality_gates() {
     
     if [ "$low_coverage_files" -le "$max_low_coverage" ]; then
         log_success "Low Coverage Files Gate: PASSED (${low_coverage_files} <= ${max_low_coverage})"
-        ((gates_passed++))
+        gates_passed=$((gates_passed + 1))
     else
         log_warning "Low Coverage Files Gate: WARNING (${low_coverage_files} > ${max_low_coverage})"
-        ((gates_warned++))
+        gates_warned=$((gates_warned + 1))
     fi
     
     echo ""

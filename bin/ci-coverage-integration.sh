@@ -320,29 +320,29 @@ run_quality_gates() {
     # Overall Coverage Gate
     if (( $(echo "$overall_coverage >= $min_coverage" | bc -l) )); then
         log_success "Overall Coverage Gate: PASSED (${overall_coverage}% >= ${min_coverage}%)"
-        ((gates_passed++))
+        gates_passed=$((gates_passed + 1))
     else
         log_error "Overall Coverage Gate: FAILED (${overall_coverage}% < ${min_coverage}%)"
-        ((gates_failed++))
+        gates_failed=$((gates_failed + 1))
     fi
     
     # Uncovered Lines Gate
     if [ "$uncovered_lines" -le "$max_uncovered_lines" ]; then
         log_success "Uncovered Lines Gate: PASSED (${uncovered_lines} <= ${max_uncovered_lines})"
-        ((gates_passed++))
+        gates_passed=$((gates_passed + 1))
     else
         log_warning "Uncovered Lines Gate: WARNING (${uncovered_lines} > ${max_uncovered_lines})"
-        ((gates_warned++))
+        gates_warned=$((gates_warned + 1))
     fi
     
     # Low Coverage Files Gate
     local low_coverage_files=$(xmlstarlet sel -t -c "//file[metrics/@coveredstatements < metrics/@statements * 0.5]" "$CLOVER_FILE" 2>/dev/null | grep -c "<file" || echo "0")
     if [ "$low_coverage_files" -le "$max_low_coverage_files" ]; then
         log_success "Low Coverage Files Gate: PASSED (${low_coverage_files} <= ${max_low_coverage_files})"
-        ((gates_passed++))
+        gates_passed=$((gates_passed + 1))
     else
         log_warning "Low Coverage Files Gate: WARNING (${low_coverage_files} > ${max_low_coverage_files})"
-        ((gates_warned++))
+        gates_warned=$((gates_warned + 1))
     fi
     
     # Generate CI output
