@@ -129,12 +129,12 @@ jobs:
             - name: Check coverage thresholds
               run: |
                   chmod +x bin/manage-coverage-thresholds.sh
-                  bin/manage-coverage-thresholds.sh check --coverage-dir coverage --thresholds-file coverage-thresholds.json --fail-on-threshold-breach
+                  bin/manage-coverage-thresholds.sh check --coverage-dir coverage --thresholds-file coverage-thresholds.json
 
             - name: Validate quality gates
               run: |
                   chmod +x bin/manage-coverage-thresholds.sh
-                  bin/manage-coverage-thresholds.sh validate --coverage-dir coverage --quality-gates-file quality-gates.json --fail-on-quality-gate-failure
+                  bin/manage-coverage-thresholds.sh validate --coverage-dir coverage --quality-gates-file quality-gates.json
 
             - name: Generate coverage report
               run: |

@@ -28,6 +28,25 @@ BLUE='\033[0;34m'
 PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
 
+# Compute overall line-coverage percentage from a Clover XML file.
+# PHPUnit's Clover format stores totals on //project/metrics and has NO
+# @percentage attribute on the root <coverage> element, so we derive it.
+clover_percentage() {
+    local file="$1"
+    local statements covered
+    statements=$(xmlstarlet sel -t -v "//project/metrics/@statements" "$file" 2>/dev/null || echo "0")
+    covered=$(xmlstarlet sel -t -v "//project/metrics/@coveredstatements" "$file" 2>/dev/null || echo "0")
+    statements=${statements:-0}
+    covered=${covered:-0}
+    if [ "$statements" -gt 0 ] 2>/dev/null; then
+        # printf guarantees a leading zero (bc emits ".50", not "0.50"),
+        # keeping the value valid for JSON output and numeric comparisons.
+        printf '%.2f' "$(echo "scale=4; $covered * 100 / $statements" | bc -l)"
+    else
+        echo "0"
+    fi
+}
+
 # Display usage information
 show_usage() {
     echo -e "${BLUE}CI/CD Coverage Threshold Integration${NC}"
@@ -180,10 +199,10 @@ check_coverage() {
     fi
     
     # Parse Clover XML to get coverage data
-    local overall_coverage=$(xmlstarlet sel -t -v "//coverage/@percentage" "$CLOVER_FILE" 2>/dev/null || echo "0")
-    local total_files=$(xmlstarlet sel -t -v "//coverage/@files" "$CLOVER_FILE" 2>/dev/null || echo "0")
-    local total_lines=$(xmlstarlet sel -t -v "//coverage/@statements" "$CLOVER_FILE" 2>/dev/null || echo "0")
-    local covered_lines=$(xmlstarlet sel -t -v "//coverage/@coveredstatements" "$CLOVER_FILE" 2>/dev/null || echo "0")
+    local overall_coverage=$(clover_percentage "$CLOVER_FILE")
+    local total_files=$(xmlstarlet sel -t -v "//project/metrics/@files" "$CLOVER_FILE" 2>/dev/null || echo "0")
+    local total_lines=$(xmlstarlet sel -t -v "//project/metrics/@statements" "$CLOVER_FILE" 2>/dev/null || echo "0")
+    local covered_lines=$(xmlstarlet sel -t -v "//project/metrics/@coveredstatements" "$CLOVER_FILE" 2>/dev/null || echo "0")
     
     local uncovered_lines=$((total_lines - covered_lines))
     
@@ -268,10 +287,10 @@ run_quality_gates() {
     fi
     
     # Parse Clover XML to get coverage data
-    local overall_coverage=$(xmlstarlet sel -t -v "//coverage/@percentage" "$CLOVER_FILE" 2>/dev/null || echo "0")
-    local total_files=$(xmlstarlet sel -t -v "//coverage/@files" "$CLOVER_FILE" 2>/dev/null || echo "0")
-    local total_lines=$(xmlstarlet sel -t -v "//coverage/@statements" "$CLOVER_FILE" 2>/dev/null || echo "0")
-    local covered_lines=$(xmlstarlet sel -t -v "//coverage/@coveredstatements" "$CLOVER_FILE" 2>/dev/null || echo "0")
+    local overall_coverage=$(clover_percentage "$CLOVER_FILE")
+    local total_files=$(xmlstarlet sel -t -v "//project/metrics/@files" "$CLOVER_FILE" 2>/dev/null || echo "0")
+    local total_lines=$(xmlstarlet sel -t -v "//project/metrics/@statements" "$CLOVER_FILE" 2>/dev/null || echo "0")
+    local covered_lines=$(xmlstarlet sel -t -v "//project/metrics/@coveredstatements" "$CLOVER_FILE" 2>/dev/null || echo "0")
     
     local uncovered_lines=$((total_lines - covered_lines))
     
@@ -280,10 +299,14 @@ run_quality_gates() {
     local max_uncovered_lines=100
     local max_low_coverage_files=5
     
+    # The minimum-coverage gate uses the same source of truth as the threshold
+    # check; quality-gates.json only carries the line/file limits.
+    if [ -f "$THRESHOLDS_FILE" ]; then
+        min_coverage=$(jq -r '.thresholds.overall_coverage.minimum // 50' "$THRESHOLDS_FILE")
+    fi
     if [ -f "$QUALITY_GATES_FILE" ]; then
-        min_coverage=$(jq -r '.quality_gates.max_uncovered_lines' "$QUALITY_GATES_FILE")
-        max_uncovered_lines=$(jq -r '.quality_gates.max_uncovered_lines' "$QUALITY_GATES_FILE")
-        max_low_coverage_files=$(jq -r '.quality_gates.max_low_coverage_files' "$QUALITY_GATES_FILE")
+        max_uncovered_lines=$(jq -r '.quality_gates.max_uncovered_lines // 100' "$QUALITY_GATES_FILE")
+        max_low_coverage_files=$(jq -r '.quality_gates.max_low_coverage_files // 5' "$QUALITY_GATES_FILE")
     fi
     
     local gates_passed=0
@@ -418,7 +441,7 @@ generate_badges() {
         exit 1
     fi
     
-    local overall_coverage=$(xmlstarlet sel -t -v "//coverage/@percentage" "$CLOVER_FILE" 2>/dev/null || echo "0")
+    local overall_coverage=$(clover_percentage "$CLOVER_FILE")
     local badges_dir="$COVERAGE_DIR/badges"
     mkdir -p "$badges_dir"
     
@@ -474,10 +497,10 @@ generate_pr_comment() {
         exit 1
     fi
     
-    local overall_coverage=$(xmlstarlet sel -t -v "//coverage/@percentage" "$CLOVER_FILE" 2>/dev/null || echo "0")
-    local total_files=$(xmlstarlet sel -t -v "//coverage/@files" "$CLOVER_FILE" 2>/dev/null || echo "0")
-    local total_lines=$(xmlstarlet sel -t -v "//coverage/@statements" "$CLOVER_FILE" 2>/dev/null || echo "0")
-    local covered_lines=$(xmlstarlet sel -t -v "//coverage/@coveredstatements" "$CLOVER_FILE" 2>/dev/null || echo "0")
+    local overall_coverage=$(clover_percentage "$CLOVER_FILE")
+    local total_files=$(xmlstarlet sel -t -v "//project/metrics/@files" "$CLOVER_FILE" 2>/dev/null || echo "0")
+    local total_lines=$(xmlstarlet sel -t -v "//project/metrics/@statements" "$CLOVER_FILE" 2>/dev/null || echo "0")
+    local covered_lines=$(xmlstarlet sel -t -v "//project/metrics/@coveredstatements" "$CLOVER_FILE" 2>/dev/null || echo "0")
     
     local comment_file="$COVERAGE_DIR/pr-comment.md"
     

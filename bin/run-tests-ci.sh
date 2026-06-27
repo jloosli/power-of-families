@@ -11,8 +11,15 @@ TEST_REPORTS_DIR="${TEST_REPORTS_DIR:-test-reports}"
 THRESHOLDS_FILE="${THRESHOLDS_FILE:-coverage-thresholds.json}"
 QUALITY_GATES_FILE="${QUALITY_GATES_FILE:-quality-gates.json}"
 CI_OUTPUT_FILE="${CI_OUTPUT_FILE:-coverage-ci-results.json}"
-FAIL_ON_THRESHOLD_BREACH="${FAIL_ON_THRESHOLD_BREACH:-true}"
-FAIL_ON_QUALITY_GATE_FAILURE="${FAIL_ON_QUALITY_GATE_FAILURE:-true}"
+FAIL_ON_THRESHOLD_BREACH="${FAIL_ON_THRESHOLD_BREACH:-}"
+FAIL_ON_QUALITY_GATE_FAILURE="${FAIL_ON_QUALITY_GATE_FAILURE:-}"
+
+# Optional test filtering forwarded to the in-container test runner. Coverage
+# and reporting are always enabled for CI runs (see execute_ci_tests), so the
+# corresponding flags are accepted as no-ops for backwards compatibility.
+TEST_GROUP="${TEST_GROUP:-}"
+TEST_FILTER="${TEST_FILTER:-}"
+TEST_SUITE="${TEST_SUITE:-}"
 
 # CI/CD specific values
 CI_ENVIRONMENT="${CI_ENVIRONMENT:-github-actions}"
@@ -121,6 +128,23 @@ while [[ $# -gt 0 ]]; do
             FAIL_ON_QUALITY_GATE_FAILURE="true"
             shift
             ;;
+        --test-group)
+            TEST_GROUP="$2"
+            shift 2
+            ;;
+        --test-filter)
+            TEST_FILTER="$2"
+            shift 2
+            ;;
+        --test-suite)
+            TEST_SUITE="$2"
+            shift 2
+            ;;
+        # Coverage/report generation is always on for CI runs; accept these
+        # flags as no-ops so existing workflow invocations don't error.
+        --coverage-enabled|--generate-reports|--generate-dashboard|--generate-badges)
+            shift
+            ;;
         -h|--help)
             show_usage
             exit 0
@@ -169,7 +193,18 @@ initialize_ci_environment() {
         log_info "Initializing quality gates..."
         bin/manage-coverage-thresholds.sh init --quality-gates-file "$QUALITY_GATES_FILE"
     fi
-    
+
+    # Resolve enforcement behaviour. Precedence: explicit env/flag > thresholds
+    # file's "enforcement" block > default (enforce). This lets a workflow run
+    # in report-only mode by setting enforcement in coverage-thresholds.json.
+    if [ -z "$FAIL_ON_THRESHOLD_BREACH" ]; then
+        FAIL_ON_THRESHOLD_BREACH=$(jq -r '.enforcement.fail_on_threshold_breach // true' "$THRESHOLDS_FILE" 2>/dev/null || echo "true")
+    fi
+    if [ -z "$FAIL_ON_QUALITY_GATE_FAILURE" ]; then
+        FAIL_ON_QUALITY_GATE_FAILURE=$(jq -r '.enforcement.fail_on_quality_gate_failure // true' "$THRESHOLDS_FILE" 2>/dev/null || echo "true")
+    fi
+    log_info "Enforcement: fail_on_threshold_breach=$FAIL_ON_THRESHOLD_BREACH, fail_on_quality_gate_failure=$FAIL_ON_QUALITY_GATE_FAILURE"
+
     log_success "CI/CD environment initialized"
 }
 
@@ -183,20 +218,41 @@ execute_ci_tests() {
     phpunit_cmd="$phpunit_cmd --generate-reports"
     phpunit_cmd="$phpunit_cmd --coverage-dir $COVERAGE_DIR"
     phpunit_cmd="$phpunit_cmd --test-reports-dir $TEST_REPORTS_DIR"
-    
+    [ -n "$TEST_GROUP" ] && phpunit_cmd="$phpunit_cmd --test-group $TEST_GROUP"
+    [ -n "$TEST_FILTER" ] && phpunit_cmd="$phpunit_cmd --test-filter $TEST_FILTER"
+    [ -n "$TEST_SUITE" ] && phpunit_cmd="$phpunit_cmd --test-suite $TEST_SUITE"
+
     local start_time=$(date +%s)
     
     # Execute tests and capture output
+    local result=0
     if $phpunit_cmd 2>&1 | tee "$TEST_REPORTS_DIR/test-output.log"; then
         local end_time=$(date +%s)
         local duration=$((end_time - start_time))
         log_success "Tests executed successfully in ${duration}s"
-        return 0
     else
         local end_time=$(date +%s)
         local duration=$((end_time - start_time))
         log_error "Tests failed after ${duration}s"
-        return 1
+        result=1
+    fi
+
+    # The test container runs as root, so coverage/ and test-reports/ files it
+    # writes into the mounted volumes are root-owned. Reclaim them so the
+    # subsequent host-side report generation (e.g. junit.xml) can write.
+    reclaim_output_ownership
+
+    return $result
+}
+
+# Reclaim ownership of container-written output so host-side steps can write
+reclaim_output_ownership() {
+    local owner
+    owner="$(id -u):$(id -g)"
+    if command -v sudo >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
+        sudo chown -R "$owner" "$COVERAGE_DIR" "$TEST_REPORTS_DIR" 2>/dev/null || true
+    else
+        chown -R "$owner" "$COVERAGE_DIR" "$TEST_REPORTS_DIR" 2>/dev/null || true
     fi
 }
 

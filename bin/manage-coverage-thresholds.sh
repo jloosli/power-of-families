@@ -19,6 +19,11 @@ DEFAULT_HIGH_COVERAGE="${DEFAULT_HIGH_COVERAGE:-90}"
 DEFAULT_MAX_UNCOVERED_LINES="${DEFAULT_MAX_UNCOVERED_LINES:-100}"
 DEFAULT_MAX_LOW_COVERAGE_FILES="${DEFAULT_MAX_LOW_COVERAGE_FILES:-5}"
 
+# Enforcement behaviour. Empty means "resolve from the thresholds file's
+# enforcement block (default: enforce)" after argument parsing.
+FAIL_ON_THRESHOLD_BREACH="${FAIL_ON_THRESHOLD_BREACH:-}"
+FAIL_ON_QUALITY_GATE_FAILURE="${FAIL_ON_QUALITY_GATE_FAILURE:-}"
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -26,6 +31,25 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
+
+# Compute overall line-coverage percentage from a Clover XML file.
+# PHPUnit's Clover format stores totals on //project/metrics and has NO
+# @percentage attribute on the root <coverage> element, so we derive it.
+clover_percentage() {
+    local file="$1"
+    local statements covered
+    statements=$(xmlstarlet sel -t -v "//project/metrics/@statements" "$file" 2>/dev/null || echo "0")
+    covered=$(xmlstarlet sel -t -v "//project/metrics/@coveredstatements" "$file" 2>/dev/null || echo "0")
+    statements=${statements:-0}
+    covered=${covered:-0}
+    if [ "$statements" -gt 0 ] 2>/dev/null; then
+        # printf guarantees a leading zero (bc emits ".50", not "0.50"),
+        # keeping the value valid for JSON output and numeric comparisons.
+        printf '%.2f' "$(echo "scale=4; $covered * 100 / $statements" | bc -l)"
+    else
+        echo "0"
+    fi
+}
 
 # Display usage information
 show_usage() {
@@ -106,6 +130,14 @@ while [[ $# -gt 0 ]]; do
             DEFAULT_HIGH_COVERAGE="$2"
             shift 2
             ;;
+        --fail-on-threshold-breach)
+            FAIL_ON_THRESHOLD_BREACH=true
+            shift
+            ;;
+        --fail-on-quality-gate-failure)
+            FAIL_ON_QUALITY_GATE_FAILURE=true
+            shift
+            ;;
         --verbose)
             VERBOSE=true
             shift
@@ -121,6 +153,15 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# Resolve enforcement behaviour. Precedence: explicit flag/env > thresholds
+# file's "enforcement" block > default (enforce).
+if [ -z "$FAIL_ON_THRESHOLD_BREACH" ]; then
+    FAIL_ON_THRESHOLD_BREACH=$(jq -r '.enforcement.fail_on_threshold_breach // true' "$THRESHOLDS_FILE" 2>/dev/null || echo "true")
+fi
+if [ -z "$FAIL_ON_QUALITY_GATE_FAILURE" ]; then
+    FAIL_ON_QUALITY_GATE_FAILURE=$(jq -r '.enforcement.fail_on_quality_gate_failure // true' "$THRESHOLDS_FILE" 2>/dev/null || echo "true")
+fi
 
 if [ -z "$COMMAND" ]; then
     echo -e "${RED}No command specified${NC}"
@@ -341,11 +382,11 @@ check_coverage() {
     fi
     
     # Parse Clover XML to get coverage data
-    local overall_coverage=$(xmlstarlet sel -t -v "//coverage/@percentage" "$CLOVER_FILE" 2>/dev/null || echo "0")
-    local total_files=$(xmlstarlet sel -t -v "//coverage/@files" "$CLOVER_FILE" 2>/dev/null || echo "0")
-    local covered_files=$(xmlstarlet sel -t -v "//coverage/@files" "$CLOVER_FILE" 2>/dev/null || echo "0")
-    local total_lines=$(xmlstarlet sel -t -v "//coverage/@statements" "$CLOVER_FILE" 2>/dev/null || echo "0")
-    local covered_lines=$(xmlstarlet sel -t -v "//coverage/@coveredstatements" "$CLOVER_FILE" 2>/dev/null || echo "0")
+    local overall_coverage=$(clover_percentage "$CLOVER_FILE")
+    local total_files=$(xmlstarlet sel -t -v "//project/metrics/@files" "$CLOVER_FILE" 2>/dev/null || echo "0")
+    local covered_files=$(xmlstarlet sel -t -v "//project/metrics/@files" "$CLOVER_FILE" 2>/dev/null || echo "0")
+    local total_lines=$(xmlstarlet sel -t -v "//project/metrics/@statements" "$CLOVER_FILE" 2>/dev/null || echo "0")
+    local covered_lines=$(xmlstarlet sel -t -v "//project/metrics/@coveredstatements" "$CLOVER_FILE" 2>/dev/null || echo "0")
     
     # Parse thresholds
     local minimum_coverage=$(jq -r '.thresholds.overall_coverage.minimum' "$THRESHOLDS_FILE")
@@ -402,7 +443,10 @@ check_coverage() {
         for issue in "${issues[@]}"; do
             log_error "  - $issue"
         done
-        exit 1
+        if [ "$FAIL_ON_THRESHOLD_BREACH" = true ]; then
+            exit 1
+        fi
+        log_warning "Continuing despite threshold breach (report-only mode)"
     fi
 }
 
@@ -423,10 +467,10 @@ validate_quality_gates() {
     fi
     
     # Parse Clover XML to get coverage data
-    local overall_coverage=$(xmlstarlet sel -t -v "//coverage/@percentage" "$CLOVER_FILE" 2>/dev/null || echo "0")
-    local total_files=$(xmlstarlet sel -t -v "//coverage/@files" "$CLOVER_FILE" 2>/dev/null || echo "0")
-    local total_lines=$(xmlstarlet sel -t -v "//coverage/@statements" "$CLOVER_FILE" 2>/dev/null || echo "0")
-    local covered_lines=$(xmlstarlet sel -t -v "//coverage/@coveredstatements" "$CLOVER_FILE" 2>/dev/null || echo "0")
+    local overall_coverage=$(clover_percentage "$CLOVER_FILE")
+    local total_files=$(xmlstarlet sel -t -v "//project/metrics/@files" "$CLOVER_FILE" 2>/dev/null || echo "0")
+    local total_lines=$(xmlstarlet sel -t -v "//project/metrics/@statements" "$CLOVER_FILE" 2>/dev/null || echo "0")
+    local covered_lines=$(xmlstarlet sel -t -v "//project/metrics/@coveredstatements" "$CLOVER_FILE" 2>/dev/null || echo "0")
     
     local uncovered_lines=$((total_lines - covered_lines))
     
@@ -480,7 +524,10 @@ validate_quality_gates() {
     
     if [ "$gates_failed" -gt 0 ]; then
         log_error "Quality gates validation failed"
-        exit 1
+        if [ "$FAIL_ON_QUALITY_GATE_FAILURE" = true ]; then
+            exit 1
+        fi
+        log_warning "Continuing despite quality gate failure (report-only mode)"
     elif [ "$gates_warned" -gt 0 ]; then
         log_warning "Quality gates validation passed with warnings"
     else
@@ -506,10 +553,10 @@ generate_report() {
     local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
     
     # Parse Clover XML to get coverage data
-    local overall_coverage=$(xmlstarlet sel -t -v "//coverage/@percentage" "$CLOVER_FILE" 2>/dev/null || echo "0")
-    local total_files=$(xmlstarlet sel -t -v "//coverage/@files" "$CLOVER_FILE" 2>/dev/null || echo "0")
-    local total_lines=$(xmlstarlet sel -t -v "//coverage/@statements" "$CLOVER_FILE" 2>/dev/null || echo "0")
-    local covered_lines=$(xmlstarlet sel -t -v "//coverage/@coveredstatements" "$CLOVER_FILE" 2>/dev/null || echo "0")
+    local overall_coverage=$(clover_percentage "$CLOVER_FILE")
+    local total_files=$(xmlstarlet sel -t -v "//project/metrics/@files" "$CLOVER_FILE" 2>/dev/null || echo "0")
+    local total_lines=$(xmlstarlet sel -t -v "//project/metrics/@statements" "$CLOVER_FILE" 2>/dev/null || echo "0")
+    local covered_lines=$(xmlstarlet sel -t -v "//project/metrics/@coveredstatements" "$CLOVER_FILE" 2>/dev/null || echo "0")
     
     local uncovered_lines=$((total_lines - covered_lines))
     
@@ -552,7 +599,7 @@ update_thresholds() {
     fi
     
     # Parse current coverage
-    local current_coverage=$(xmlstarlet sel -t -v "//coverage/@percentage" "$CLOVER_FILE" 2>/dev/null || echo "0")
+    local current_coverage=$(clover_percentage "$CLOVER_FILE")
     
     # Update thresholds file
     local updated_thresholds=$(jq --arg current "$current_coverage" '
