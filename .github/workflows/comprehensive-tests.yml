@@ -40,6 +40,9 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v6
 
+            - name: Install system dependencies
+              run: sudo apt-get update && sudo apt-get install -y xmlstarlet
+
             - name: Set up Node.js
               uses: actions/setup-node@v6
               with:
@@ -94,6 +97,9 @@ jobs:
         steps:
             - name: Checkout code
               uses: actions/checkout@v6
+
+            - name: Install system dependencies
+              run: sudo apt-get update && sudo apt-get install -y xmlstarlet
 
             - name: Set up Node.js
               uses: actions/setup-node@v6
@@ -174,6 +180,9 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v6
 
+            - name: Install system dependencies
+              run: sudo apt-get update && sudo apt-get install -y xmlstarlet
+
             - name: Set up Node.js
               uses: actions/setup-node@v6
               with:
@@ -245,6 +254,9 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v6
 
+            - name: Install system dependencies
+              run: sudo apt-get update && sudo apt-get install -y xmlstarlet
+
             - name: Set up Node.js
               uses: actions/setup-node@v6
               with:
@@ -299,6 +311,9 @@ jobs:
         steps:
             - name: Checkout code
               uses: actions/checkout@v6
+
+            - name: Install system dependencies
+              run: sudo apt-get update && sudo apt-get install -y xmlstarlet
 
             - name: Set up Node.js
               uses: actions/setup-node@v6

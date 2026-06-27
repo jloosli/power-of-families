@@ -197,11 +197,16 @@ initialize_ci_environment() {
     # Resolve enforcement behaviour. Precedence: explicit env/flag > thresholds
     # file's "enforcement" block > default (enforce). This lets a workflow run
     # in report-only mode by setting enforcement in coverage-thresholds.json.
+    # NB: jq's `//` treats `false` as empty, so it cannot supply a default
+    # without clobbering an explicit `false`. Read the raw value and only
+    # fall back to "true" when the key is absent/null.
     if [ -z "$FAIL_ON_THRESHOLD_BREACH" ]; then
-        FAIL_ON_THRESHOLD_BREACH=$(jq -r '.enforcement.fail_on_threshold_breach // true' "$THRESHOLDS_FILE" 2>/dev/null || echo "true")
+        FAIL_ON_THRESHOLD_BREACH=$(jq -r '.enforcement.fail_on_threshold_breach' "$THRESHOLDS_FILE" 2>/dev/null || echo "null")
+        [ "$FAIL_ON_THRESHOLD_BREACH" = "null" ] && FAIL_ON_THRESHOLD_BREACH="true"
     fi
     if [ -z "$FAIL_ON_QUALITY_GATE_FAILURE" ]; then
-        FAIL_ON_QUALITY_GATE_FAILURE=$(jq -r '.enforcement.fail_on_quality_gate_failure // true' "$THRESHOLDS_FILE" 2>/dev/null || echo "true")
+        FAIL_ON_QUALITY_GATE_FAILURE=$(jq -r '.enforcement.fail_on_quality_gate_failure' "$THRESHOLDS_FILE" 2>/dev/null || echo "null")
+        [ "$FAIL_ON_QUALITY_GATE_FAILURE" = "null" ] && FAIL_ON_QUALITY_GATE_FAILURE="true"
     fi
     log_info "Enforcement: fail_on_threshold_breach=$FAIL_ON_THRESHOLD_BREACH, fail_on_quality_gate_failure=$FAIL_ON_QUALITY_GATE_FAILURE"
 
