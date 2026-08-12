@@ -1,0 +1,16 @@
+# Prettier reads both .gitignore and .prettierignore by default, so build
+# output and untracked dirs (wordpress, coverage, test-reports, db-data) are
+# already excluded. This file covers tracked files we deliberately don't format.
+
+# Vendored third-party code — upstream copies, keep byte-identical so they
+# stay diffable against their source releases.
+wp-content/themes/power-of-families/bootstrap
+wp-content/plugins/pof-bloom-plugin/assets/js/jQuery.dotdotdot-master
+
+# Minified builds
+*.min.js
+*.min.css
+
+# Generated lockfiles
+package-lock.json
+wp-content/themes/power-of-families/composer.lock
