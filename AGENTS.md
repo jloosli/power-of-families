@@ -76,12 +76,22 @@ gh api --paginate repos/jloosli/power-of-families/pulls/<n>/comments \
     --jq '.[] | "\(.user.login) @ \(.path):\(.line)\n\(.body)"'
 ```
 
-Substantive feedback lands as inline comments (the second command); the first
-only shows the review summary. Keep `--paginate` — without it `gh api` returns
-only the first 30 comments, so a busy PR would silently truncate and you'd
-think you'd seen everything. Copilot skips generated files, so a lockfile-only
-PR gets "Copilot wasn't able to review any files in this pull request" —
-nothing to action there.
+Feedback arrives in two places and you have to read both:
+
+- **Inline comments** (the second command) — the line-anchored findings. Keep
+  `--paginate`; without it `gh api` returns only the first 30, so a busy PR
+  would silently truncate and you'd think you'd seen everything.
+- **The review body** (the first command) — besides the summary, this carries
+  _suppressed comments_: lower-confidence findings Copilot withholds from the
+  inline API. They sit in a `<summary>Suppressed comments (N)</summary>` block
+  and never appear in `pulls/<n>/comments`, so an empty result from that
+  endpoint does **not** mean there was no feedback. They can be perfectly
+  valid — both real issues Copilot caught on #63 arrived this way, and
+  following the inline API alone would have merged them unexamined. Print the
+  body in full rather than truncating it.
+
+Copilot skips generated files, so a lockfile-only PR gets "Copilot wasn't able
+to review any files in this pull request" — nothing to action there.
 
 Copilot reviews the commit it was triggered on and does **not** re-review when
 you push fixes. If you want it to look again, ask explicitly:
