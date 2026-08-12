@@ -45,6 +45,16 @@ resolve_path() {
     esac
 }
 
+# Every value-taking flag goes through this before `shift 2`. Without it a
+# missing value makes `shift 2` fail, and under `set -e` the script dies with a
+# bare "shift: shift count out of range" instead of naming the offending flag.
+require_value() {
+    if [ $# -lt 2 ] || [ -z "$2" ] || [[ "$2" == --* ]]; then
+        echo "ci-test.sh: $1 requires a value" >&2
+        exit 1
+    fi
+}
+
 while [[ $# -gt 0 ]]; do
     case $1 in
         --coverage-enabled)
@@ -56,22 +66,27 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --coverage-dir)
+            require_value "$@"
             COVERAGE_DIR="$2"
             shift 2
             ;;
         --test-reports-dir)
+            require_value "$@"
             TEST_REPORTS_DIR="$2"
             shift 2
             ;;
         --test-filter)
+            require_value "$@"
             TEST_FILTER="$2"
             shift 2
             ;;
         --test-group)
+            require_value "$@"
             TEST_GROUP="$2"
             shift 2
             ;;
         --test-suite)
+            require_value "$@"
             TEST_SUITE="$2"
             shift 2
             ;;
