@@ -90,10 +90,20 @@ you push fixes. If you want it to look again, ask explicitly:
 gh pr edit <n> --add-reviewer "@copilot"
 ```
 
-Do this while the PR is still open. GitHub accepts the request on a merged PR
-and silently discards it — exit 0, no reviewer added, no new review — so the
-window closes at merge. "No new comments" after a push therefore means nobody
-looked again, not that the fix was approved.
+The new review takes a minute or two to arrive, so don't conclude nothing
+happened from an immediate poll. Two traps when checking whether the request
+registered:
+
+- REST `requested_reviewers` lists only Users, never Bots, so a pending
+  Copilot request reads as an empty array there. Check GraphQL
+  `reviewRequests` instead — the bot's login is
+  `copilot-pull-request-reviewer` — or simply wait for the review to post.
+- The request works on a **merged** PR too, so a review can land after you've
+  merged. Ask before merging anyway: a finding that arrives afterwards needs a
+  whole new PR to act on.
+
+So "no new comments" after a push means nobody looked again, not that the fix
+was approved.
 
 ## Agent skills
 
