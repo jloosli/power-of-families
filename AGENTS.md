@@ -90,6 +90,10 @@ you push fixes. If you want it to look again, ask explicitly:
 gh pr edit <n> --add-reviewer "@copilot"
 ```
 
+The `@copilot` reviewer alias needs a reasonably recent `gh` (verified on
+2.97.0); if your version rejects it, upgrade rather than assuming Copilot
+review is unavailable.
+
 The new review takes a minute or two to arrive, so don't conclude nothing
 happened from an immediate poll. Two traps when checking whether the request
 registered:
