@@ -108,63 +108,62 @@
 	.home-cta {
 		background-color: var(--color-primary-backed-off);
 		color: var(--color-white);
-        display: flex;
-        flex-flow: column;
-        align-items: center;
-        padding: 2rem 0;
+		display: flex;
+		flex-flow: column;
+		align-items: center;
+		padding: 2rem 0;
 		font-size: 1.2em;
 
-        .home-cta-wrapper {
-            max-width: var(--site-width);
-            display: flex;
-            flex-flow: column;
-            gap: 1rem;
+		.home-cta-wrapper {
+			max-width: var(--site-width);
+			display: flex;
+			flex-flow: column;
+			gap: 1rem;
 
-            .cta-main {
-            flex: 1 1 auto;
-            padding: 0 0.5rem;
-            }
+			.cta-main {
+				flex: 1 1 auto;
+				padding: 0 0.5rem;
+			}
 
-            .cta-img {
-            flex: 1 1 400px;
-            max-width: none;
-            width: auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            }
+			.cta-img {
+				flex: 1 1 400px;
+				max-width: none;
+				width: auto;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
 
-            .cta-img img {
-            display: block;
-            max-width: 284px;
-            height: 387px;
-            }
+			.cta-img img {
+				display: block;
+				max-width: 284px;
+				height: 387px;
+			}
 
-            h4 {
-            color: var(--color-white);
-            font-size: 2em;
-            font-weight: 400;
-            }
+			h4 {
+				color: var(--color-white);
+				font-size: 2em;
+				font-weight: 400;
+			}
 
 			.button {
 				margin-top: 2rem;
 				font-size: 0.9em;
 			}
-        }
+		}
 
-        @media (--breakpoint-medium) {
-            .home-cta-wrapper {
-            flex-flow: row;
-            }
+		@media (--breakpoint-medium) {
+			.home-cta-wrapper {
+				flex-flow: row;
+			}
 
-            .cta-main {
-                padding: 0;
-            }
-        }
-
+			.cta-main {
+				padding: 0;
+			}
+		}
 	}
 
-    h2.wp-block-post-title a {
-        color: var(--color-primary);
-    }
+	h2.wp-block-post-title a {
+		color: var(--color-primary);
+	}
 }

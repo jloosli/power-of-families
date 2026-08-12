@@ -29,6 +29,7 @@ If you see anything else, fix it before continuing — every task below assumes 
 ## File Structure
 
 **Create:**
+
 - `bin/smoke` — orchestrator (bash, executable)
 - `bin/smoke-fixtures` — WP-CLI idempotent seeder (bash, executable)
 - `tests/smoke/playwright.config.ts`
@@ -38,6 +39,7 @@ If you see anything else, fix it before continuing — every task below assumes 
 - `tests/smoke/specs/woo-checkout.spec.ts`
 
 **Modify:**
+
 - `package.json` — add `smoke`, `smoke:fixtures`, `smoke:install` scripts
 - `.gitignore` — add Playwright artifact dirs
 - `README.md` — add "Smoke Testing" section
@@ -47,6 +49,7 @@ If you see anything else, fix it before continuing — every task below assumes 
 ## Task 1: Scaffold tests/smoke/ and install Chromium
 
 **Files:**
+
 - Create: `tests/smoke/playwright.config.ts`
 - Create: `tests/smoke/specs/placeholder.spec.ts` (temporary — deleted in Task 7)
 - Modify: `package.json`
@@ -62,24 +65,24 @@ import { defineConfig } from '@playwright/test';
 const wpPort = process.env.WP_PORT ?? '8080';
 
 export default defineConfig({
-    testDir: './specs',
-    fullyParallel: true,
-    forbidOnly: !!process.env.CI,
-    retries: 0,
-    workers: undefined,
-    reporter: 'list',
-    use: {
-        baseURL: `http://localhost:${wpPort}`,
-        trace: 'retain-on-failure',
-        screenshot: 'only-on-failure',
-        video: 'off',
-    },
-    projects: [
-        {
-            name: 'chromium',
-            use: { browserName: 'chromium' },
-        },
-    ],
+	testDir: './specs',
+	fullyParallel: true,
+	forbidOnly: !!process.env.CI,
+	retries: 0,
+	workers: undefined,
+	reporter: 'list',
+	use: {
+		baseURL: `http://localhost:${wpPort}`,
+		trace: 'retain-on-failure',
+		screenshot: 'only-on-failure',
+		video: 'off',
+	},
+	projects: [
+		{
+			name: 'chromium',
+			use: { browserName: 'chromium' },
+		},
+	],
 });
 ```
 
@@ -91,7 +94,7 @@ Create `tests/smoke/specs/placeholder.spec.ts`:
 import { test, expect } from '@playwright/test';
 
 test('placeholder — runner wiring sanity check', () => {
-    expect(1 + 1).toBe(2);
+	expect(1 + 1).toBe(2);
 });
 ```
 
@@ -137,6 +140,7 @@ git commit -m "Scaffold Playwright smoke runner under tests/smoke/"
 ## Task 2: bin/smoke-fixtures — create test user idempotently
 
 **Files:**
+
 - Create: `bin/smoke-fixtures` (executable)
 
 The fixtures script grows incrementally over Tasks 2–5. Each task adds one fixture; running the script after every task should be idempotent (no errors on re-run).
@@ -219,6 +223,7 @@ git commit -m "Add smoke-fixtures script with idempotent test user creation"
 ## Task 3: bin/smoke-fixtures — add WooCommerce test product
 
 **Files:**
+
 - Modify: `bin/smoke-fixtures`
 
 - [ ] **Step 1: Add the product fixture**
@@ -301,6 +306,7 @@ git commit -m "Add idempotent WooCommerce test product to smoke-fixtures"
 This is a research task that resolves Open Question #1 from the spec. Output: a documented gating mechanism that Task 5 will use.
 
 **Files:**
+
 - No code changes yet — this is investigation.
 
 - [ ] **Step 1: List active members-related plugins**
@@ -358,6 +364,7 @@ git commit -m "Document smoke-test members-gating decision"
 ## Task 5: bin/smoke-fixtures — add gated members page
 
 **Files:**
+
 - Modify: `bin/smoke-fixtures`
 
 The exact shortcode/block/role added below depends on Task 4's findings. The structure below assumes the common case: a `[shortcode]...[/shortcode]` wrapper that gates by role or membership. Adjust the `gated_content` heredoc to match your plugin's syntax.
@@ -457,6 +464,7 @@ git commit -m "Add idempotent gated members page to smoke-fixtures"
 ## Task 6: bin/smoke-fixtures — emit latest-post and product URLs
 
 **Files:**
+
 - Modify: `bin/smoke-fixtures`
 
 - [ ] **Step 1: Add URL resolution**
@@ -539,6 +547,7 @@ git commit -m "Resolve and emit smoke-fixture URLs"
 ## Task 7: tests/smoke/fixtures.ts — shared spec constants
 
 **Files:**
+
 - Create: `tests/smoke/fixtures.ts`
 - Delete: `tests/smoke/specs/placeholder.spec.ts`
 
@@ -548,44 +557,44 @@ Create `tests/smoke/fixtures.ts`:
 
 ```ts
 function required(name: string): string {
-    const value = process.env[name];
-    if (!value) {
-        throw new Error(
-            `Missing required env var: ${name}. Did bin/smoke-fixtures run before this spec?`,
-        );
-    }
-    return value;
+	const value = process.env[name];
+	if (!value) {
+		throw new Error(
+			`Missing required env var: ${name}. Did bin/smoke-fixtures run before this spec?`
+		);
+	}
+	return value;
 }
 
 export const env = {
-    siteUrl: required('SITE_URL'),
-    userEmail: required('SMOKE_USER_EMAIL'),
-    userLogin: required('SMOKE_USER_LOGIN'),
-    password: required('SMOKE_PASSWORD'),
-    productUrl: required('SMOKE_PRODUCT_URL'),
-    gatedUrl: required('SMOKE_GATED_URL'),
-    gatedMarker: required('SMOKE_GATED_MARKER'),
-    latestPostUrl: required('SMOKE_LATEST_POST_URL'),
+	siteUrl: required('SITE_URL'),
+	userEmail: required('SMOKE_USER_EMAIL'),
+	userLogin: required('SMOKE_USER_LOGIN'),
+	password: required('SMOKE_PASSWORD'),
+	productUrl: required('SMOKE_PRODUCT_URL'),
+	gatedUrl: required('SMOKE_GATED_URL'),
+	gatedMarker: required('SMOKE_GATED_MARKER'),
+	latestPostUrl: required('SMOKE_LATEST_POST_URL'),
 };
 
 // Strings WP renders when something blows up server-side.
 export const phpErrorMarkers = [
-    'Fatal error',
-    'Parse error',
-    'There has been a critical error on this website',
+	'Fatal error',
+	'Parse error',
+	'There has been a critical error on this website',
 ];
 
 // Selectors that may need tweaking based on theme overrides. Centralized
 // here so spec churn happens in one file.
 export const selectors = {
-    // WP login form
-    loginUsername: '#user_login',
-    loginPassword: '#user_pass',
-    loginSubmit: '#wp-submit',
-    // WooCommerce — verified during Task 9 implementation.
-    addToCart: 'button[name="add-to-cart"], .single_add_to_cart_button',
-    cartSuccess: '.woocommerce-message, .wc-block-components-notice-banner',
-    checkoutForm: '.woocommerce-checkout, form.checkout',
+	// WP login form
+	loginUsername: '#user_login',
+	loginPassword: '#user_pass',
+	loginSubmit: '#wp-submit',
+	// WooCommerce — verified during Task 9 implementation.
+	addToCart: 'button[name="add-to-cart"], .single_add_to_cart_button',
+	cartSuccess: '.woocommerce-message, .wc-block-components-notice-banner',
+	checkoutForm: '.woocommerce-checkout, form.checkout',
 };
 ```
 
@@ -606,6 +615,7 @@ git commit -m "Add shared fixtures module for smoke specs"
 ## Task 8: public-pages.spec.ts
 
 **Files:**
+
 - Create: `tests/smoke/specs/public-pages.spec.ts`
 
 - [ ] **Step 1: Write the spec**
@@ -617,26 +627,25 @@ import { test, expect } from '@playwright/test';
 import { env, phpErrorMarkers } from '../fixtures';
 
 const urls: Array<{ name: string; url: string }> = [
-    { name: 'homepage', url: '/' },
-    { name: 'shop', url: '/shop/' },
-    { name: 'latest post', url: env.latestPostUrl },
-    { name: 'product', url: env.productUrl },
+	{ name: 'homepage', url: '/' },
+	{ name: 'shop', url: '/shop/' },
+	{ name: 'latest post', url: env.latestPostUrl },
+	{ name: 'product', url: env.productUrl },
 ];
 
 for (const { name, url } of urls) {
-    test(`${name} loads without PHP errors`, async ({ page }) => {
-        const response = await page.goto(url);
-        expect(response, `no response for ${url}`).not.toBeNull();
-        expect(response!.status(), `unexpected status for ${url}`).toBe(200);
+	test(`${name} loads without PHP errors`, async ({ page }) => {
+		const response = await page.goto(url);
+		expect(response, `no response for ${url}`).not.toBeNull();
+		expect(response!.status(), `unexpected status for ${url}`).toBe(200);
 
-        const body = await page.content();
-        for (const marker of phpErrorMarkers) {
-            expect(
-                body.includes(marker),
-                `Found "${marker}" on ${url}`,
-            ).toBe(false);
-        }
-    });
+		const body = await page.content();
+		for (const marker of phpErrorMarkers) {
+			expect(body.includes(marker), `Found "${marker}" on ${url}`).toBe(
+				false
+			);
+		}
+	});
 }
 ```
 
@@ -665,6 +674,7 @@ git commit -m "Add public-pages smoke spec"
 ## Task 9: woo-checkout.spec.ts
 
 **Files:**
+
 - Create: `tests/smoke/specs/woo-checkout.spec.ts`
 
 This task includes a selector-discovery step that resolves Open Question #2 from the spec.
@@ -672,6 +682,7 @@ This task includes a selector-discovery step that resolves Open Question #2 from
 - [ ] **Step 1: Discover the actual Add-to-Cart selector**
 
 In the live site (any incognito window), visit the test product page. Open DevTools, find the Add-to-Cart button. Note:
+
 - Its `name` attribute (commonly `add-to-cart`)
 - Its CSS class (commonly `single_add_to_cart_button`)
 
@@ -693,31 +704,30 @@ import { test, expect } from '@playwright/test';
 import { env, phpErrorMarkers, selectors } from '../fixtures';
 
 test('add-to-cart through checkout render', async ({ page }) => {
-    await page.goto(env.productUrl);
+	await page.goto(env.productUrl);
 
-    await page.locator(selectors.addToCart).first().click();
+	await page.locator(selectors.addToCart).first().click();
 
-    await expect(
-        page.locator(selectors.cartSuccess).first(),
-        'cart success indicator did not appear',
-    ).toBeVisible({ timeout: 10_000 });
+	await expect(
+		page.locator(selectors.cartSuccess).first(),
+		'cart success indicator did not appear'
+	).toBeVisible({ timeout: 10_000 });
 
-    const checkoutResponse = await page.goto('/checkout/');
-    expect(checkoutResponse).not.toBeNull();
-    expect(checkoutResponse!.status()).toBe(200);
+	const checkoutResponse = await page.goto('/checkout/');
+	expect(checkoutResponse).not.toBeNull();
+	expect(checkoutResponse!.status()).toBe(200);
 
-    await expect(
-        page.locator(selectors.checkoutForm).first(),
-        'checkout form did not render',
-    ).toBeVisible({ timeout: 10_000 });
+	await expect(
+		page.locator(selectors.checkoutForm).first(),
+		'checkout form did not render'
+	).toBeVisible({ timeout: 10_000 });
 
-    const body = await page.content();
-    for (const marker of phpErrorMarkers) {
-        expect(
-            body.includes(marker),
-            `Found "${marker}" on /checkout/`,
-        ).toBe(false);
-    }
+	const body = await page.content();
+	for (const marker of phpErrorMarkers) {
+		expect(body.includes(marker), `Found "${marker}" on /checkout/`).toBe(
+			false
+		);
+	}
 });
 ```
 
@@ -744,6 +754,7 @@ git commit -m "Add WooCommerce add-to-cart smoke spec"
 ## Task 10: login-gated.spec.ts
 
 **Files:**
+
 - Create: `tests/smoke/specs/login-gated.spec.ts`
 
 - [ ] **Step 1: Write the spec**
@@ -755,33 +766,37 @@ import { test, expect } from '@playwright/test';
 import { env, selectors } from '../fixtures';
 
 test('gated members page hides marker when logged out, reveals when logged in', async ({
-    page,
+	page,
 }) => {
-    // 1. Logged-out: marker must not appear.
-    await page.goto(env.gatedUrl);
-    await expect(page.locator('body'), 'gated content leaked to logged-out user').not.toContainText(
-        env.gatedMarker,
-    );
+	// 1. Logged-out: marker must not appear.
+	await page.goto(env.gatedUrl);
+	await expect(
+		page.locator('body'),
+		'gated content leaked to logged-out user'
+	).not.toContainText(env.gatedMarker);
 
-    // 2. Log in via wp-login.php.
-    await page.goto('/wp-login.php');
-    await page.locator(selectors.loginUsername).fill(env.userLogin);
-    await page.locator(selectors.loginPassword).fill(env.password);
-    await Promise.all([page.waitForNavigation(), page.locator(selectors.loginSubmit).click()]);
+	// 2. Log in via wp-login.php.
+	await page.goto('/wp-login.php');
+	await page.locator(selectors.loginUsername).fill(env.userLogin);
+	await page.locator(selectors.loginPassword).fill(env.password);
+	await Promise.all([
+		page.waitForNavigation(),
+		page.locator(selectors.loginSubmit).click(),
+	]);
 
-    // wp-login.php redirects to /wp-admin/ on success. If we landed elsewhere
-    // (e.g., back on the login page with an error), bail with a clear message.
-    expect(
-        page.url(),
-        `login redirect went somewhere unexpected: ${page.url()}`,
-    ).toMatch(/wp-admin|profile|members/);
+	// wp-login.php redirects to /wp-admin/ on success. If we landed elsewhere
+	// (e.g., back on the login page with an error), bail with a clear message.
+	expect(
+		page.url(),
+		`login redirect went somewhere unexpected: ${page.url()}`
+	).toMatch(/wp-admin|profile|members/);
 
-    // 3. Logged-in: marker must appear.
-    await page.goto(env.gatedUrl);
-    await expect(
-        page.locator('body'),
-        'gated content not visible to logged-in member',
-    ).toContainText(env.gatedMarker);
+	// 3. Logged-in: marker must appear.
+	await page.goto(env.gatedUrl);
+	await expect(
+		page.locator('body'),
+		'gated content not visible to logged-in member'
+	).toContainText(env.gatedMarker);
 });
 ```
 
@@ -810,6 +825,7 @@ git commit -m "Add members login + gated content smoke spec"
 ## Task 11: bin/smoke — orchestrator
 
 **Files:**
+
 - Create: `bin/smoke` (executable)
 
 - [ ] **Step 1: Write the orchestrator**
@@ -913,6 +929,7 @@ Then: `chmod +x bin/smoke`.
 
 Run: `bin/smoke`
 Expected:
+
 - `==> Seeding smoke fixtures…`
 - `==> Running Playwright smoke suite…` → `6 passed` (4 public-pages + 1 login-gated + 1 woo-checkout)
 - `==> Checking PHP error log since …`
@@ -925,7 +942,7 @@ Verify exit code: `echo $?` → `0`.
 
 Run: `bin/smoke --strict || true`
 
-If this passes, your install is clean. If it fails with notices/deprecations, that's the existing baseline — the failure output shows what's currently noisy, and re-running `bin/smoke --strict` after a future update will surface anything *new*. Don't fix the baseline noise; it's expected.
+If this passes, your install is clean. If it fails with notices/deprecations, that's the existing baseline — the failure output shows what's currently noisy, and re-running `bin/smoke --strict` after a future update will surface anything _new_. Don't fix the baseline noise; it's expected.
 
 - [ ] **Step 4: Confirm failure path works**
 
@@ -949,6 +966,7 @@ git commit -m "Add bin/smoke orchestrator with PHP error log tail"
 ## Task 12: README — Smoke Testing section
 
 **Files:**
+
 - Modify: `README.md`
 
 - [ ] **Step 1: Add the section**
@@ -1008,6 +1026,7 @@ on every run; no manual setup needed beyond `npm run smoke:install`.
 - [ ] **Step 2: Verify the rendered Markdown**
 
 Skim the section in a Markdown preview (VS Code's preview, GitHub's web view of the worktree branch, or `glow`). Confirm:
+
 - Code blocks are fenced correctly.
 - The discovery + loop commands are easy to scan.
 - The first-run setup is unambiguous.
@@ -1024,6 +1043,7 @@ git commit -m "Document smoke testing workflow in README"
 ## Task 13: Final end-to-end verification
 
 **Files:**
+
 - No code changes.
 
 - [ ] **Step 1: Clean slate run**

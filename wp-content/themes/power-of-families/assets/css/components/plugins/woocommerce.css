@@ -17,7 +17,7 @@
 
 	.wp-block-button__link {
 		background-color: var(--background-color-5);
-		--wp--preset--font-size--medium: .8em;
+		--wp--preset--font-size--medium: 0.8em;
 		text-transform: uppercase;
 	}
 

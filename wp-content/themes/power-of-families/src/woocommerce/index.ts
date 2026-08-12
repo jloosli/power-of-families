@@ -7,20 +7,22 @@
 const context = 'data-wp-context';
 
 function addLinkToLearnMoreButton() {
-    		document.addEventListener('DOMContentLoaded', () =>
-			setTimeout(() => addLinks())
-		);
+	document.addEventListener('DOMContentLoaded', () =>
+		setTimeout(() => addLinks())
+	);
 }
 function addLinks() {
-    document.querySelectorAll('.learn-more-button').forEach(theDiv => {
-        const productString = theDiv.closest(`[${context}]`)?.getAttribute(context);
-        if (!productString) return;
-        const productId = JSON.parse(productString)?.productId;
-        // console.log({ productId });
-        const theButton = theDiv.querySelector('a');
-        if (!theButton) return;
-        theButton.setAttribute('href', `/?page_id=${productId}`);
-    });
+	document.querySelectorAll('.learn-more-button').forEach((theDiv) => {
+		const productString = theDiv
+			.closest(`[${context}]`)
+			?.getAttribute(context);
+		if (!productString) return;
+		const productId = JSON.parse(productString)?.productId;
+		// console.log({ productId });
+		const theButton = theDiv.querySelector('a');
+		if (!theButton) return;
+		theButton.setAttribute('href', `/?page_id=${productId}`);
+	});
 }
 
 export { addLinkToLearnMoreButton };

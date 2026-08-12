@@ -18,11 +18,11 @@ When working in a `git worktree` (under `.claude/worktrees/`), pick one of
 three DB-sharing patterns from
 [README → Sharing DB / WordPress data](README.md#sharing-db--wordpress-data-with-the-main-checkout):
 
-| | DB | When |
-|---|---|---|
-| **A** | own copy, populated by stdin-streaming main's dump | branch work that mutates DB |
-| **B** | main's running `db` container (compose override) | read-mostly, ok with shared writes |
-| **C** | symlinked `db-data` via `bin/use-worktree-data` | maximum sharing, only one `db` runs at a time |
+|       | DB                                                 | When                                          |
+| ----- | -------------------------------------------------- | --------------------------------------------- |
+| **A** | own copy, populated by stdin-streaming main's dump | branch work that mutates DB                   |
+| **B** | main's running `db` container (compose override)   | read-mostly, ok with shared writes            |
+| **C** | symlinked `db-data` via `bin/use-worktree-data`    | maximum sharing, only one `db` runs at a time |
 
 Quick recipe for **A** (recommended default — keeps main's data safe):
 
@@ -44,15 +44,15 @@ of which DB pattern you pick.
 
 ## Commands
 
-| Task | Command |
-|---|---|
-| Start dev containers | `docker compose up -d wordpress` |
-| Build theme JS/CSS | `npm run build:theme` |
-| Build plugin JS | `npm run build:plugin` |
-| Build both | `npm run build` |
-| Watch theme | `npm run start:theme` |
-| Watch plugin | `npm run start:plugin` |
-| Run tests | `npm run test` |
+| Task                                                     | Command                                                   |
+| -------------------------------------------------------- | --------------------------------------------------------- |
+| Start dev containers                                     | `docker compose up -d wordpress`                          |
+| Build theme JS/CSS                                       | `npm run build:theme`                                     |
+| Build plugin JS                                          | `npm run build:plugin`                                    |
+| Build both                                               | `npm run build`                                           |
+| Watch theme                                              | `npm run start:theme`                                     |
+| Watch plugin                                             | `npm run start:plugin`                                    |
+| Run tests                                                | `npm run test`                                            |
 | Smoke-test the site after a plugin / theme / core update | `npm run smoke` (one-time setup: `npm run smoke:install`) |
 
 ## Key Facts

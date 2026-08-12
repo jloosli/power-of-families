@@ -6,9 +6,9 @@
 
 ## Problem
 
-Production plugins, the Genesis parent theme, and WordPress core periodically need updating. Doing those updates blind on production risks breaking the public site (homepage, blog), the WooCommerce buy flow, or the gated members area. We want to apply each update *locally first*, prove the site still works, and only then mirror the same update to production via WP-CLI — one update at a time, so any breakage is unambiguously attributable.
+Production plugins, the Genesis parent theme, and WordPress core periodically need updating. Doing those updates blind on production risks breaking the public site (homepage, blog), the WooCommerce buy flow, or the gated members area. We want to apply each update _locally first_, prove the site still works, and only then mirror the same update to production via WP-CLI — one update at a time, so any breakage is unambiguously attributable.
 
-The repo already has Docker-based local WordPress and PHPUnit unit tests for the custom theme/plugin, but no automated way to verify that the *integrated* site still functions after a third-party plugin update. That gap is what this spec fills.
+The repo already has Docker-based local WordPress and PHPUnit unit tests for the custom theme/plugin, but no automated way to verify that the _integrated_ site still functions after a third-party plugin update. That gap is what this spec fills.
 
 ## Goals
 
@@ -80,14 +80,16 @@ Smoke tests live under `tests/smoke/`, not the theme's `tests/`, because they're
 ### Components
 
 **`bin/smoke`** — the entry point. Bash script. Responsibilities:
+
 1. Verify the `wordpress` container is up (`docker compose ps wordpress`); exit with a helpful message if not.
-2. Record the PHP error log start position (see *PHP error log tail* below).
+2. Record the PHP error log start position (see _PHP error log tail_ below).
 3. Run `bin/smoke-fixtures` and capture the emitted `SMOKE_USER_EMAIL`, `SMOKE_GATED_URL`, `SMOKE_PRODUCT_URL`, `SMOKE_LATEST_POST_URL`.
 4. Run `npx playwright test --config tests/smoke/playwright.config.ts` with those values in the environment.
 5. Slice the PHP error log from the recorded start point and check for new fatals/uncaught exceptions.
 6. Exit 0 only if Playwright passed AND the log slice is clean. Otherwise print the relevant failures and exit non-zero.
 
 **`bin/smoke-fixtures`** — idempotent WP-CLI seeding. Each step checks before creating:
+
 1. **Test member user** — email `smoketest@example.com`, role `subscriber` (or whichever role gates members content; resolved during implementation by inspecting an existing gated page). Password read from env `SMOKE_PASSWORD`, defaulting to a documented dev value. `wp user get smoketest@example.com` first; only `wp user create` if it 404s.
 2. **Test gated page** — title `Smoke Test Members Page`, slug fixed, body contains the literal string `MEMBERS_ONLY_MARKER` wrapped in whatever members-plugin gate the site uses. The login spec asserts the marker is absent pre-login and present post-login.
 3. **Test WooCommerce product** — title `Smoke Test Product`, slug `smoke-test-product`, type `simple`, price `$1`, status `publish`, stock management off so it's always purchasable.
@@ -95,6 +97,7 @@ Smoke tests live under `tests/smoke/`, not the theme's `tests/`, because they're
 5. Prints the resolved identifiers and URLs to stdout in `KEY=value` form so `bin/smoke` can export them as env vars for Playwright: `SMOKE_USER_EMAIL`, `SMOKE_GATED_URL`, `SMOKE_PRODUCT_URL`, `SMOKE_LATEST_POST_URL`.
 
 **`tests/smoke/playwright.config.ts`** — minimal config:
+
 - `baseURL` = `http://localhost:${process.env.WP_PORT ?? 8080}` so worktrees with their own ports work unchanged.
 - Single project (Chromium only — additional browsers add time without catching more WP-plugin breakage).
 - `retries: 0`.
@@ -106,19 +109,22 @@ Smoke tests live under `tests/smoke/`, not the theme's `tests/`, because they're
 ### The three specs
 
 **`public-pages.spec.ts`** — one test per URL, parallel:
+
 - `/` (homepage)
 - `SMOKE_LATEST_POST_URL` (latest published post)
 - `/shop/`
 - `SMOKE_PRODUCT_URL` (the seeded `smoke-test-product`)
 
-Each test: `goto(url)`, assert response status is 200, assert the page body does *not* contain `Fatal error`, `Parse error`, or the WP user-facing critical-error string `There has been a critical error on this website`. Warnings, notices, and deprecations are deliberately *not* asserted in the body — they're caught (when you want them) by the PHP error log tail's `--strict` mode in the next section, so the default smoke run doesn't fail on the baseline notice noise that a 30-plugin WP install typically carries.
+Each test: `goto(url)`, assert response status is 200, assert the page body does _not_ contain `Fatal error`, `Parse error`, or the WP user-facing critical-error string `There has been a critical error on this website`. Warnings, notices, and deprecations are deliberately _not_ asserted in the body — they're caught (when you want them) by the PHP error log tail's `--strict` mode in the next section, so the default smoke run doesn't fail on the baseline notice noise that a 30-plugin WP install typically carries.
 
 **`login-gated.spec.ts`** — single test:
+
 1. `goto(SMOKE_GATED_URL)` — assert `MEMBERS_ONLY_MARKER` is NOT visible (gating works).
 2. Log in via the `/wp-login.php` form using `SMOKE_USER_EMAIL` + `SMOKE_PASSWORD`.
 3. `goto(SMOKE_GATED_URL)` again — assert `MEMBERS_ONLY_MARKER` IS visible.
 
 **`woo-checkout.spec.ts`** — single test:
+
 1. `goto(SMOKE_PRODUCT_URL)`, click the Add-to-Cart button.
 2. Assert the cart's success notice or count badge (selector lives in `fixtures.ts`).
 3. `goto(/checkout/)`, assert a stable checkout-page element (e.g. `#payment` or `.woocommerce-checkout`) renders.
@@ -131,11 +137,13 @@ Catches "page returned 200 but threw a warning" — the failure mode that pure H
 **Source:** `docker compose logs wordpress --since=<start-timestamp>`. This is preferred over `wp-content/debug.log` because it works without flipping `WP_DEBUG_LOG` and doesn't require a container restart. Noise from other requests is filtered with grep patterns. `bin/smoke` captures a UTC timestamp before tests start; after tests complete, it pulls the log slice since that timestamp.
 
 **Patterns matched (default):**
+
 - `PHP Fatal`
 - `PHP Parse`
 - `Uncaught`
 
 **Patterns matched with `--strict`:** the above plus
+
 - `PHP Warning`
 - `PHP Notice`
 - `Deprecated`
@@ -152,9 +160,9 @@ On failure the developer gets:
 
 - Playwright `list` reporter output naming each failed spec + the failing assertion.
 - Per-failed-test artifacts in `tests/smoke/test-results/<spec-name>/`:
-  - PNG screenshot at the point of failure
-  - Full Playwright trace (`trace.zip`, openable with `npx playwright show-trace`)
-  - The page HTML at failure time
+    - PNG screenshot at the point of failure
+    - Full Playwright trace (`trace.zip`, openable with `npx playwright show-trace`)
+    - The page HTML at failure time
 - If the PHP error log slice triggered the failure, the matching log lines are printed inline.
 - Non-zero exit code (composes with `&&` if scripted).
 
@@ -163,14 +171,16 @@ Gitignored: `tests/smoke/test-results/`, `tests/smoke/playwright-report/`, Playw
 ## Developer ergonomics
 
 **Package.json scripts:**
+
 - `npm run smoke` → `bin/smoke`
 - `npm run smoke:fixtures` → `bin/smoke-fixtures` (rarely needed standalone)
 - `npm run smoke:install` → `npx playwright install chromium` (one-time browser download)
 
 **README addition:** a "Smoke Testing" section under "Ongoing Development" containing:
+
 - First-run setup (`npm run smoke:install`).
 - The discovery commands (`wp plugin list --update=available`, `wp theme list --update=available`, `wp core check-update`) so the developer can see at a glance what needs updating without remembering the WP-CLI syntax.
-- The full update loop (discover → update locally → smoke → mirror to prod or revert) documented in the *Workflow this enables* section above.
+- The full update loop (discover → update locally → smoke → mirror to prod or revert) documented in the _Workflow this enables_ section above.
 
 ## Open questions resolved during implementation
 
@@ -185,4 +195,4 @@ These don't block writing the implementation plan but need answers before code l
 - A `--deep` flag that places a real test order through the WooCommerce "Cash on Delivery" gateway, for catching breakage in the order-creation path.
 - `wp-admin` smoke (load dashboard, plugins page, post editor).
 - CI integration that gates prod-syncs on a green local smoke run.
-- A `bin/update-and-smoke <plugin>` wrapper, *only if* the explicit-step boundary stops being valuable.
+- A `bin/update-and-smoke <plugin>` wrapper, _only if_ the explicit-step boundary stops being valuable.

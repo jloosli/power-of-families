@@ -44,8 +44,13 @@ class ResponsiveMenu {
 		toggles.forEach((toggle) => {
 			toggle.addEventListener('click', () => {
 				toggle.classList.toggle('activated');
-				toggle.setAttribute('aria-pressed', toggle.classList.contains('activated').toString());
-				toggle?.parentElement?.parentElement?.querySelector('nav, .sub-menu')?.classList.toggle('activated');
+				toggle.setAttribute(
+					'aria-pressed',
+					toggle.classList.contains('activated').toString()
+				);
+				toggle?.parentElement?.parentElement
+					?.querySelector('nav, .sub-menu')
+					?.classList.toggle('activated');
 			});
 		});
 		// jQuery('.menu-toggle, .sub-menu-toggle').on('click', function () {
