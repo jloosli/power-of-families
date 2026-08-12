@@ -15,6 +15,10 @@ Line counts and `file:line` references were verified against the working tree on
 2026-08-12. **Candidate 06 was reproduced by execution; every other finding is static
 analysis** — worth confirming before acting on the larger ones.
 
+**Paths.** `bin/…`, `docs/…` and `wp-content/…` are relative to the repo root. As
+shorthand, `inc/…` and `tests/…` are relative to
+`wp-content/themes/power-of-families/`, since most of the theme references live there.
+
 | Area                                                   |  Lines |
 | ------------------------------------------------------ | -----: |
 | Theme modules (`inc/PowerOfFamilies`)                  |  1,685 |
@@ -87,7 +91,7 @@ this before writing code.
 - `inc/PowerOfFamilies/Settings.php:137-171` — builds the shape
 - `inc/PowerOfFamilies/Programs/AffiliateLinkerSettings.php:41-64` — builds the shape
 - `inc/PowerOfFamilies/FieldRenderer.php:19-194`, `:249-316` — destructures it
-- `plugins/pof-bloom-plugin/includes/lib/class-pom-bloom-admin-api.php` — destructures it again
+- `wp-content/plugins/pof-bloom-plugin/includes/lib/class-pom-bloom-admin-api.php` — destructures it again
 
 **Problem.** An untyped array shape
 (`['id'=>…, 'label'=>…, 'type'=>…, 'options'=>…, 'default'=>…, 'placeholder'=>…]`) is the
@@ -285,9 +289,9 @@ string), `pof_save_meta`/`pof_meta_nonce` (twice in one file), `POF_Affiliate_Li
 
 **Files**
 
-- `plugins/pof-bloom-plugin/includes/class-pom-bloom-program.php` (749)
+- `wp-content/plugins/pof-bloom-plugin/includes/class-pom-bloom-program.php` (749)
   — `:106-243 ajax_callback`, `:330-342 get_partial`, `:552-748 setup`
-- `plugins/pof-bloom-plugin/assets/partials/*.php` (18 files)
+- `wp-content/plugins/pof-bloom-plugin/assets/partials/*.php` (18 files)
 
 **Problem.** One 749-line class is router, AJAX endpoint, view-model builder and HTML
 generator:
