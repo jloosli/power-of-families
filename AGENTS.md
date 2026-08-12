@@ -83,6 +83,18 @@ think you'd seen everything. Copilot skips generated files, so a lockfile-only
 PR gets "Copilot wasn't able to review any files in this pull request" —
 nothing to action there.
 
+Copilot reviews the commit it was triggered on and does **not** re-review when
+you push fixes. If you want it to look again, ask explicitly:
+
+```sh
+gh pr edit <n> --add-reviewer "@copilot"
+```
+
+Do this while the PR is still open. GitHub accepts the request on a merged PR
+and silently discards it — exit 0, no reviewer added, no new review — so the
+window closes at merge. "No new comments" after a push therefore means nobody
+looked again, not that the fix was approved.
+
 ## Agent skills
 
 ### Issue tracker
