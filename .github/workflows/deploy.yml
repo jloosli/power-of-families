@@ -38,7 +38,7 @@ jobs:
 
             - name: Run tests
               run: |
-                  docker compose run --rm test ci --coverage-enabled --generate-reports --coverage-dir coverage --test-reports-dir test-reports
+                  docker compose run --rm test ci-test.sh --coverage-enabled --generate-reports --coverage-dir coverage --test-reports-dir test-reports
 
             - name: Stop services
               if: always()

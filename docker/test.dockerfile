@@ -33,20 +33,29 @@ COPY docker/test-xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 # Create directories for test reports and coverage
 RUN mkdir -p /var/www/html/coverage /var/www/html/test-reports
 
-# Set working directory
-WORKDIR /var/www/html
+# Set working directory to the theme, which is where phpunit.xml, composer.json,
+# vendor/ and tests/ all live. Every caller passes `phpunit --configuration
+# phpunit.xml`, so this is the CWD they all assume; from /var/www/html that
+# config is unreadable. The directory is a bind-mount target at runtime.
+WORKDIR /var/www/html/wp-content/themes/power-of-families
 
 # Copy WordPress test installation script
 COPY bin/install-wp-tests.sh /usr/local/bin/install-wp-tests.sh
 RUN chmod +x /usr/local/bin/install-wp-tests.sh
 
-# Copy test execution script
-COPY bin/run-tests.sh /usr/local/bin/run-tests.sh
-RUN chmod +x /usr/local/bin/run-tests.sh
+# Copy the container-side CI test runner.
+#
+# Deliberately no ENTRYPOINT of our own: we inherit the base wordpress image's
+# docker-entrypoint.sh, which execs its arguments verbatim for anything that is
+# not apache2*/php-fpm. So `docker compose run --rm test php ...` and
+# `... phpunit ...` run as written. Baking bin/run-tests.sh in as ENTRYPOINT
+# swallowed those arguments and rejected them as unknown mode names.
+COPY docker/ci-test.sh /usr/local/bin/ci-test.sh
+RUN chmod +x /usr/local/bin/ci-test.sh
 
 # Set proper permissions
 RUN chown -R www-data:www-data /var/www/html/coverage /var/www/html/test-reports
 
-# Default command: run CI mode (setup + phpunit)
-ENTRYPOINT ["/usr/local/bin/run-tests.sh"]
-CMD ["ci"]
+# Default command: run the suite. Use `ci-test.sh` for the full
+# provision-then-test flow that CI needs.
+CMD ["phpunit", "--configuration", "phpunit.xml"]

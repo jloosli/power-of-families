@@ -45,6 +45,7 @@ wp-content/plugins/pof-bloom-plugin/build/
 # Test reports and coverage
 coverage/
 test-reports/
+coverage-ci-results.json
 
 # xDebug logs and profiles
 xdebug-logs/

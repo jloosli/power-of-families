@@ -20,7 +20,7 @@
 		"build:theme": "wp-scripts build wp-content/themes/power-of-families/src/admin.ts wp-content/themes/power-of-families/src/main.ts --output-path=wp-content/themes/power-of-families/dist",
 		"build:plugin": "wp-scripts build --config wp-content/plugins/pof-bloom-plugin/webpack.config.js",
 		"build": "npm run build:theme && npm run build:plugin",
-		"test:php-setup": "docker compose run --rm --entrypoint='' test bash -c '/usr/local/bin/install-wp-tests.sh wordpress_test root password \"$TEST_DB_HOST\" latest'",
+		"test:php-setup": "docker compose run --rm test bash -c '/usr/local/bin/install-wp-tests.sh \"$TEST_DB_NAME\" \"$TEST_DB_USER\" \"$TEST_DB_PASSWORD\" \"$TEST_DB_HOST\" \"$WP_VERSION\"'",
 		"test:php": "docker-compose run --rm test",
 		"test": "bin/run-tests.sh",
 		"test:quick": "bin/run-tests.sh quick",
