@@ -160,14 +160,14 @@ them from scratch.
 
 ### Reference: Docker compose env overrides
 
-| Var                | Default    | Used in                  |
-| ------------------ | ---------- | ------------------------ |
-| `WP_PORT`          | `8080`     | wordpress host port      |
-| `XDEBUG_PORT`      | `9003`     | wordpress + test xDebug  |
+| Var                | Default    | Used in                        |
+| ------------------ | ---------- | ------------------------------ |
+| `WP_PORT`          | `8080`     | wordpress host port            |
+| `XDEBUG_PORT`      | `9003`     | wordpress + test xDebug        |
 | `DB_PORT`          | `3306`     | db host port (for GUI clients) |
-| `PHP_VERSION`      | `8.4`      | wordpress + test image   |
-| `MARIA_DB_VERSION` | `10.11.14` | db image                 |
-| `WORDPRESS_DEBUG`  | `false`    | `WORDPRESS_SCRIPT_DEBUG` |
+| `PHP_VERSION`      | `8.4`      | wordpress + test image         |
+| `MARIA_DB_VERSION` | `10.11.14` | db image                       |
+| `WORDPRESS_DEBUG`  | `false`    | `WORDPRESS_SCRIPT_DEBUG`       |
 
 ### Bumping the PHP version
 

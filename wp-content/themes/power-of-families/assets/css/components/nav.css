@@ -85,7 +85,6 @@ li.menu-item-has-children {
 	position: relative;
 }
 
-
 .genesis-nav-menu .sub-menu {
 	opacity: 0;
 	display: none;
@@ -117,8 +116,6 @@ li.menu-item-has-children {
 	.genesis-nav-menu {
 		flex-direction: row;
 	}
-
-
 }
 
 /* .genesis-nav-menu .menu-item {

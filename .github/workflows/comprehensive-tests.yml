@@ -289,12 +289,7 @@ jobs:
         name: Test Summary
         runs-on: ubuntu-24.04
         needs:
-            [
-                unit-tests,
-                coverage-analysis,
-                integration-tests,
-                security-tests,
-            ]
+            [unit-tests, coverage-analysis, integration-tests, security-tests]
         if: always()
         steps:
             - name: Checkout code

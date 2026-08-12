@@ -36,8 +36,9 @@ services:
 
     db:
         image: alpine
-        command: ["echo", "db skipped — using main project's power-of-families-db-1"]
-        restart: "no"
+        command:
+            ['echo', "db skipped — using main project's power-of-families-db-1"]
+        restart: 'no'
 
 networks:
     main_db:

@@ -61,8 +61,7 @@
 	--site-width: 1200px;
 
 	--wc-highlight: yellow;
-
 }
-	@custom-media --breakpoint-small (min-width: 480px);
-	@custom-media --breakpoint-medium (min-width: 768px);
-	@custom-media --breakpoint-large (min-width: 1024px);
+@custom-media --breakpoint-small (min-width: 480px);
+@custom-media --breakpoint-medium (min-width: 768px);
+@custom-media --breakpoint-large (min-width: 1024px);

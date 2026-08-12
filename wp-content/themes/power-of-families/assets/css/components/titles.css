@@ -3,7 +3,8 @@
 	padding: 50px 60px 0 60px;
 }
 
-.entry-title, .wp-block-post-title {
+.entry-title,
+.wp-block-post-title {
 	font-size: 30px;
 	color: var(--color-primary);
 	font-family: var(--font-headings);
@@ -12,7 +13,8 @@
 	font-weight: normal;
 }
 
-.page .entry-title, .archive .archive-title {
+.page .entry-title,
+.archive .archive-title {
 	font-size: 42px;
 	font-family: var(--font-headings-light);
 }

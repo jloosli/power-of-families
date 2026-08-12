@@ -16,6 +16,27 @@ env:
     NODE_VERSION: '20'
 
 jobs:
+    # Formatting — runs independently of the tests so a style nit reports as
+    # its own check rather than as a test failure, and never blocks a deploy.
+    format-check:
+        name: Format Check
+        runs-on: ubuntu-24.04
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v6
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: 'npm'
+
+            - name: Install dependencies
+              run: npm install
+
+            - name: Check formatting
+              run: npm run format:check
+
     # Unit Tests
     unit-tests:
         name: Unit Tests
