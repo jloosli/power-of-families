@@ -22,6 +22,10 @@ db-backups
 # Claude Code (local settings + worktree mirrors under .claude/worktrees/)
 .claude/
 
+# Local Claude Code skill installs (mattpocock/skills etc.)
+.agents/
+skills-lock.json
+
 # Logs
 logs
 *.log
@@ -45,3 +49,9 @@ test-reports/
 # xDebug logs and profiles
 xdebug-logs/
 xdebug-profiles/
+
+# Smoke testing artifacts (both cwd-relative and config-relative output dirs)
+test-results/
+tests/smoke/test-results/
+playwright-report/
+tests/smoke/playwright-report/

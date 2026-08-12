@@ -1,0 +1,219 @@
+#!/usr/bin/env bash
+# Idempotently seed test fixtures for bin/smoke. Each fixture checks before
+# creating, so this script is safe to re-run.
+#
+# Emits KEY=value lines on stdout so bin/smoke can `eval` / export them as
+# env vars for the Playwright suite.
+set -euo pipefail
+
+SMOKE_USER_EMAIL="smoketest@example.com"
+SMOKE_USER_LOGIN="smoketest"
+SMOKE_PASSWORD="${SMOKE_PASSWORD:-smoke-test-pw-change-me}"
+
+SMOKE_PRODUCT_SLUG="smoke-test-product"
+SMOKE_PRODUCT_TITLE="Smoke Test Product"
+
+SMOKE_GATED_SLUG="smoke-test-members-page"
+SMOKE_GATED_TITLE="Smoke Test Members Page"
+SMOKE_GATED_MARKER="MEMBERS_ONLY_MARKER"
+SMOKE_GROUP_ID="1"   # "Registered" group — base tier; see comment at top of file.
+
+# ---------------------------------------------------------------------
+# Members-plugin gating decision (resolved 2026-05-14, Task 4 of plan).
+#
+# Active plugin:      groups (v3.7.0) + groups-woocommerce (v3.0.0)
+#                     members (v3.2.18) is active but its content_permissions
+#                     feature is OFF (option members_settings.content_permissions=0),
+#                     so it is NOT enforcing any page-level access.
+#
+# Gating mechanism:   `groups` plugin, postmeta key `groups-read`, value = group_id.
+#                     When a logged-out (or non-member) visitor hits a gated page,
+#                     WordPress returns HTTP 404 — no redirect, just a hard 404.
+#                     71 published posts/pages are gated this way.
+#
+# Example gated page: "Joy School Materials" (ID 57829, slug joy-school-materials-2)
+#                     groups-read = 83 ("Joy School Lifetime") and 84 ("Joy School
+#                     Parent Materials").
+#                     Simplest group for test purposes: group_id=1 ("Registered"),
+#                     which is the base membership tier every registered user joins.
+#
+# Test strategy for
+#   Task 5:           Create a page (slug smoke-test-gated) with postmeta
+#                     groups-read = 1 (group "Registered"). The smoketest user
+#                     (role=subscriber) must also be added to group_id=1 via the
+#                     groups plugin user-group table (wp_groups_user_group) so the
+#                     logged-in smoke test sees the page content, while the
+#                     logged-out check gets a 404. No shortcodes needed; the gating
+#                     is purely meta-driven by the groups plugin at request time.
+# ---------------------------------------------------------------------
+wpcli() {
+    docker compose run --rm -T wpcli "$@"
+}
+
+ensure_user() {
+    if wpcli user get "$SMOKE_USER_EMAIL" --field=ID >/dev/null 2>&1; then
+        return 0
+    fi
+    wpcli user create "$SMOKE_USER_LOGIN" "$SMOKE_USER_EMAIL" \
+        --role=subscriber \
+        --user_pass="$SMOKE_PASSWORD" \
+        --display_name="Smoke Test" >/dev/null
+}
+
+ensure_product() {
+    local existing
+    existing=$(wpcli post list \
+        --post_type=product \
+        --name="$SMOKE_PRODUCT_SLUG" \
+        --field=ID \
+        --format=ids 2>/dev/null | tr -d '[:space:]')
+    if [[ -n "$existing" ]]; then
+        return 0
+    fi
+    local id
+    id=$(wpcli post create \
+        --post_type=product \
+        --post_status=publish \
+        --post_title="$SMOKE_PRODUCT_TITLE" \
+        --post_name="$SMOKE_PRODUCT_SLUG" \
+        --porcelain)
+    # Resolve an admin user ID (WooCommerce CLI requires a valid WP user).
+    local admin_id
+    admin_id=$(wpcli user list --role=administrator --field=ID --format=ids 2>/dev/null \
+        | tr ' ' '\n' | head -1 | tr -d '[:space:]')
+    if [[ -z "$admin_id" ]]; then
+        echo "ensure_product: no administrator user found to authenticate the WooCommerce update" >&2
+        exit 1
+    fi
+    # Make it a simple, purchasable product priced $1 with stock management off.
+    wpcli wc product update "$id" \
+        --type=simple \
+        --regular_price=1 \
+        --manage_stock=false \
+        --user="$admin_id" >/dev/null
+}
+
+ensure_gated_page() {
+    # `wpcli post list --name=...` does not reliably filter by exact slug;
+    # query via $wpdb instead to get an exact match on post_name.
+    local existing
+    existing=$(wpcli eval \
+        "global \$wpdb; echo \$wpdb->get_var(\$wpdb->prepare(\"SELECT ID FROM wp_posts WHERE post_name = %s AND post_type = 'page' AND post_status = 'publish'\", '${SMOKE_GATED_SLUG}'));" \
+        2>/dev/null | tr -d '[:space:]')
+    if [[ -z "$existing" ]]; then
+        existing=$(wpcli post create \
+            --post_type=page \
+            --post_status=publish \
+            --post_title="$SMOKE_GATED_TITLE" \
+            --post_name="$SMOKE_GATED_SLUG" \
+            --post_content="Public preamble. $SMOKE_GATED_MARKER" \
+            --porcelain)
+    fi
+    # Ensure the groups-read meta is set to our target group. Idempotent
+    # via wp post meta update (creates or replaces).
+    wpcli post meta update "$existing" groups-read "$SMOKE_GROUP_ID" >/dev/null
+}
+
+ensure_user_in_group() {
+    # Add smoketest user to group_id=$SMOKE_GROUP_ID by inserting into
+    # the groups plugin's wp_groups_user_group mapping. Idempotent via
+    # INSERT IGNORE. Uses wpcli eval + $wpdb to avoid SSL issues with
+    # `wpcli db query` against MariaDB.
+    local user_id
+    user_id=$(wpcli user get "$SMOKE_USER_EMAIL" --field=ID 2>/dev/null | tr -d '[:space:]')
+    if [[ -z "$user_id" ]]; then
+        echo "ensure_user_in_group: smoketest user not found" >&2
+        exit 1
+    fi
+    wpcli eval "global \$wpdb; \$wpdb->query(\$wpdb->prepare(\"INSERT IGNORE INTO wp_groups_user_group (user_id, group_id) VALUES (%d, %d)\", ${user_id}, ${SMOKE_GROUP_ID}));" >/dev/null
+}
+
+ensure_woo_settings() {
+    # The local docker stack only serves HTTP (no HTTPS port exposed), so
+    # woocommerce_force_ssl_checkout must be off; otherwise /checkout/ redirects
+    # to https://localhost:PORT/checkout/ which no browser can reach in CI.
+    # This is idempotent — safe to run even if already set correctly.
+    wpcli option update woocommerce_force_ssl_checkout no >/dev/null
+}
+
+ensure_user
+ensure_product
+ensure_gated_page
+ensure_user_in_group
+ensure_woo_settings
+
+# ---------------------------------------------------------------------
+# Resolve URLs
+# ---------------------------------------------------------------------
+WP_PORT_LOCAL="${WP_PORT:-8080}"
+SITE_URL="http://localhost:${WP_PORT_LOCAL}"
+
+LATEST_POST_ID=$(wpcli post list \
+    --post_type=post \
+    --post_status=publish \
+    --posts_per_page=1 \
+    --field=ID \
+    --format=ids 2>/dev/null | tr -d '[:space:]')
+
+if [[ -z "$LATEST_POST_ID" ]]; then
+    echo "ERROR: no published posts found — public-pages spec needs one" >&2
+    exit 1
+fi
+
+PRODUCT_ID=$(wpcli post list \
+    --post_type=product \
+    --name="$SMOKE_PRODUCT_SLUG" \
+    --field=ID \
+    --format=ids 2>/dev/null | tr -d '[:space:]')
+
+# Look up gated page ID via $wpdb (groups plugin filters it from wp post list).
+GATED_ID=$(wpcli eval \
+    "global \$wpdb; echo \$wpdb->get_var(\$wpdb->prepare(\"SELECT ID FROM wp_posts WHERE post_name = %s AND post_type = 'page' AND post_status = 'publish'\", '${SMOKE_GATED_SLUG}'));" \
+    2>/dev/null | tr -d '[:space:]')
+
+# wp post url returns URLs with the production domain; extract the path and
+# prepend SITE_URL so every URL points to the local dev environment.
+local_url() {
+    # $1 = raw URL from wp post url (e.g. https://poweroffamilies.com/product/foo/)
+    # Returns $SITE_URL + path (e.g. http://localhost:8081/product/foo/)
+    # Exits non-zero if the input isn't a recognizable absolute URL — that
+    # way a missing/garbled raw URL fails loudly here rather than producing
+    # a malformed http://localhost:8081// that 404s silently in Playwright.
+    local raw path
+    raw="$1"
+    if [[ ! "$raw" =~ ^https?://[^/]+/ ]]; then
+        echo "local_url: expected an absolute http(s) URL with a path, got: ${raw:-<empty>}" >&2
+        exit 1
+    fi
+    path="${raw#http*://*/}"      # strip scheme + host
+    path="/${path%/}/"            # ensure leading slash and trailing slash
+    printf '%s%s' "$SITE_URL" "$path"
+}
+
+raw_latest=$(wpcli post url "$LATEST_POST_ID" 2>/dev/null | tr -d '[:space:]')
+SMOKE_LATEST_POST_URL=$(local_url "$raw_latest")
+
+raw_product=$(wpcli post url "$PRODUCT_ID" 2>/dev/null | tr -d '[:space:]')
+SMOKE_PRODUCT_URL=$(local_url "$raw_product")
+
+# wp post url may return empty for a gated page because groups plugin filters
+# it from WP queries; fall back to constructing the URL from the slug.
+raw_gated=$(wpcli post url "$GATED_ID" 2>/dev/null | tr -d '[:space:]')
+if [[ -n "$raw_gated" ]]; then
+    SMOKE_GATED_URL=$(local_url "$raw_gated")
+else
+    SMOKE_GATED_URL="${SITE_URL}/${SMOKE_GATED_SLUG}/"
+fi
+
+cat <<EOF
+SMOKE_USER_EMAIL=$SMOKE_USER_EMAIL
+SMOKE_USER_LOGIN=$SMOKE_USER_LOGIN
+SMOKE_PASSWORD=$SMOKE_PASSWORD
+SMOKE_PRODUCT_SLUG=$SMOKE_PRODUCT_SLUG
+SMOKE_PRODUCT_URL=$SMOKE_PRODUCT_URL
+SMOKE_GATED_SLUG=$SMOKE_GATED_SLUG
+SMOKE_GATED_URL=$SMOKE_GATED_URL
+SMOKE_GATED_MARKER=$SMOKE_GATED_MARKER
+SMOKE_LATEST_POST_URL=$SMOKE_LATEST_POST_URL
+SITE_URL=$SITE_URL
+EOF

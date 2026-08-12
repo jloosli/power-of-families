@@ -53,6 +53,7 @@ of which DB pattern you pick.
 | Watch theme | `npm run start:theme` |
 | Watch plugin | `npm run start:plugin` |
 | Run tests | `npm run test` |
+| Smoke-test the site after a plugin / theme / core update | `npm run smoke` (one-time setup: `npm run smoke:install`) |
 
 ## Key Facts
 
@@ -61,3 +62,17 @@ of which DB pattern you pick.
 - CSS is plain PostCSS (postcss-nested, autoprefixer). Config: `postcss.config.js`.
 - Linting: `prettier.config.js` and `.phpcs.xml.dist`. Use spaces, not tabs.
 - Deploy: push to `main` triggers rsync of the theme directory to production via `.github/workflows/deploy.yml`.
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues on `jloosli/power-of-families`, via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default canonical vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context layout — `CONTEXT.md` + `docs/adr/` at the repo root (neither created yet; producer skills will create them lazily). See `docs/agents/domain.md`.

@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+# One-shot smoke test for after a plugin / theme / core update.
+#
+# Pipeline:
+#   1. Confirm the wordpress container is up.
+#   2. Record the docker-logs cutoff timestamp.
+#   3. Seed fixtures (idempotent) and export their identifiers.
+#   4. Run Playwright.
+#   5. Slice the wordpress container logs since the cutoff and check for
+#      PHP fatals / parse errors / uncaught exceptions. With --strict, also
+#      fail on warnings / notices / deprecations.
+#
+# Exits 0 only if Playwright passed AND the log slice is clean.
+set -euo pipefail
+
+ROOT_DIR=$(cd "$(dirname "$0")/.." && pwd)
+cd "$ROOT_DIR"
+
+STRICT=0
+for arg in "$@"; do
+    case "$arg" in
+        --strict) STRICT=1 ;;
+        -h|--help)
+            cat <<EOF
+Usage: bin/smoke [--strict]
+
+  --strict   also fail on PHP Warning / PHP Notice / Deprecated
+EOF
+            exit 0
+            ;;
+        *)
+            echo "Unknown argument: $arg" >&2
+            exit 2
+            ;;
+    esac
+done
+
+# Source .env if present so WP_PORT (and friends) are available to
+# bin/smoke-fixtures and Playwright. Compose reads .env automatically;
+# the host-side tools (this script, Playwright) do not.
+if [[ -f .env ]]; then
+    set -a
+    . ./.env
+    set +a
+fi
+
+# 1. Container check.
+if ! docker compose ps --status=running --services 2>/dev/null | grep -qx wordpress; then
+    cat >&2 <<EOF
+wordpress container is not running. Bring it up first:
+
+    docker compose up -d wordpress
+
+EOF
+    exit 1
+fi
+
+# 2. Cutoff timestamp (RFC3339, UTC).
+SMOKE_LOG_SINCE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+# 3. Seed fixtures and export their KEY=value output as env vars.
+echo "==> Seeding smoke fixtures…" >&2
+FIXTURES_OUT=$(bin/smoke-fixtures)
+while IFS= read -r line; do
+    [[ -z "$line" || "$line" != *=* ]] && continue
+    export "$line"
+done <<< "$FIXTURES_OUT"
+
+# 4. Run Playwright.
+echo "==> Running Playwright smoke suite…" >&2
+PLAYWRIGHT_EXIT=0
+npx playwright test --config tests/smoke/playwright.config.ts || PLAYWRIGHT_EXIT=$?
+
+# 5. Log slice.
+echo "==> Checking PHP error log since ${SMOKE_LOG_SINCE}…" >&2
+LOG_SLICE=$(docker compose logs wordpress --since="$SMOKE_LOG_SINCE" --no-color 2>&1 || true)
+
+if [[ "$STRICT" -eq 1 ]]; then
+    PATTERN='PHP Fatal|PHP Parse|Uncaught|PHP Warning|PHP Notice|Deprecated'
+else
+    PATTERN='PHP Fatal|PHP Parse|Uncaught'
+fi
+
+LOG_HITS=$(echo "$LOG_SLICE" | grep -E "$PATTERN" || true)
+LOG_EXIT=0
+if [[ -n "$LOG_HITS" ]]; then
+    LOG_EXIT=1
+    echo "==> PHP error log slice contained errors:" >&2
+    echo "$LOG_HITS" >&2
+fi
+
+if [[ "$PLAYWRIGHT_EXIT" -ne 0 || "$LOG_EXIT" -ne 0 ]]; then
+    echo "==> SMOKE FAILED (playwright=$PLAYWRIGHT_EXIT, log=$LOG_EXIT)" >&2
+    exit 1
+fi
+
+echo "==> SMOKE PASSED" >&2

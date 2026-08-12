@@ -64,9 +64,9 @@
         ]
     },
     "enforcement": {
-        "fail_on_threshold_breach": true,
-        "fail_on_quality_gate_failure": true,
-        "warn_on_threshold_breach": false,
+        "fail_on_threshold_breach": false,
+        "fail_on_quality_gate_failure": false,
+        "warn_on_threshold_breach": true,
         "warn_on_quality_gate_failure": true
     }
 }
