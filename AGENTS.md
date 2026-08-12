@@ -83,6 +83,32 @@ think you'd seen everything. Copilot skips generated files, so a lockfile-only
 PR gets "Copilot wasn't able to review any files in this pull request" —
 nothing to action there.
 
+Copilot reviews the commit it was triggered on and does **not** re-review when
+you push fixes. If you want it to look again, ask explicitly:
+
+```sh
+gh pr edit <n> --add-reviewer "@copilot"
+```
+
+The `@copilot` reviewer alias needs a reasonably recent `gh` (verified on
+2.97.0); if your version rejects it, upgrade rather than assuming Copilot
+review is unavailable.
+
+The new review takes a minute or two to arrive, so don't conclude nothing
+happened from an immediate poll. Two traps when checking whether the request
+registered:
+
+- REST `requested_reviewers` lists only Users, never Bots, so a pending
+  Copilot request reads as an empty array there. Check GraphQL
+  `reviewRequests` instead — the bot's login is
+  `copilot-pull-request-reviewer` — or simply wait for the review to post.
+- The request works on a **merged** PR too, so a review can land after you've
+  merged. Ask before merging anyway: a finding that arrives afterwards needs a
+  whole new PR to act on.
+
+So "no new comments" after a push means nobody looked again, not that the fix
+was approved.
+
 ## Agent skills
 
 ### Issue tracker
