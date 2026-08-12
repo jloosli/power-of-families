@@ -72,14 +72,16 @@ why.
 
 ```sh
 gh pr view <n> --json reviews --jq '.reviews[] | "\(.author.login) [\(.state)]: \(.body)"'
-gh api repos/jloosli/power-of-families/pulls/<n>/comments \
+gh api --paginate repos/jloosli/power-of-families/pulls/<n>/comments \
     --jq '.[] | "\(.user.login) @ \(.path):\(.line)\n\(.body)"'
 ```
 
 Substantive feedback lands as inline comments (the second command); the first
-only shows the review summary. Copilot skips generated files, so a
-lockfile-only PR gets "Copilot wasn't able to review any files in this pull
-request" — nothing to action there.
+only shows the review summary. Keep `--paginate` — without it `gh api` returns
+only the first 30 comments, so a busy PR would silently truncate and you'd
+think you'd seen everything. Copilot skips generated files, so a lockfile-only
+PR gets "Copilot wasn't able to review any files in this pull request" —
+nothing to action there.
 
 ## Agent skills
 
