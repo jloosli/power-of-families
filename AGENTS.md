@@ -62,3 +62,17 @@ of which DB pattern you pick.
 - CSS is plain PostCSS (postcss-nested, autoprefixer). Config: `postcss.config.js`.
 - Linting: `prettier.config.js` and `.phpcs.xml.dist`. Use spaces, not tabs.
 - Deploy: push to `main` triggers rsync of the theme directory to production via `.github/workflows/deploy.yml`.
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues on `jloosli/power-of-families`, via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default canonical vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context layout — `CONTEXT.md` + `docs/adr/` at the repo root (neither created yet; producer skills will create them lazily). See `docs/agents/domain.md`.
