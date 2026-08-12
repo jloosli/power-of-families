@@ -63,6 +63,24 @@ of which DB pattern you pick.
 - Linting: `prettier.config.js` and `.phpcs.xml.dist`. Use spaces, not tabs.
 - Deploy: push to `main` triggers rsync of the theme directory to production via `.github/workflows/deploy.yml`.
 
+## Before merging
+
+Make sure every GitHub Copilot review comment on the PR has either been
+addressed or been found unnecessary. Never merge with Copilot feedback left
+unexamined — decide on each comment, and say which ones you're dismissing and
+why.
+
+```sh
+gh pr view <n> --json reviews --jq '.reviews[] | "\(.author.login) [\(.state)]: \(.body)"'
+gh api repos/jloosli/power-of-families/pulls/<n>/comments \
+    --jq '.[] | "\(.user.login) @ \(.path):\(.line)\n\(.body)"'
+```
+
+Substantive feedback lands as inline comments (the second command); the first
+only shows the review summary. Copilot skips generated files, so a
+lockfile-only PR gets "Copilot wasn't able to review any files in this pull
+request" — nothing to action there.
+
 ## Agent skills
 
 ### Issue tracker
