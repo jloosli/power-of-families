@@ -266,16 +266,24 @@ execute_ci_tests() {
 
     local start_time=$(date +%s)
     
-    # Execute tests and capture output
+    # Execute tests and capture output.
+    #
+    # `cmd | tee` reports tee's exit status, not the runner's, and `set -e` is
+    # suspended inside an `if` condition — so the failure branch below was
+    # unreachable and a genuinely failing suite still exited 0. Read the
+    # runner's own status from PIPESTATUS, immediately after the pipeline and
+    # before any other command can overwrite it.
     local result=0
-    if $phpunit_cmd 2>&1 | tee "$TEST_REPORTS_DIR/test-output.log"; then
+    $phpunit_cmd 2>&1 | tee "$TEST_REPORTS_DIR/test-output.log"
+    local runner_status="${PIPESTATUS[0]}"
+    if [ "$runner_status" -eq 0 ]; then
         local end_time=$(date +%s)
         local duration=$((end_time - start_time))
         log_success "Tests executed successfully in ${duration}s"
     else
         local end_time=$(date +%s)
         local duration=$((end_time - start_time))
-        log_error "Tests failed after ${duration}s"
+        log_error "Tests failed after ${duration}s (runner exited $runner_status)"
         result=1
     fi
 
