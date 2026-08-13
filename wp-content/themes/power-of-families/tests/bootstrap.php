@@ -22,11 +22,12 @@ if ( file_exists( dirname( __DIR__ ) . '/vendor/autoload.php' ) ) {
 	require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 }
 
-// Load Genesis and WooCommerce stubs before WordPress initialises so all
-// genesis_* / WC functions exist when theme files are parsed and when
-// hook callbacks fire during go_to().
+// Load Genesis, WooCommerce and Groups stubs before WordPress initialises so
+// all genesis_* / WC functions and Groups_* classes exist when theme files are
+// parsed and when hook callbacks fire during go_to().
 require_once __DIR__ . '/stubs/GenesisStubs.php';
 require_once __DIR__ . '/stubs/WooCommerceStubs.php';
+require_once __DIR__ . '/stubs/GroupsStubs.php';
 
 // Give access to tests_add_filter() function.
 require_once "{$_tests_dir}/includes/functions.php";

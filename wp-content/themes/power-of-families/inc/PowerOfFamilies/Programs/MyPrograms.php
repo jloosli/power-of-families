@@ -9,7 +9,12 @@ class MyPrograms implements HookRegistrar
 
     public static mixed $settingsInstance = null;
 
-    public function __construct(private ?string $token = null) {}
+    private ProgramMembership $membership;
+
+    public function __construct(private ?string $token = null, ?ProgramMembership $membership = null)
+    {
+        $this->membership = $membership ?? new GroupsMembership();
+    }
 
     public function register(): void
     {
@@ -50,20 +55,10 @@ class MyPrograms implements HookRegistrar
         $title = $showtitle == "true" ? "<h2>$title</h2>" : "";
         $output = "<div id='pof_userprograms'>$title\n";
         if (is_user_logged_in()) {
-            $progs = $this->getCurrentUserPrograms(get_current_user_id());
+            $progs = $this->membership->programsFor(get_current_user_id());
             if ($progs) {
                 foreach ($progs as $prog) {
-                    $meta = $this->getProgramMetaFromDescription($prog->description);
-                    $image = '';
-                    if (!empty($meta->image)) {
-                        $image = sprintf("<img class='alignleft' src='%s' width='88' height='88' />", esc_url($meta->image));
-                    }
-                    $output .= sprintf(
-                        "<div class='program'><a href='%s'>%s%s</a></div>",
-                        esc_url( !empty($meta->home) ? $meta->home : '' ),
-                        $image,
-                        esc_html( stripslashes($prog->name) )
-                    );
+                    $output .= $this->render_program($prog);
                 }
                 $output .= "</div>";
             } else {
@@ -77,44 +72,26 @@ class MyPrograms implements HookRegistrar
         return $output;
     }
 
-    private function getProgramMetaFromDescription( ?string $description ) : \stdClass
+    /**
+     * One program's tile: its image, if it declares one, linked to its home page.
+     *
+     * The image gets `alt=""` rather than the program name: the same link already
+     * carries that name as text, so announcing it twice is noise to a screen
+     * reader. Decorative is the accurate description here.
+     */
+    private function render_program( EnrolledProgram $program ) : string
     {
-        $meta = new \stdClass();
-        $lines = explode("\n", $description ?? '');
-        foreach ($lines as $line) {
-            $parts = array_map('trim', explode(":", $line));
-            if (count($parts) >= 2) {
-                $attr = strtolower(array_shift($parts));
-                $val = implode(':', $parts);
-                $meta->{$attr} = $val;
-            }
-        }
-        return $meta;
-    }
+        $image = $program->description->image();
+        $home = $program->description->home();
 
-    private function getCurrentUserPrograms( ?int $user_id = null ) : array
-    {
-        if (!$user_id) {
-            $user_id = get_current_user_id();
-        }
-        $the_programs = [];
-        if (class_exists('Groups_User')) {
-            if (
-                defined('GROUPS_ADMINISTRATOR_OVERRIDE')
-                && (GROUPS_ADMINISTRATOR_OVERRIDE === true)
-                && current_user_can('administrator')
-            ) {
-                $the_programs = \Groups_Group::get_groups();
-            } else {
-                $groups_user = new \Groups_User($user_id);
-                // get groups objects
-                $user_groups = $groups_user->groups;
-                $the_programs = array_map(function ($group) {
-                    return $group->group;
-                }, $user_groups);
-            }
-        }
-        return $the_programs;
+        return sprintf(
+            "<div class='program'><a href='%s'>%s%s</a></div>",
+            esc_url( $home ?? '' ),
+            null === $image
+                ? ''
+                : sprintf("<img class='alignleft' src='%s' width='88' height='88' alt='' />", esc_url($image)),
+            esc_html( stripslashes($program->name) )
+        );
     }
 
 }
