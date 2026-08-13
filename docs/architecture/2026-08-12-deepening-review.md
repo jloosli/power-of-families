@@ -257,6 +257,18 @@ a valid mode — the other ~10 call sites are all affected.
 
 ## 07 — Extract the program-description parser
 
+> **Closed 2026-08-13** as designed — `ProgramDescription` for the parse,
+> `ProgramMembership`/`GroupsMembership`/`EnrolledProgram` for the Groups seam. See
+> [`docs/superpowers/specs/2026-08-13-program-description-parser-design.md`](../superpowers/specs/2026-08-13-program-description-parser-design.md).
+> Two things this analysis did not predict. The seam closed issue #41 without the Groups
+> stubs that issue proposed as prerequisite work — the shortcode no longer touches Groups
+> — so the stubs went in for a smaller job, covering the adapter. And reading Groups'
+> source to get the shapes right exposed a live fatal in the extracted code:
+> `Groups_User->groups` is `null`, not `[]`, for a user with no memberships, so the
+> `array_map` over it was a PHP 8 `TypeError` on `/my-account/` for exactly the users the
+> "no subscriptions" branch was written for. Static analysis of _our_ code could not see
+> that; it needed the plugin's source.
+
 **Files**
 
 - `inc/PowerOfFamilies/Programs/MyPrograms.php` (120) — `:38-78 show_programs`, `:95-118 getCurrentUserPrograms`
@@ -352,6 +364,10 @@ hypothetical. Then 03 is a free deletion clearing 1,514 dead lines out of the bo
 > the end, because it was closed by deleting the second copy rather than merging the two —
 > the ordering argument above only held while an extraction was the plan. What remains is
 > **02 → 07 → 04/05 → 08**.
+
+> **Updated 2026-08-13.** 02 and 07 have landed too. What remains is **04/05 → 08**, and
+> 04/05 should follow issue #68's reporting work — both touch `bin/` and the PHPUnit
+> bootstrap.
 
 ## Domain terms
 
