@@ -167,6 +167,58 @@ class Settings implements HookRegistrar
 
         $settings = apply_filters($this->token . '_settings_fields', $settings);
 
+        // Single conversion boundary: everything downstream -- ours and any
+        // field contributed through the filter above -- is typed from here on.
+        //
+        // This method runs on `init`, so it is reached on every request rather
+        // than only on the settings screen. A malformed field from a third-party
+        // filter must therefore degrade itself, not the site: each conversion is
+        // contained, and a bad field is dropped with a developer notice while the
+        // rest of the section still renders.
+        foreach ($settings as $section => $data) {
+            // `isset($data['fields'])` is safe on a string or an int, but raises
+            // "Cannot use object of type X as array" on an object, so the section
+            // itself has to be checked before its offsets are read.
+            if (!is_array($data)) {
+                _doing_it_wrong(
+                    __METHOD__,
+                    sprintf('Settings section "%s" is not an array and has been dropped.', esc_html((string) $section)),
+                    '3.0.0'
+                );
+
+                // Dropped, not merely skipped. Leaving it in place would push the
+                // fatal downstream instead of preventing it: register_settings()
+                // and settings_page() both read $data['title'] unguarded, so an
+                // object section would still take down every admin request.
+                // Nothing downstream can render a section that is not an array.
+                unset($settings[$section]);
+                continue;
+            }
+
+            if (!isset($data['fields']) || !is_array($data['fields'])) {
+                continue;
+            }
+
+            $definitions = [];
+
+            foreach ($data['fields'] as $field) {
+                if ($field instanceof FieldDefinition) {
+                    $definitions[] = $field;
+                    continue;
+                }
+
+                try {
+                    $definitions[] = FieldDefinition::fromArray($field);
+                } catch (\InvalidArgumentException | \TypeError $e) {
+                    // InvalidArgumentException: absent id, or an unrecognised type.
+                    // TypeError: the element is not an array at all.
+                    _doing_it_wrong(__METHOD__, esc_html($e->getMessage()), '3.0.0');
+                }
+            }
+
+            $settings[$section]['fields'] = $definitions;
+        }
+
         return $settings;
     }
 
@@ -208,23 +260,21 @@ class Settings implements HookRegistrar
                     continue;
                 }
 
-                // Add section to page
-                add_settings_section($section, $data['title'], [$this, 'settings_section'], $this->token . '_settings');
+                // Add section to page. A section may legitimately carry no
+                // fields -- settings_fields() tolerates that shape -- so both
+                // reads are guarded rather than assuming the richer shape.
+                add_settings_section($section, $data['title'] ?? '', [$this, 'settings_section'], $this->token . '_settings');
 
-                foreach ($data['fields'] as $field) {
+                $fields = isset($data['fields']) && is_array($data['fields']) ? $data['fields'] : [];
 
-                    // Validation callback for field
-                    $validation = '';
-                    if (isset($field['callback'])) {
-                        $validation = $field['callback'];
-                    }
+                foreach ($fields as $field) {
 
                     // Register field
-                    $option_name = $this->base . $field['id'];
-                    register_setting($this->token . '_settings', $option_name, $validation);
+                    $option_name = $this->base . $field->id;
+                    register_setting($this->token . '_settings', $option_name, $field->callback ?? '');
 
                     // Add field to page
-                    add_settings_field($field['id'], $field['label'], array(
+                    add_settings_field($field->id, $field->label, array(
                         $this->renderer,
                         'display_field'
                     ), $this->token . '_settings', $section, array(

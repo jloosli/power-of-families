@@ -1,318 +1,200 @@
 <?php
 
 namespace PowerOfFamilies;
-if ( ! defined( 'ABSPATH' ) ) exit;
 
-class FieldRenderer implements HookRegistrar {
+if (!defined('ABSPATH')) {
+    exit;
+}
 
-	public function register(): void {
-		add_action( 'save_post', [$this, 'save_meta_boxes'], 10, 1 );
-	}
+/**
+ * Draws one settings-screen field.
+ *
+ * Registered as the add_settings_field callback by {@see Settings}. This
+ * class no longer wires any hooks of its own -- the metabox path it used
+ * to serve was driven by a `{post_type}_custom_fields` filter that nothing
+ * in the install ever registered.
+ */
+class FieldRenderer
+{
+    /**
+     * Render one field.
+     *
+     * @param array $args WordPress add_settings_field payload:
+     *                    ['field' => FieldDefinition|array, 'prefix' => string]
+     */
+    public function display_field(array $args = []): void
+    {
+        $field = $args['field'] ?? $args;
 
-	/**
-	 * Generate HTML for displaying fields
-	 * @param  array   $field Field data
-	 * @param  object  $post  Post object
-	 * @param  boolean $echo  Whether to echo the field HTML or return it
-	 * @return void
-	 */
-	public function display_field ( array $data = [], $post = false, bool $echo = true ) {
+        if (is_array($field)) {
+            $field = FieldDefinition::fromArray($field);
+        }
 
-		// Get field info
-		if ( isset( $data['field'] ) ) {
-			$field = $data['field'];
-		} else {
-			$field = $data;
-		}
+        $prefix = isset($args['prefix']) ? (string) $args['prefix'] : '';
+        $option_name = $prefix . $field->id;
 
-		// Check for prefix on option name
-		$option_name = '';
-		if ( isset( $data['prefix'] ) ) {
-			$option_name = $data['prefix'];
-		}
+        echo $this->render($field, $option_name, $this->currentValue($field, $option_name));
+    }
 
-		// Get saved data
-		$data = '';
-		if ( $post ) {
+    /**
+     * The saved option, falling back to the definition's default.
+     */
+    private function currentValue(FieldDefinition $field, string $option_name): mixed
+    {
+        $option = get_option($option_name);
+        $value = (false === $option) ? $field->default : $option;
 
-			// Get saved field data
-			$option_name .= $field['id'];
-			$option = get_post_meta( $post->ID, $field['id'], true );
+        if (null === $value) {
+            return $field->type->isMultiValue() ? [] : '';
+        }
 
-			// Get data to display in field
-			if ( isset( $option ) ) {
-				$data = $option;
-			}
+        if ($field->type->isMultiValue() && !is_array($value)) {
+            return '' === $value ? [] : [$value];
+        }
 
-		} else {
+        return $value;
+    }
 
-			// Get saved option
-			$option_name .= $field['id'];
-			$option = get_option( $option_name );
+    private function render(FieldDefinition $field, string $option_name, mixed $value): string
+    {
+        $html = $this->control($field, $option_name, $value);
 
-			// Get data to display in field
-			if ( isset( $option ) ) {
-				$data = $option;
-			}
+        if ($field->type->describesBelowControl()) {
+            return $html . '<br/><span class="description">' . wp_kses_post($field->description) . '</span>';
+        }
 
-		}
+        $html .= '<label for="' . esc_attr($field->id) . '">' . "\n";
+        $html .= '<span class="description">' . wp_kses_post($field->description) . '</span>' . "\n";
+        $html .= '</label>' . "\n";
 
-		// Show default data if no option saved and default is supplied
-		if ( $data === false && isset( $field['default'] ) ) {
-			$data = $field['default'];
-		} elseif ( $data === false ) {
-			$data = '';
-		}
+        return $html;
+    }
 
-		$html = '';
+    private function control(FieldDefinition $field, string $option_name, mixed $value): string
+    {
+        return match ($field->type) {
+            FieldType::None => '',
 
-		switch( $field['type'] ) {
+            FieldType::Text, FieldType::Url, FieldType::Email => sprintf(
+                '<input id="%s" type="text" name="%s" placeholder="%s" value="%s" />' . "\n",
+                esc_attr($field->id),
+                esc_attr($option_name),
+                esc_attr($field->placeholder),
+                esc_attr($value)
+            ),
 
-			case 'text':
-			case 'url':
-			case 'email':
-				$html .= '<input id="' . esc_attr( $field['id'] ) . '" type="text" name="' . esc_attr( $option_name ) . '" placeholder="' . esc_attr( $field['placeholder'] ) . '" value="' . esc_attr( $data ) . '" />' . "\n";
-			break;
+            FieldType::Password, FieldType::Number, FieldType::Hidden => sprintf(
+                '<input id="%s" type="%s" name="%s" placeholder="%s" value="%s"%s%s/>' . "\n",
+                esc_attr($field->id),
+                esc_attr($field->type->value),
+                esc_attr($option_name),
+                esc_attr($field->placeholder),
+                esc_attr($value),
+                null === $field->min ? '' : ' min="' . esc_attr($field->min) . '"',
+                null === $field->max ? '' : ' max="' . esc_attr($field->max) . '"'
+            ),
 
-			case 'password':
-			case 'number':
-			case 'hidden':
-				$min = '';
-				if ( isset( $field['min'] ) ) {
-					$min = ' min="' . esc_attr( $field['min'] ) . '"';
-				}
+            FieldType::TextSecret => sprintf(
+                '<input id="%s" type="text" name="%s" placeholder="%s" value="" />' . "\n",
+                esc_attr($field->id),
+                esc_attr($option_name),
+                esc_attr($field->placeholder)
+            ),
 
-				$max = '';
-				if ( isset( $field['max'] ) ) {
-					$max = ' max="' . esc_attr( $field['max'] ) . '"';
-				}
-				$html .= '<input id="' . esc_attr( $field['id'] ) . '" type="' . esc_attr( $field['type'] ) . '" name="' . esc_attr( $option_name ) . '" placeholder="' . esc_attr( $field['placeholder'] ) . '" value="' . esc_attr( $data ) . '"' . $min . '' . $max . '/>' . "\n";
-			break;
+            FieldType::Textarea => sprintf(
+                '<textarea id="%s" rows="5" cols="50" name="%s" placeholder="%s">%s</textarea><br/>' . "\n",
+                esc_attr($field->id),
+                esc_attr($option_name),
+                esc_attr($field->placeholder),
+                esc_textarea($value)
+            ),
 
-			case 'text_secret':
-				$html .= '<input id="' . esc_attr( $field['id'] ) . '" type="text" name="' . esc_attr( $option_name ) . '" placeholder="' . esc_attr( $field['placeholder'] ) . '" value="" />' . "\n";
-			break;
+            FieldType::Checkbox => sprintf(
+                '<input id="%s" type="checkbox" name="%s" %s/>' . "\n",
+                esc_attr($field->id),
+                esc_attr($option_name),
+                checked('on', $value, false)
+            ),
 
-			case 'textarea':
-				$html .= '<textarea id="' . esc_attr( $field['id'] ) . '" rows="5" cols="50" name="' . esc_attr( $option_name ) . '" placeholder="' . esc_attr( $field['placeholder'] ) . '">' . $data . '</textarea><br/>'. "\n";
-			break;
+            FieldType::CheckboxMulti => $this->checkboxMulti($field, $option_name, $value),
+            FieldType::Radio => $this->radio($field, $option_name, $value),
+            FieldType::Select => $this->select($field, $option_name, $value, false),
+            FieldType::SelectMulti => $this->select($field, $option_name, $value, true),
+            FieldType::Image => $this->image($option_name, $value),
+            FieldType::Color => $this->color($option_name, $value),
+        };
+    }
 
-			case 'checkbox':
-				$checked = '';
-				if ( $data && 'on' == $data ) {
-					$checked = 'checked="checked"';
-				}
-				$html .= '<input id="' . esc_attr( $field['id'] ) . '" type="' . esc_attr( $field['type'] ) . '" name="' . esc_attr( $option_name ) . '" ' . $checked . '/>' . "\n";
-			break;
+    private function checkboxMulti(FieldDefinition $field, string $option_name, mixed $value): string
+    {
+        $html = '';
 
-			case 'checkbox_multi':
-				foreach ( $field['options'] as $k => $v ) {
-					$checked = false;
-					if ( in_array( $k, $data ) ) {
-						$checked = true;
-					}
-					$html .= '<label for="' . esc_attr( $field['id'] . '_' . $k ) . '" class="checkbox_multi"><input type="checkbox" ' . checked( $checked, true, false ) . ' name="' . esc_attr( $option_name ) . '[]" value="' . esc_attr( $k ) . '" id="' . esc_attr( $field['id'] . '_' . $k ) . '" /> ' . $v . '</label> ';
-				}
-			break;
+        foreach ($field->options as $key => $label) {
+            $id = $field->id . '_' . $key;
+            $html .= '<label for="' . esc_attr($id) . '" class="checkbox_multi">'
+                . '<input type="checkbox" ' . checked(in_array($key, (array) $value, false), true, false)
+                . ' name="' . esc_attr($option_name) . '[]" value="' . esc_attr($key) . '"'
+                . ' id="' . esc_attr($id) . '" /> ' . esc_html($label) . '</label> ';
+        }
 
-			case 'radio':
-				foreach ( $field['options'] as $k => $v ) {
-					$checked = false;
-					if ( $k == $data ) {
-						$checked = true;
-					}
-					$html .= '<label for="' . esc_attr( $field['id'] . '_' . $k ) . '"><input type="radio" ' . checked( $checked, true, false ) . ' name="' . esc_attr( $option_name ) . '" value="' . esc_attr( $k ) . '" id="' . esc_attr( $field['id'] . '_' . $k ) . '" /> ' . $v . '</label> ';
-				}
-			break;
+        return $html;
+    }
 
-			case 'select':
-				$html .= '<select name="' . esc_attr( $option_name ) . '" id="' . esc_attr( $field['id'] ) . '">';
-				foreach ( $field['options'] as $k => $v ) {
-					$selected = false;
-					if ( $k == $data ) {
-						$selected = true;
-					}
-					$html .= '<option ' . selected( $selected, true, false ) . ' value="' . esc_attr( $k ) . '">' . $v . '</option>';
-				}
-				$html .= '</select> ';
-			break;
+    private function radio(FieldDefinition $field, string $option_name, mixed $value): string
+    {
+        $html = '';
 
-			case 'select_multi':
-				$html .= '<select name="' . esc_attr( $option_name ) . '[]" id="' . esc_attr( $field['id'] ) . '" multiple="multiple">';
-				foreach ( $field['options'] as $k => $v ) {
-					$selected = false;
-					if ( in_array( $k, $data ) ) {
-						$selected = true;
-					}
-					$html .= '<option ' . selected( $selected, true, false ) . ' value="' . esc_attr( $k ) . '">' . $v . '</option>';
-				}
-				$html .= '</select> ';
-			break;
+        foreach ($field->options as $key => $label) {
+            $id = $field->id . '_' . $key;
+            $html .= '<label for="' . esc_attr($id) . '">'
+                . '<input type="radio" ' . checked($key, $value, false)
+                . ' name="' . esc_attr($option_name) . '" value="' . esc_attr($key) . '"'
+                . ' id="' . esc_attr($id) . '" /> ' . esc_html($label) . '</label> ';
+        }
 
-			case 'image':
-				$image_thumb = '';
-				if ( $data ) {
-					$image_thumb = wp_get_attachment_thumb_url( $data );
-				}
-				$html .= '<img id="' . $option_name . '_preview" class="image_preview" src="' . $image_thumb . '" /><br/>' . "\n";
-				$html .= '<input id="' . $option_name . '_button" type="button" data-uploader_title="' . __( 'Upload an image' , 'power-of-families-programs' ) . '" data-uploader_button_text="' . __( 'Use image' , 'power-of-families-programs' ) . '" class="image_upload_button button" value="'. __( 'Upload new image' , 'power-of-families-programs' ) . '" />' . "\n";
-				$html .= '<input id="' . $option_name . '_delete" type="button" class="image_delete_button button" value="'. __( 'Remove image' , 'power-of-families-programs' ) . '" />' . "\n";
-				$html .= '<input id="' . $option_name . '" class="image_data_field" type="hidden" name="' . $option_name . '" value="' . $data . '"/><br/>' . "\n";
-			break;
+        return $html;
+    }
 
-			case 'color':
-				?>
-				<div class="color-picker" style="position:relative;">
-			        <input type="text" name="<?php esc_attr_e( $option_name ); ?>" class="color" value="<?php esc_attr_e( $data ); ?>" />
-			        <div style="position:absolute;background:#FFF;z-index:99;border-radius:100%;" class="colorpicker"></div>
-			    </div>
-			    <?php
-			break;
+    private function select(FieldDefinition $field, string $option_name, mixed $value, bool $multiple): string
+    {
+        $html = '<select name="' . esc_attr($option_name) . ($multiple ? '[]' : '') . '"'
+            . ' id="' . esc_attr($field->id) . '"' . ($multiple ? ' multiple="multiple"' : '') . '>';
 
-		}
+        foreach ($field->options as $key => $label) {
+            $selected = $multiple ? in_array($key, (array) $value, false) : (string) $key === (string) $value;
+            $html .= '<option ' . selected($selected, true, false)
+                . ' value="' . esc_attr($key) . '">' . esc_html($label) . '</option>';
+        }
 
-		if ( in_array( $field['type'], [ 'checkbox_multi', 'radio', 'select_multi' ], true ) ) {
-			$html .= '<br/><span class="description">' . $field['description'] . '</span>';
-		} else {
-			if ( ! $post ) {
-				$html .= '<label for="' . esc_attr( $field['id'] ) . '">' . "\n";
-			}
+        return $html . '</select> ';
+    }
 
-			$html .= '<span class="description">' . $field['description'] . '</span>' . "\n";
+    private function image(string $option_name, mixed $value): string
+    {
+        $thumb = $value ? wp_get_attachment_thumb_url($value) : '';
 
-			if ( ! $post ) {
-				$html .= '</label>' . "\n";
-			}
-		}
+        $html = '<img id="' . esc_attr($option_name) . '_preview" class="image_preview" src="'
+            . esc_url((string) $thumb) . '" /><br/>' . "\n";
+        $html .= '<input id="' . esc_attr($option_name) . '_button" type="button"'
+            . ' data-uploader_title="' . esc_attr__('Upload an image', 'power-of-families-programs') . '"'
+            . ' data-uploader_button_text="' . esc_attr__('Use image', 'power-of-families-programs') . '"'
+            . ' class="image_upload_button button"'
+            . ' value="' . esc_attr__('Upload new image', 'power-of-families-programs') . '" />' . "\n";
+        $html .= '<input id="' . esc_attr($option_name) . '_delete" type="button"'
+            . ' class="image_delete_button button"'
+            . ' value="' . esc_attr__('Remove image', 'power-of-families-programs') . '" />' . "\n";
+        $html .= '<input id="' . esc_attr($option_name) . '" class="image_data_field" type="hidden"'
+            . ' name="' . esc_attr($option_name) . '" value="' . esc_attr($value) . '"/><br/>' . "\n";
 
-		if ( ! $echo ) {
-			return $html;
-		}
+        return $html;
+    }
 
-		echo $html;
-
-	}
-
-	/**
-	 * Validate form field
-	 * @param  string $data Submitted value
-	 * @param  string $type Type of field to validate
-	 * @return string       Validated value
-	 */
-	public function validate_field ( string $data = '', string $type = 'text' ) : string {
-
-		switch( $type ) {
-			case 'text': $data = esc_attr( $data ); break;
-			case 'url': $data = esc_url( $data ); break;
-			case 'email': $data = is_email( $data ); break;
-		}
-
-		return $data;
-	}
-
-	/**
-	 * Add meta box to the dashboard
-	 * @param string $id            Unique ID for metabox
-	 * @param string $title         Display title of metabox
-	 * @param array  $post_types    Post types to which this metabox applies
-	 * @param string $context       Context in which to display this metabox ('advanced' or 'side')
-	 * @param string $priority      Priority of this metabox ('default', 'low' or 'high')
-	 * @param array  $callback_args Any axtra arguments that will be passed to the display function for this metabox
-	 * @return void
-	 */
-	public function add_meta_box ( $id = '', $title = '', $post_types = array(), $context = 'advanced', $priority = 'default', $callback_args = null ) : void {
-
-		// Get post type(s)
-		if ( ! is_array( $post_types ) ) {
-			$post_types = array( $post_types );
-		}
-
-		// Generate each metabox
-		foreach ( $post_types as $post_type ) {
-			add_meta_box( $id, $title, [$this, 'meta_box_content'], $post_type, $context, $priority, $callback_args );
-		}
-	}
-
-	/**
-	 * Display metabox content
-	 * @param  object $post Post object
-	 * @param  array  $args Arguments unique to this metabox
-	 * @return void
-	 */
-	public function meta_box_content ( $post, array $args ) : void {
-
-		$fields = apply_filters( $post->post_type . '_custom_fields', array(), $post->post_type );
-
-		if ( ! is_array( $fields ) || 0 == count( $fields ) ) return;
-
-		echo '<div class="custom-field-panel">' . "\n";
-		wp_nonce_field( 'pof_save_meta', 'pof_meta_nonce' );
-
-		foreach ( $fields as $field ) {
-
-			if ( ! isset( $field['metabox'] ) ) continue;
-
-			if ( ! is_array( $field['metabox'] ) ) {
-				$field['metabox'] = array( $field['metabox'] );
-			}
-
-			if ( in_array( $args['id'], $field['metabox'] ) ) {
-				$this->display_meta_box_field( $field, $post );
-			}
-
-		}
-
-		echo '</div>' . "\n";
-
-	}
-
-	/**
-	 * Dispay field in metabox
-	 * @param  array  $field Field data
-	 * @param  object $post  Post object
-	 * @return void
-	 */
-	public function display_meta_box_field ( array $field = [], $post = null ) : void {
-
-		if ( ! is_array( $field ) || 0 == count( $field ) ) return;
-
-		$field = '<p class="form-field"><label for="' . $field['id'] . '">' . $field['label'] . '</label>' . $this->display_field( $field, $post, false ) . '</p>' . "\n";
-
-		echo $field;
-	}
-
-	/**
-	 * Save metabox fields
-	 * @param  integer $post_id Post ID
-	 * @return void
-	 */
-	public function save_meta_boxes ( int $post_id = 0 ) : void {
-
-		if ( ! isset( $_POST['pof_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pof_meta_nonce'] ) ), 'pof_save_meta' ) ) {
-			return;
-		}
-		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
-			return;
-		}
-		if ( ! current_user_can( 'edit_post', $post_id ) ) {
-			return;
-		}
-
-		if ( ! $post_id ) return;
-
-		$post_type = get_post_type( $post_id );
-
-		$fields = apply_filters( $post_type . '_custom_fields', array(), $post_type );
-
-		if ( ! is_array( $fields ) || 0 == count( $fields ) ) return;
-
-		foreach ( $fields as $field ) {
-			if ( isset( $_POST[ $field['id'] ] ) ) {
-				update_post_meta( $post_id, $field['id'], $this->validate_field( wp_unslash( $_POST[ $field['id'] ] ), $field['type'] ) );
-			} else {
-				update_post_meta( $post_id, $field['id'], '' );
-			}
-		}
-	}
-
+    private function color(string $option_name, mixed $value): string
+    {
+        return '<div class="color-picker" style="position:relative;">'
+            . '<input type="text" name="' . esc_attr($option_name) . '" class="color"'
+            . ' value="' . esc_attr($value) . '" />'
+            . '<div style="position:absolute;background:#FFF;z-index:99;border-radius:100%;" class="colorpicker"></div>'
+            . '</div>';
+    }
 }
