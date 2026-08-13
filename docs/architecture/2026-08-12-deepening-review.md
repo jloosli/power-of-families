@@ -211,9 +211,11 @@ most copies, most drift.
 the same isolation check, the second a strict superset — delete the first. Roughly 15 of
 the 28 scripts appear in neither `README.md` nor `AGENTS.md`.
 
-> **Tracked as #78 (2026-08-13), and it has grown.** The table above is now wrong in five of
-> six rows: 25 scripts / 8,772 lines (#66 and #71 deleted three), colour codes in 20,
-> loggers in 16. Two duplicated blocks the review never counted now dominate the case —
+> **Tracked as #78 (2026-08-13), and it has grown.** Every figure above has moved: 25
+> scripts / 8,772 lines (#66 and #71 deleted three), and all four table rows now measure
+> colour codes in 20, loggers in 16, `mysqladmin` in 8 `bin/` scripts (the 6 inlined into
+> workflows are unchanged) and `TEST_DB_*` in 8. Two duplicated blocks the review never
+> counted now dominate the case —
 > `clover_percentage()` in **5** scripts and `require_xmlstarlet()` in **3**. Both were
 > duplicated knowingly while fixing #68, with comments pointing here, to keep those PRs
 > scoped. Fixing a reporting bug made this candidate larger, which is the argument for it.
