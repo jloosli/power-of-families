@@ -181,6 +181,53 @@ class test_MyPrograms extends WP_UnitTestCase {
     }
 
     // -------------------------------------------------------------------------
+    // Wrapper markup
+    //
+    // Issue #73: the enrolled-programs branch closed #pof_userprograms twice, so
+    // the stray </div> landed on whatever Genesis wrapper contained the widget
+    // and closed it a level early. Every branch has to hand back balanced
+    // markup, not just the two that always did.
+    // -------------------------------------------------------------------------
+
+    private function assertBalancedDivs( string $output ): void {
+        $this->assertSame(
+            substr_count( $output, '<div' ),
+            substr_count( $output, '</div>' ),
+            "unbalanced <div> markup: $output"
+        );
+    }
+
+    public function test_logged_out_markup_is_balanced() {
+        wp_set_current_user( 0 );
+
+        $this->assertBalancedDivs( $this->my_programs->show_programs( array() ) );
+    }
+
+    public function test_no_programs_markup_is_balanced() {
+        $this->enroll( array() );
+
+        $this->assertBalancedDivs( $this->my_programs->show_programs( array() ) );
+    }
+
+    public function test_one_program_markup_is_balanced() {
+        $this->enroll( array( $this->program( 'Goalsetting', 'home: https://example.com/one' ) ) );
+
+        $this->assertBalancedDivs( $this->my_programs->show_programs( array() ) );
+    }
+
+    public function test_several_programs_markup_is_balanced() {
+        $this->enroll(
+            array(
+                $this->program( 'Goalsetting', 'home: https://example.com/one' ),
+                $this->program( 'Assessments', 'image: https://example.com/i.png' ),
+                $this->program( 'Journaling', null ),
+            )
+        );
+
+        $this->assertBalancedDivs( $this->my_programs->show_programs( array() ) );
+    }
+
+    // -------------------------------------------------------------------------
     // Shortcode attributes
     // -------------------------------------------------------------------------
 
