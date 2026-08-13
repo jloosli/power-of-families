@@ -285,14 +285,16 @@ class Settings implements HookRegistrar
                     $class .= ' nav-tab-active';
                 }
 
-                // Set tab link
+                // Set tab link. add_query_arg() with no URL argument builds
+                // from $_SERVER['REQUEST_URI'], which WordPress does not
+                // escape — esc_url() below is what makes it safe to output.
                 $tab_link = add_query_arg(array('tab' => $section));
                 if (isset($_GET['settings-updated'])) {
                     $tab_link = remove_query_arg('settings-updated', $tab_link);
                 }
 
                 // Output tab
-                $html .= '<a href="' . $tab_link . '" class="' . esc_attr($class) . '">' . esc_html($data['title']) . '</a>' . "\n";
+                $html .= '<a href="' . esc_url($tab_link) . '" class="' . esc_attr($class) . '">' . esc_html($data['title']) . '</a>' . "\n";
 
                 ++$c;
             }

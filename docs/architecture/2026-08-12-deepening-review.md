@@ -22,7 +22,7 @@ shorthand, `inc/…` and `tests/…` are relative to
 | Area                                                   |  Lines |
 | ------------------------------------------------------ | -----: |
 | Theme modules (`inc/PowerOfFamilies`)                  |  1,685 |
-| Bloom plugin                                           |  2,681 |
+| Bloom plugin (retired 2026-08-12 — see candidate 01)   |  2,681 |
 | Test harness (seeders/reporting/fixtures/verification) |  4,073 |
 | Actual `test-*.php`                                    |    535 |
 | `bin/` scripts (28 files)                              | 10,754 |
@@ -39,7 +39,7 @@ adapter rather than a mock, and production code participates in that contract vi
 
 | #   | Candidate                                          | Strength        | Rough size        |
 | --- | -------------------------------------------------- | --------------- | ----------------- |
-| 01  | One Settings Screen module, not two copies         | Strong          | ~650 lines merged |
+| 01  | One Settings Screen module, not two copies         | **Closed**      | ~650 lines merged |
 | 02  | Give the field definition a type                   | Strong          | new small module  |
 | 03  | Delete the test-reporting module                   | Strong          | −1,514 lines      |
 | 04  | Move the seeding harness off the PHPUnit bootstrap | Strong          | 2,799 lines moved |
@@ -47,11 +47,20 @@ adapter rather than a mock, and production code participates in that contract vi
 | 06  | Split `run-tests.sh`'s two roles                   | **Confirmed**   | one file split    |
 | 07  | Extract the program-description parser             | Strong          | new small module  |
 | 08  | Declare the program contract, don't reflect on it  | Worth exploring | new interface     |
-| 09  | Break up `POM_Bloom_Program`                       | Worth exploring | 749-line class    |
+| 09  | Break up `POM_Bloom_Program`                       | **Void**        | 749-line class    |
 
 ---
 
 ## 01 — One Settings Screen module, not two copies
+
+> **Closed 2026-08-12 by retirement, not extraction.** The open question below assumed two
+> live consumers. There was one: the Bloom plugin is absent from `active_plugins` in the
+> production snapshot and no workflow ever deployed it. The plugin was deleted instead of a
+> shared module being built, so the "where does it live" question is moot. The security
+> finding below was fixed in the surviving theme copy (`esc_url()` on the tab link); the
+> plugin's raw `$_GET['tab']` drift went away with the deletion. See
+> [the retirement spec](../superpowers/specs/2026-08-12-retire-bloom-plugin-design.md).
+> Plugin code is recoverable at `git show ba01519:wp-content/plugins/pof-bloom-plugin/…`.
 
 **Files**
 
@@ -91,7 +100,8 @@ this before writing code.
 - `inc/PowerOfFamilies/Settings.php:137-171` — builds the shape
 - `inc/PowerOfFamilies/Programs/AffiliateLinkerSettings.php:41-64` — builds the shape
 - `inc/PowerOfFamilies/FieldRenderer.php:19-194`, `:249-316` — destructures it
-- `wp-content/plugins/pof-bloom-plugin/includes/lib/class-pom-bloom-admin-api.php` — destructures it again
+- ~~`wp-content/plugins/pof-bloom-plugin/includes/lib/class-pom-bloom-admin-api.php` — destructures it again~~
+  (deleted 2026-08-12 with the Bloom plugin — see candidate 01, so four readers remain, not five)
 
 **Problem.** An untyped array shape
 (`['id'=>…, 'label'=>…, 'type'=>…, 'options'=>…, 'default'=>…, 'placeholder'=>…]`) is the
@@ -287,6 +297,9 @@ string), `pof_save_meta`/`pof_meta_nonce` (twice in one file), `POF_Affiliate_Li
 
 ## 09 — Break up `POM_Bloom_Program`
 
+> **Void as of 2026-08-12.** The Bloom plugin was retired (see candidate 01), so this class
+> and its 18 partials no longer exist. Nothing to break up.
+
 **Files**
 
 - `wp-content/plugins/pof-bloom-plugin/includes/class-pom-bloom-program.php` (749)
@@ -323,6 +336,11 @@ near-identical 650-line modules without a test command you trust is how the drif
 in the first place. Fix the test seam first — it is small, mechanical, and no longer
 hypothetical. Then 03 is a free deletion clearing 1,514 dead lines out of the bootstrap,
 02 defines the interface that 01 needs, and 01 collapses the copies behind it.
+
+> **Superseded 2026-08-12.** 06, 03 and 01 have landed; 09 is void. 01 did not need 02 in
+> the end, because it was closed by deleting the second copy rather than merging the two —
+> the ordering argument above only held while an extraction was the plan. What remains is
+> **02 → 07 → 04/05 → 08**.
 
 ## Domain terms
 
