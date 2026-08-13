@@ -122,6 +122,31 @@ was approved.
 
 GitHub Issues on `jloosli/power-of-families`, via the `gh` CLI. See `docs/agents/issue-tracker.md`.
 
+**The tracker is the backlog — nothing else is.** In particular
+[docs/architecture/2026-08-12-deepening-review.md](docs/architecture/2026-08-12-deepening-review.md)
+is a dated analysis snapshot, deliberately frozen, and is **not** a work queue. It decays:
+its candidate 05 had every figure move within two days, and grew rather than shrank. Where
+it and an issue disagree, the issue is right. Start with `gh issue list`.
+
+Status of that review's nine candidates, so nobody re-derives it from `git log`:
+
+| Candidate                              | Outcome                                    |
+| -------------------------------------- | ------------------------------------------ |
+| 01 collapse the duplicated Settings Screen | done — #69, by retiring the plugin     |
+| 02 type the field-definition array     | done — #70                                 |
+| 03 delete `tests/reporting/`           | done — #66                                 |
+| 04 seeding harness off the bootstrap   | **open — #79**                             |
+| 05 shared `bin/lib/common.sh`          | **open — #78**                             |
+| 06 split `run-tests.sh`'s two roles    | done — #67                                 |
+| 07 extract the program-description parser | done — #72, closing #41                 |
+| 08 declare the program contract        | **open — #80** (`needs-triage`)            |
+| 09 break up `POM_Bloom_Program`        | void — the plugin was retired by 01        |
+
+Work found by *running* the tooling rather than reading it was never part of that review and
+lives only in the tracker — currently #74 and #76. Both matter when reading a green build:
+`bin/run-tests-with-reporting.sh` runs no tests at all, and two of the nightly's four test
+jobs select zero tests and pass.
+
 ### Triage labels
 
 Default canonical vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
