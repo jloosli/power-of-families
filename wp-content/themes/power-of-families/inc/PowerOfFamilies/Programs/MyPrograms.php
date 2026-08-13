@@ -60,7 +60,6 @@ class MyPrograms implements HookRegistrar
                 foreach ($progs as $prog) {
                     $output .= $this->render_program($prog);
                 }
-                $output .= "</div>";
             } else {
                 $output .= "<div class='message'>$nosubscriptions</div>";
             }
