@@ -2,13 +2,21 @@
 
 namespace PowerOfFamilies\Programs;
 
-use PowerOfFamilies\HookRegistrar;
-
-class AffiliateLinker implements HookRegistrar
+class AffiliateLinker implements ProgramModule
 {
-    public static ?AffiliateLinkerSettings $settingsInstance = null;
+    private ?AffiliateLinkerSettings $settings = null;
 
     public string $affiliate_id = '';
+
+    /**
+     * The token namespaces script handles and hook names. This module
+     * registers neither under a namespaced name -- its ajax action and cron
+     * hook are fixed strings -- so it takes the argument and drops it, for
+     * the sake of a uniform construction contract.
+     */
+    public function __construct(string $token = '')
+    {
+    }
 
     public function register(): void
     {
@@ -23,14 +31,14 @@ class AffiliateLinker implements HookRegistrar
         add_action('POF_Affiliate_Linker_CRON', [$this, 'add_amazon']);
     }
 
-    public static function getSettingsInstance() : AffiliateLinkerSettings
+    /**
+     * Built once per instance rather than once per request: the settings
+     * screen was a static singleton, which is process-wide state that two
+     * tests -- or two Settings instances -- would have had to share.
+     */
+    public function settings() : ?ProgramSettings
     {
-        if (is_null(self::$settingsInstance)) {
-            self::$settingsInstance = new AffiliateLinkerSettings();
-        }
-
-        return self::$settingsInstance;
-
+        return $this->settings ??= new AffiliateLinkerSettings();
     }
 
     public function activation() : void

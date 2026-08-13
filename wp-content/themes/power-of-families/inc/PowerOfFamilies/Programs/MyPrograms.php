@@ -2,18 +2,28 @@
 
 namespace PowerOfFamilies\Programs;
 
-use PowerOfFamilies\HookRegistrar;
-
-class MyPrograms implements HookRegistrar
+class MyPrograms implements ProgramModule
 {
-
-    public static mixed $settingsInstance = null;
 
     private ProgramMembership $membership;
 
+    /**
+     * The token is nullable, and $membership is a second argument the
+     * contract does not mention, because both are widenings PHP allows an
+     * implementation to make: tests construct this class directly, with a
+     * fake membership and no token.
+     */
     public function __construct(private ?string $token = null, ?ProgramMembership $membership = null)
     {
         $this->membership = $membership ?? new GroupsMembership();
+    }
+
+    /**
+     * This module is a shortcode; it has nothing to configure.
+     */
+    public function settings() : ?ProgramSettings
+    {
+        return null;
     }
 
     public function register(): void

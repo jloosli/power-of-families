@@ -63,6 +63,7 @@
             <file>./tests/test-SiteChrome.php</file>
             <file>./tests/test-SharingControls.php</file>
             <file>./tests/test-MyPrograms.php</file>
+            <file>./tests/test-ProgramModule.php</file>
             <file>./tests/test-ProgramDescription.php</file>
             <file>./tests/test-GroupsMembership.php</file>
             <file>./tests/test-AffiliateLinker.php</file>

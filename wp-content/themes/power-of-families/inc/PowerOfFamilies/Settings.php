@@ -2,6 +2,8 @@
 
 namespace PowerOfFamilies;
 
+use PowerOfFamilies\Programs\ProgramModule;
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -36,8 +38,8 @@ class Settings implements HookRegistrar
     public array $settings = [];
 
     /**
-     * Active programs
-     * @var array
+     * Active programs, keyed by their registry key.
+     * @var array<string, ProgramModule>
      * @access public
      * @since  2.0.0
      */
@@ -59,9 +61,7 @@ class Settings implements HookRegistrar
         add_action('admin_menu', [$this, 'add_menu_item']);
 
         foreach ($this->programs as $program) {
-            if ($program instanceof HookRegistrar) {
-                $program->register();
-            }
+            $program->register();
         }
     }
 
@@ -91,7 +91,13 @@ class Settings implements HookRegistrar
 
     /**
      * Get available programs from the programs directory
-     * @return array
+     *
+     * Every listed class must implement {@see ProgramModule}. There is no
+     * `has-settings` flag any more: a module answers `settings()` for
+     * itself, so the registry cannot claim a settings screen that the class
+     * does not actually provide.
+     *
+     * @return array<string, array{class: string, name: string}>
      */
     private function getAvailablePrograms(): array
     {
@@ -99,8 +105,8 @@ class Settings implements HookRegistrar
         // and must stay stable for backward compatibility; the `class` field
         // is the actual PHP class name in the PowerOfFamilies\Programs namespace.
         return [
-            'Affiliate_Linker' => ['class' => 'AffiliateLinker', 'name' => 'Affiliate Linker', 'has-settings' => true],
-            'My_Programs'      => ['class' => 'MyPrograms',      'name' => 'My Programs',      'has-settings' => false],
+            'Affiliate_Linker' => ['class' => 'AffiliateLinker', 'name' => 'Affiliate Linker'],
+            'My_Programs'      => ['class' => 'MyPrograms',      'name' => 'My Programs'],
         ];
     }
 
@@ -109,6 +115,9 @@ class Settings implements HookRegistrar
         return get_option('pof_active_programs', []);
     }
 
+    /**
+     * @return array<string, ProgramModule>
+     */
     public function loadActivePrograms(): array
     {
         $available = $this->getAvailablePrograms();
@@ -116,14 +125,9 @@ class Settings implements HookRegistrar
         foreach ($this->getActivePrograms() as $program) {
             if (array_key_exists($program, $available)) {
                 $ClassName = '\PowerOfFamilies\Programs\\' . $available[$program]['class'];
-                // Some program classes accept the token (e.g. for script handle
-                // namespacing), others take no constructor args. Inspect the
-                // ctor and pass the token only when it's expected so we don't
-                // emit "Too many arguments" warnings under PHP 8.4+.
-                $ctor = ( new \ReflectionClass( $ClassName ) )->getConstructor();
-                $programs[$program] = ( $ctor && $ctor->getNumberOfParameters() > 0 )
-                    ? new $ClassName( $this->token )
-                    : new $ClassName();
+                // ProgramModule declares the constructor, so every module
+                // takes the token and there is nothing to inspect at runtime.
+                $programs[$program] = new $ClassName($this->token);
             }
         }
         return $programs;
@@ -157,11 +161,13 @@ class Settings implements HookRegistrar
             )
         );
 
-        foreach ($this->getActivePrograms() as $program) {
-            $programs = $this->getAvailablePrograms();
-            if (isset($programs[$program]) && $programs[$program]['has-settings']) {
-                $theProgramSettings = $this->programs[$program]->getSettingsInstance();
-                $settings[$program] = $theProgramSettings->getSettings();
+        // One tab per active module that declares a settings screen. Modules
+        // are already filtered to the available ones and are in the order the
+        // option lists them, so the tabs keep the order they had.
+        foreach ($this->programs as $program => $module) {
+            $programSettings = $module->settings();
+            if (null !== $programSettings) {
+                $settings[$program] = $programSettings->getSettings();
             }
         }
 
