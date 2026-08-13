@@ -19,11 +19,15 @@
 
     <php>
         <const name="PHPUNIT_RUNNING" value="true"/>
-        <!-- Must match WP_TESTS_DIR / WP_CORE_DIR on the test service in
-             docker-compose.yml. tests/bootstrap.php reads the env vars, not
-             these constants, so a mismatch here is silent but misleading. -->
-        <const name="WP_TESTS_DIR" value="/wp-test-suite/wordpress-tests-lib"/>
-        <const name="WP_CORE_DIR" value="/wp-test-suite/wordpress"/>
+        <!-- WP_TESTS_DIR / WP_CORE_DIR are deliberately NOT declared here.
+             docker-compose.yml sets them on the test service, and that is the
+             only place that can be authoritative: docker/ci-test.sh runs
+             install-wp-tests.sh as a separate process before PHPUnit starts,
+             so the container environment (not this file) decides where the
+             suite is installed. tests/bootstrap.php then reads the same env
+             vars via getenv(). Declaring them here again, as a const or an
+             env entry, would only add a second copy to keep in sync. -->
+
         <const name="WP_TESTS_DOMAIN" value="example.org"/>
         <const name="WP_TESTS_EMAIL" value="admin@example.org"/>
         <const name="WP_TESTS_TITLE" value="Test Blog"/>
