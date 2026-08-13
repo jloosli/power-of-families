@@ -91,7 +91,40 @@ class test_SettingsFieldTyping extends WP_UnitTestCase {
             'not an array'      => [ 'just a string' ],
             'missing id'        => [ [ 'type' => 'text' ] ],
             'unrecognised type' => [ [ 'id' => 'typo_field', 'type' => 'txet' ] ],
+            // (string) on an object raises a plain \Error -- not a \TypeError --
+            // so an unguarded cast escapes a catch naming TypeError and fatals
+            // the request. Arrays are the milder sibling: a warning, which this
+            // suite turns into an exception via convertWarningsToExceptions.
+            'object id'      => [ [ 'id' => new \stdClass() ] ],
+            'object type'    => [ [ 'id' => 'obj_type', 'type' => new \stdClass() ] ],
+            'object label'   => [ [ 'id' => 'obj_label', 'type' => 'text', 'label' => new \stdClass() ] ],
+            'array type'     => [ [ 'id' => 'arr_type', 'type' => [ 'nested' ] ] ],
+            'array label'    => [ [ 'id' => 'arr_label', 'type' => 'text', 'label' => [ 'nested' ] ] ],
         ];
+    }
+
+    public function test_a_non_array_section_does_not_fatal() {
+        $this->setExpectedIncorrectUsage( 'PowerOfFamilies\Settings::settings_fields' );
+
+        add_filter(
+            'Power_of_Families_Programs_settings_fields',
+            function ( $settings ) {
+                // An object section: isset($data['fields']) on this raises
+                // "Cannot use object of type stdClass as array".
+                $settings['bogus'] = new \stdClass();
+
+                return $settings;
+            }
+        );
+
+        $settings = new \PowerOfFamilies\Settings( 'Power_of_Families_Programs', new \PowerOfFamilies\FieldRenderer() );
+        $settings->init_settings();
+
+        $this->assertInstanceOf(
+            \PowerOfFamilies\FieldDefinition::class,
+            $settings->settings['standard']['fields'][0],
+            'A malformed section must not stop the well-formed ones being typed.'
+        );
     }
 
     public function test_the_standard_section_still_types_when_a_filter_field_is_malformed() {

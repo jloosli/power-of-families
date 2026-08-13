@@ -176,6 +176,18 @@ class Settings implements HookRegistrar
         // contained, and a bad field is dropped with a developer notice while the
         // rest of the section still renders.
         foreach ($settings as $section => $data) {
+            // `isset($data['fields'])` is safe on a string or an int, but raises
+            // "Cannot use object of type X as array" on an object, so the section
+            // itself has to be checked before its offsets are read.
+            if (!is_array($data)) {
+                _doing_it_wrong(
+                    __METHOD__,
+                    sprintf('Settings section "%s" is not an array.', esc_html((string) $section)),
+                    '3.0.0'
+                );
+                continue;
+            }
+
             if (!isset($data['fields']) || !is_array($data['fields'])) {
                 continue;
             }
