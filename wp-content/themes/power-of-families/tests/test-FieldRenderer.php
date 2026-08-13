@@ -99,9 +99,13 @@ class test_FieldRenderer extends WP_UnitTestCase {
             ]
         );
 
+        $control_position     = strpos( $html, 'color-picker' );
+        $description_position = strpos( $html, 'description' );
+
         $this->assertLessThan(
-            strpos( $html, 'description' ),
-            strpos( $html, 'color-picker' )
+            $description_position,
+            $control_position,
+            'The color control should render before its description.'
         );
     }
 
