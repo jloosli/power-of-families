@@ -386,13 +386,26 @@ hypothetical. Then 03 is a free deletion clearing 1,514 dead lines out of the bo
 > the ordering argument above only held while an extraction was the plan. What remains is
 > **02 → 07 → 04/05 → 08**.
 >
-> **This document is no longer the backlog (2026-08-13).** 02 (#70) and 07 (#72) have since
-> landed, so every candidate is either done, void, or filed: **04 → #79, 05 → #78,
-> 08 → #80**. Those issues carry the live state and re-verify each premise against `main`;
-> this file stays a dated snapshot of the original analysis. Where the two disagree, the
-> issue is right — candidate 05 in particular has grown since this was written. Work found
-> by running the pipeline rather than reading it is tracked only in the issue tracker
-> (#73, #74, #76), and was never part of this review.
+> **This document is no longer the backlog (2026-08-13).** Every candidate is now done,
+> void, or filed. Those issues carry the live state and re-verify each premise against
+> `main`; this file stays a dated snapshot of the original analysis. Where the two disagree,
+> the issue is right — candidate 05 in particular has grown since this was written.
+>
+> | Candidate                                  | Outcome                            |
+> | ------------------------------------------ | ---------------------------------- |
+> | 01 collapse the duplicated Settings Screen | done — #69, by retiring the plugin |
+> | 02 type the field-definition array         | done — #70                         |
+> | 03 delete `tests/reporting/`               | done — #66                         |
+> | 04 seeding harness off the bootstrap       | **open — #79**                     |
+> | 05 shared `bin/lib/common.sh`              | **open — #78**                     |
+> | 06 split `run-tests.sh`'s two roles        | done — #67                         |
+> | 07 extract the program-description parser  | done — #72, closing #41            |
+> | 08 declare the program contract            | **open — #80** (`needs-triage`)    |
+> | 09 break up `POM_Bloom_Program`            | void — plugin retired by 01        |
+>
+> This table is temporary: once 04, 05 and 08 close, `gh issue list` is the only thing worth
+> reading. Work found by _running_ the tooling rather than reading it — #73, #74, #76 — was
+> never part of this review and lives only in the tracker.
 
 > **Updated 2026-08-13.** 02 and 07 have landed too. What remains is **04/05 → 08**, and
 > 04/05 should follow issue #68's reporting work — both touch `bin/` and the PHPUnit

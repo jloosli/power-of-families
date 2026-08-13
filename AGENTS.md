@@ -57,8 +57,12 @@ schema regardless of which DB pattern you pick.
 - CSS is plain PostCSS (postcss-nested, autoprefixer). Config: `postcss.config.js`.
 - Linting: `prettier.config.js` and `.phpcs.xml.dist`. Use spaces, not tabs.
 - Deploy: push to `main` triggers rsync of the theme directory to production via `.github/workflows/deploy.yml`.
-- Coverage reporting needs `xmlstarlet` on the **host** (`brew install xmlstarlet`); it is not in the containers. `bin/run-tests-ci.sh` and `bin/ci-coverage-integration.sh` abort without it rather than reporting a false 0%.
-- `npm run test:php-ci` exits 0 even when PHPUnit fails. Read `test-reports/test-output.log` for the real `OK (N tests, M assertions)` line rather than trusting the summary.
+- Coverage reporting needs `xmlstarlet` on the **host** (`brew install xmlstarlet`); it is
+  not in the containers. `bin/run-tests-ci.sh` and `bin/ci-coverage-integration.sh` abort
+  without it rather than reporting a false 0%.
+- `npm run test:php-ci` exits non-zero on failure since #75. Its `Total Tests` /
+  `Assertions` still print 0 on a fully clean run (#76), so `test-reports/test-output.log`
+  remains the source of truth for `OK (N tests, M assertions)`.
 
 ## Before merging
 
@@ -121,6 +125,11 @@ was approved.
 ### Issue tracker
 
 GitHub Issues on `jloosli/power-of-families`, via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+**The tracker is the backlog — nothing else is.** Start with `gh issue list`. Documents under
+`docs/architecture/` are dated analysis snapshots, not work queues; where one disagrees with
+an issue, the issue is right. The 2026-08-12 deepening review carries a table mapping its
+candidates to their issues, kept there because it goes stale as they close.
 
 ### Triage labels
 
