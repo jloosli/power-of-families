@@ -49,9 +49,10 @@ require_xmlstarlet() {
 # PHPUnit's Clover format stores totals on //project/metrics and has NO
 # @percentage attribute on the root <coverage> element, so we derive it.
 #
-# Third copy of this helper (see bin/ci-coverage-integration.sh and
-# bin/run-tests-ci.sh). Candidate 05 of the deepening review proposes a shared
-# bin/lib/common.sh; this trio is exactly what it would collapse.
+# One of five copies (see bin/ci-coverage-integration.sh, bin/run-tests-ci.sh,
+# bin/manage-coverage-thresholds.sh and bin/generate-junit-report.sh).
+# Candidate 05 of the deepening review proposes a shared bin/lib/common.sh;
+# this set is exactly what it would collapse.
 clover_percentage() {
     local file="$1"
     local statements covered
