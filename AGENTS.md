@@ -6,7 +6,6 @@ Power of Families WordPress site. PHP 8.4 / TypeScript / Docker.
 
 ```
 wp-content/themes/power-of-families/   ← custom Genesis child theme (your main work)
-wp-content/plugins/pof-bloom-plugin/   ← custom Bloom plugin
 wordpress/                             ← WP core (git-ignored, pulled separately)
 docker-compose.yml                     ← local dev environment
 docker-compose.worktree.yml            ← optional override: share main project's DB
@@ -37,28 +36,24 @@ docker compose up -d wordpress            # site at http://localhost:${WP_PORT:-
 ```
 
 In all three patterns, the worktree's `wp-content/themes/power-of-families`
-and `wp-content/plugins/pof-bloom-plugin` are bind-mounted on top of the
-shared WP install, so your theme/plugin code remains isolated to the
-worktree. PHPUnit always gets its own `wordpress_tests` schema regardless
-of which DB pattern you pick.
+is bind-mounted on top of the shared WP install, so your theme code remains
+isolated to the worktree. PHPUnit always gets its own `wordpress_tests`
+schema regardless of which DB pattern you pick.
 
 ## Commands
 
 | Task                                                     | Command                                                   |
 | -------------------------------------------------------- | --------------------------------------------------------- |
 | Start dev containers                                     | `docker compose up -d wordpress`                          |
-| Build theme JS/CSS                                       | `npm run build:theme`                                     |
-| Build plugin JS                                          | `npm run build:plugin`                                    |
-| Build both                                               | `npm run build`                                           |
-| Watch theme                                              | `npm run start:theme`                                     |
-| Watch plugin                                             | `npm run start:plugin`                                    |
+| Build theme JS/CSS                                       | `npm run build:theme` (aliased as `npm run build`)        |
+| Watch theme                                              | `npm run start:theme` (aliased as `npm run start`)        |
 | Run tests                                                | `npm run test`                                            |
 | Smoke-test the site after a plugin / theme / core update | `npm run smoke` (one-time setup: `npm run smoke:install`) |
 
 ## Key Facts
 
 - Theme is a Genesis Framework child theme. PHP classes live in `wp-content/themes/power-of-families/inc/PowerOfFamilies/` (PSR-4 autoloaded).
-- Plugin JS is built via `@wordpress/scripts` (webpack) into `wp-content/plugins/pof-bloom-plugin/build/`. Never edit files in `build/` directly.
+- Theme JS/CSS is built via `@wordpress/scripts` (webpack) into `wp-content/themes/power-of-families/dist/`. Never edit files in `dist/` directly.
 - CSS is plain PostCSS (postcss-nested, autoprefixer). Config: `postcss.config.js`.
 - Linting: `prettier.config.js` and `.phpcs.xml.dist`. Use spaces, not tabs.
 - Deploy: push to `main` triggers rsync of the theme directory to production via `.github/workflows/deploy.yml`.

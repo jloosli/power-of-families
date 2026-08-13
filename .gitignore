@@ -38,9 +38,8 @@ vendor
 
 *.cache
 
-# Build outputs (theme dist + plugin build)
+# Build outputs
 wp-content/themes/power-of-families/dist/
-wp-content/plugins/pof-bloom-plugin/build/
 
 # Test reports and coverage
 coverage/

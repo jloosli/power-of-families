@@ -134,9 +134,30 @@ gated behind `manage_options`, so severity is moderate rather than critical — 
 exactly the "hardening lands once" win candidate 01 was after, and after the deletion there
 is exactly one place for it to land.
 
+**Exploitable only via the path segment.** Verified empirically against WordPress 6.8.3:
+`add_query_arg()` re-encodes the _query string_ it inherits from `REQUEST_URI`, so a payload
+after the `?` comes back percent-encoded and harmless. The path segment before the `?` is
+passed through verbatim. A request URI of
+`/wp-admin/"><script>alert(1)</script>/options-general.php?page=pof_settings` therefore
+renders as a live `<script>` tag in the unfixed code, and as
+`/wp-admin/scriptalert(1)/script/…` once `esc_url()` is applied. This distinction matters
+for the regression test: a payload placed in the query string passes with or without the
+fix and proves nothing.
+
 The other half of the drift — the plugin's copy assigning `$_POST['tab']` / `$_GET['tab']`
 raw, while the theme's `get_current_tab()` whitelists and sanitises — is resolved by the
 deletion itself. No code change needed.
+
+**Regression test added** (a scope addition beyond the approved design, taken because
+`Settings` had 0% coverage and this is a security fix):
+`wp-content/themes/power-of-families/tests/test-Settings.php`, wired into
+`wp-content/themes/power-of-families/phpunit.xml`. Three cases — tab links render, the
+path-segment payload cannot break out of the `href`, and `get_current_tab()` rejects an
+unknown tab. Confirmed red without the fix and green with it.
+
+Note that the theme keeps **two** PHPUnit configs: the root `phpunit.xml` and
+`wp-content/themes/power-of-families/phpunit.xml`. Only the latter runs — `docker/ci-test.sh`
+`cd`s into the theme directory first. The root copy appears to be stale.
 
 ### 4. Annotate the architecture review
 
@@ -144,10 +165,13 @@ Append to `docs/architecture/2026-08-12-deepening-review.md` without editing the
 
 - **Candidate 01** — a note that it was closed by retiring the second consumer; the shared
   module was never built and the open question is moot.
-- **Candidates 08 and 09** — both are about plugin internals (`POM_Bloom_Program`, the
-  reflection-based program registry) and are void; the files no longer exist.
+- **Candidate 09** — void; `POM_Bloom_Program` and its 18 partials no longer exist.
 - **Candidate 02** — a one-line amendment: `class-pom-bloom-admin-api.php` is gone, so the
   untyped field-definition array now has four readers, not five.
+
+**Candidate 08 is unaffected.** Despite its `POM_`-adjacent subject matter, its files are
+`inc/PowerOfFamilies/Settings.php` and `Programs/AffiliateLinker.php` — the theme's
+reflection-based program registry, not the plugin's. It survives this change intact.
 
 Republish the artifact at the URL recorded in memory so the two copies stay in sync. Run
 `npx prettier --write` on the Markdown before committing — CI gates on Prettier.
@@ -182,6 +206,9 @@ rollback carries no data or migration concerns.
 
 - Candidate **02** (field-definition type) is in flight in a separate worktree and shrinks
   by one reader as a result of this change.
-- Candidates **08** and **09** are void; the review annotation records this.
-- Issue **#68** (coverage-reporting defects) is unrelated and unaffected.
+- Candidate **09** is void; the review annotation records this. Candidate **08** is
+  theme-scoped and survives.
+- Issue **#68** (coverage-reporting defects) is unrelated and unaffected. Its symptoms
+  reproduced during this work: `npm run test:php-ci` reports empty test counts and 0%
+  coverage while PHPUnit itself passes.
 - Orphaned Bloom content in production (terms and shortcodes) is left alone deliberately.
