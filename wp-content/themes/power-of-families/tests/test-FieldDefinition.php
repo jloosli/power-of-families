@@ -91,4 +91,21 @@ class test_FieldDefinition extends WP_UnitTestCase {
 
         $this->assertEquals( $first, $second );
     }
+
+    public function test_supplied_callback_min_and_max_are_preserved() {
+        $callback = 'sanitize_text_field';
+        $field    = \PowerOfFamilies\FieldDefinition::fromArray(
+            [
+                'id'       => 'user_age',
+                'type'     => 'number',
+                'min'      => '0',
+                'max'      => '150',
+                'callback' => $callback,
+            ]
+        );
+
+        $this->assertSame( '0', $field->min );
+        $this->assertSame( '150', $field->max );
+        $this->assertSame( $callback, $field->callback );
+    }
 }
