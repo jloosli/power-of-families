@@ -36,9 +36,6 @@ services:
             - type: bind
               source: ./wp-content/themes/power-of-families
               target: /var/www/html/wp-content/themes/power-of-families
-            - type: bind
-              source: ./wp-content/plugins/pof-bloom-plugin
-              target: /var/www/html/wp-content/plugins/pof-bloom-plugin
             - ./.phpcs.xml.dist:/var/www/html/wp-content/themes/power-of-families/.phpcs.xml
             - ./bin:/var/www/html/bin
             - ./xdebug-logs:/var/log
@@ -118,9 +115,6 @@ services:
             - type: bind
               source: ./wp-content/themes/power-of-families
               target: /var/www/html/wp-content/themes/power-of-families
-            - type: bind
-              source: ./wp-content/plugins/pof-bloom-plugin
-              target: /var/www/html/wp-content/plugins/pof-bloom-plugin
             - ./.phpcs.xml.dist:/var/www/html/wp-content/themes/power-of-families/.phpcs.xml
             - ./bin:/var/www/html/bin
             - ./coverage:/var/www/html/coverage

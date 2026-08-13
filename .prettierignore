@@ -5,7 +5,6 @@
 # Vendored third-party code — upstream copies, keep byte-identical so they
 # stay diffable against their source releases.
 wp-content/themes/power-of-families/bootstrap
-wp-content/plugins/pof-bloom-plugin/assets/js/jQuery.dotdotdot-master
 
 # Minified builds
 *.min.js

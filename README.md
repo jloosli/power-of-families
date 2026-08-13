@@ -3,7 +3,6 @@
 ## Contents
 
 - [Theme](wp-content/themes/power-of-families)
-- [Bloom Plugin](wp-content/plugins/pof-bloom-plugin)
 
 ## First Time Setup
 
@@ -22,6 +21,9 @@
 1. Import the database: `npm run setup:db-import`
 1. Sync the genesis theme: `npm run setup:sync-themes`
 1. Sync the plugins: `npm run setup:sync-plugins`
+   (excludes `pof-programs`, `pom-bloom`, and `pof-bloom` — the first is
+   maintained in this repo, and the two Bloom directories are retired code
+   that may still be sitting deactivated on the production server)
 1. Install composer dependencies: `npm run setup:composer-install`
 1. Update local user password: `docker compose run --rm wpcli user update <user> --user_pass='pass' --skip-plugins`
 1. Set up the PHP testing environment:
@@ -84,9 +86,9 @@ to be:
 | **B. Live-shared DB**                 | main's running container | symlink to main      | quick lookups / read-mostly work; ok with shared writes  |
 | **C. Full symlink**                   | symlinked db-data        | symlink to main      | maximum sharing; only one stack's `db` may run at a time |
 
-In all three, the worktree's bind mounts of `wp-content/themes/power-of-families`
-and `wp-content/plugins/pof-bloom-plugin` overlay the shared WP install, so
-your theme/plugin code stays isolated to the worktree.
+In all three, the worktree's bind mount of `wp-content/themes/power-of-families`
+overlays the shared WP install, so your theme code stays isolated to the
+worktree.
 
 #### Pattern A — independent DB via stdin import
 
@@ -145,9 +147,8 @@ prior pattern already populated them.
 
 #### One-time theme bootstrap
 
-The worktree's own `wp-content/themes/power-of-families/{vendor,dist}` and
-`wp-content/plugins/pof-bloom-plugin/build` are gitignored and bind-mounted
-as-is, so a fresh worktree needs:
+The worktree's own `wp-content/themes/power-of-families/{vendor,dist}` are
+gitignored and bind-mounted as-is, so a fresh worktree needs:
 
 ```shell
 docker compose run --rm composer install --no-dev   # creates theme vendor/
@@ -196,25 +197,8 @@ Build for production:
 npm run build:theme
 ```
 
-### Plugin
-
-Watch and rebuild JS on change:
-
-```shell
-npm run start:plugin
-```
-
-Build for production:
-
-```shell
-npm run build:plugin
-```
-
-### Build Everything
-
-```shell
-npm run build
-```
+`npm run build` and `npm run start` are aliases for the two commands above —
+the theme is the only thing this repo builds.
 
 ### Smoke Testing After Updates
 
