@@ -35,6 +35,42 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# Abort rather than report zeros derived from a missing tool. Every coverage
+# figure below comes out of xmlstarlet; without it the extractions silently
+# yield empty strings and the run reports 0% coverage on a healthy suite.
+# CI installs it explicitly (see .github/workflows/comprehensive-tests.yml).
+require_xmlstarlet() {
+    if ! command -v xmlstarlet >/dev/null 2>&1; then
+        echo -e "${RED}❌ xmlstarlet is required to read coverage data but was not found.${NC}" >&2
+        echo -e "${YELLOW}   Install it with: brew install xmlstarlet  (macOS)${NC}" >&2
+        echo -e "${YELLOW}                    sudo apt-get install -y xmlstarlet  (Debian/Ubuntu)${NC}" >&2
+        exit 1
+    fi
+}
+
+# Compute overall line-coverage percentage from a Clover XML file.
+# PHPUnit's Clover format stores totals on //project/metrics and has NO
+# @percentage attribute on the root <coverage> element, so we derive it.
+#
+# Duplicated from bin/ci-coverage-integration.sh. Candidate 05 of the
+# deepening review proposes a shared bin/lib/common.sh; this pair is exactly
+# what it would collapse.
+clover_percentage() {
+    local file="$1"
+    local statements covered
+    statements=$(xmlstarlet sel -t -v "//project/metrics/@statements" "$file" 2>/dev/null || echo "0")
+    covered=$(xmlstarlet sel -t -v "//project/metrics/@coveredstatements" "$file" 2>/dev/null || echo "0")
+    statements=${statements:-0}
+    covered=${covered:-0}
+    if [ "$statements" -gt 0 ] 2>/dev/null; then
+        # printf guarantees a leading zero (bc emits ".50", not "0.50"),
+        # keeping the value valid for JSON output and numeric comparisons.
+        printf '%.2f' "$(echo "scale=4; $covered * 100 / $statements" | bc -l)"
+    else
+        echo "0"
+    fi
+}
+
 # Display usage information
 show_usage() {
     echo -e "${BLUE}CI/CD Test Execution Script${NC}"
@@ -142,7 +178,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         # Coverage/report generation is always on for CI runs; accept these
         # flags as no-ops so existing workflow invocations don't error.
-        --coverage-enabled|--generate-reports|--generate-dashboard|--generate-badges)
+        --coverage-enabled|--generate-reports|--generate-badges)
             shift
             ;;
         -h|--help)
@@ -357,25 +393,36 @@ display_ci_results() {
     
     # Display test results
     if [ -f "$TEST_REPORTS_DIR/test-output.log" ]; then
-        local total_tests=$(grep -o "Tests: [0-9]*" "$TEST_REPORTS_DIR/test-output.log" | grep -o "[0-9]*" | tail -1 || echo "0")
-        local passed_tests=$(grep -o "Assertions: [0-9]*" "$TEST_REPORTS_DIR/test-output.log" | grep -o "[0-9]*" | tail -1 || echo "0")
-        local failed_tests=$(grep -o "Failures: [0-9]*" "$TEST_REPORTS_DIR/test-output.log" | grep -o "[0-9]*" | tail -1 || echo "0")
-        
+        # PHPUnit's summary reads "Tests: N, Assertions: M" and adds
+        # "Failures: F" only when something failed, so an absent Failures count
+        # means zero. Assertions is not a pass count — labelling it "Passed"
+        # reported 86 passes for a 37-test run.
+        #
+        # The trailing `|| echo "0"` these greps used to carry never fired:
+        # tail exits 0 even on empty input, so a missing count rendered as an
+        # empty string. The ${var:-0} defaults below are what actually applies.
+        local total_tests=$(grep -o "Tests: [0-9]*" "$TEST_REPORTS_DIR/test-output.log" | grep -o "[0-9]*" | tail -1)
+        local assertions=$(grep -o "Assertions: [0-9]*" "$TEST_REPORTS_DIR/test-output.log" | grep -o "[0-9]*" | tail -1)
+        local failed_tests=$(grep -o "Failures: [0-9]*" "$TEST_REPORTS_DIR/test-output.log" | grep -o "[0-9]*" | tail -1)
+
         echo ""
-        echo -e "Total Tests: ${GREEN}$total_tests${NC}"
-        echo -e "Passed: ${GREEN}$passed_tests${NC}"
-        echo -e "Failed: ${RED}$failed_tests${NC}"
+        echo -e "Total Tests: ${GREEN}${total_tests:-0}${NC}"
+        echo -e "Assertions: ${GREEN}${assertions:-0}${NC}"
+        echo -e "Failed: ${RED}${failed_tests:-0}${NC}"
     fi
-    
+
     # Display coverage results
     if [ -f "$COVERAGE_DIR/clover.xml" ]; then
-        local overall_coverage=$(xmlstarlet sel -t -v "//coverage/@percentage" "$COVERAGE_DIR/clover.xml" 2>/dev/null || echo "0")
-        echo -e "Overall Coverage: ${GREEN}${overall_coverage}%${NC}"
+        echo -e "Overall Coverage: ${GREEN}$(clover_percentage "$COVERAGE_DIR/clover.xml")%${NC}"
     fi
     
     # Display CI output
     if [ -f "$CI_OUTPUT_FILE" ]; then
-        local ci_status=$(jq -r '.status' "$CI_OUTPUT_FILE")
+        # Two writers share this file with different shapes: the `check`
+        # command writes a top-level .status, while `gate` — which runs last,
+        # and so is what normally survives — writes .quality_gates.overall_status.
+        # Reading only .status printed a literal "null" for every CI run.
+        local ci_status=$(jq -r '.quality_gates.overall_status // .status // "unknown"' "$CI_OUTPUT_FILE")
         echo -e "CI Status: ${GREEN}$ci_status${NC}"
     fi
     
@@ -391,7 +438,9 @@ display_ci_results() {
 main() {
     echo -e "${BLUE}🚀 CI/CD Test Execution${NC}"
     echo ""
-    
+
+    require_xmlstarlet
+
     local start_time=$(date +%s)
     local exit_code=0
     

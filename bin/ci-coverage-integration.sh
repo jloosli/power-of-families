@@ -28,6 +28,19 @@ BLUE='\033[0;34m'
 PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
 
+# Abort rather than report zeros derived from a missing tool. Every coverage
+# figure in this script comes out of xmlstarlet; without it the extractions
+# silently yield empty strings and a healthy suite reports 0% coverage.
+# CI installs it explicitly (see .github/workflows/comprehensive-tests.yml).
+require_xmlstarlet() {
+    if ! command -v xmlstarlet >/dev/null 2>&1; then
+        echo -e "${RED}❌ xmlstarlet is required to read coverage data but was not found.${NC}" >&2
+        echo -e "${YELLOW}   Install it with: brew install xmlstarlet  (macOS)${NC}" >&2
+        echo -e "${YELLOW}                    sudo apt-get install -y xmlstarlet  (Debian/Ubuntu)${NC}" >&2
+        exit 1
+    fi
+}
+
 # Compute overall line-coverage percentage from a Clover XML file.
 # PHPUnit's Clover format stores totals on //project/metrics and has NO
 # @percentage attribute on the root <coverage> element, so we derive it.
@@ -336,7 +349,11 @@ run_quality_gates() {
     fi
     
     # Low Coverage Files Gate
-    local low_coverage_files=$(xmlstarlet sel -t -c "//file[metrics/@coveredstatements < metrics/@statements * 0.5]" "$CLOVER_FILE" 2>/dev/null | grep -c "<file" || echo "0")
+    # grep -c already prints 0 when it matches nothing; it also exits 1, so a
+    # `|| echo "0"` here would append a second 0 and make the variable the
+    # two-line string "0\n0" — breaking the numeric test below and the JSON
+    # written from it further down.
+    local low_coverage_files=$(xmlstarlet sel -t -c "//file[metrics/@coveredstatements < metrics/@statements * 0.5]" "$CLOVER_FILE" 2>/dev/null | grep -c "<file")
     if [ "$low_coverage_files" -le "$max_low_coverage_files" ]; then
         log_success "Low Coverage Files Gate: PASSED (${low_coverage_files} <= ${max_low_coverage_files})"
         gates_passed=$((gates_passed + 1))
@@ -584,6 +601,8 @@ EOF
 
 # Main execution
 main() {
+    require_xmlstarlet
+
     case "$COMMAND" in
         check)
             check_coverage

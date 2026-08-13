@@ -178,8 +178,6 @@ list_commands() {
     
     echo -e "${YELLOW}Reporting Commands:${NC}"
     echo "  bin/generate-junit-report.sh      # Generate JUnit reports"
-    echo "  bin/generate-html-coverage.sh     # Generate HTML coverage"
-    echo "  bin/generate-coverage-dashboard.sh # Generate coverage dashboard"
     echo "  bin/ci-coverage-integration.sh    # CI/CD integration"
     echo ""
     
@@ -422,12 +420,6 @@ show_api_reference() {
     echo -e "${CYAN}bin/generate-junit-report.sh [options]${NC}"
     echo "  Options: --output-dir, --junit-file, --coverage-dir, --verbose"
     echo ""
-    echo -e "${CYAN}bin/generate-html-coverage.sh [options]${NC}"
-    echo "  Options: --coverage-dir, --html-dir, --clover-file, --verbose"
-    echo ""
-    echo -e "${CYAN}bin/generate-coverage-dashboard.sh [options]${NC}"
-    echo "  Options: --coverage-dir, --html-dir, --dashboard-file, --verbose"
-    echo ""
 }
 
 # Show configuration options
@@ -648,12 +640,6 @@ show_coverage_guide() {
     echo -e "${CYAN}Run Tests with Coverage:${NC}"
     echo "   npm run test:coverage"
     echo ""
-    echo -e "${CYAN}Generate Coverage Reports:${NC}"
-    echo "   bin/generate-html-coverage.sh"
-    echo ""
-    echo -e "${CYAN}Generate Coverage Dashboard:${NC}"
-    echo "   bin/generate-coverage-dashboard.sh"
-    echo ""
     echo -e "${CYAN}Check Coverage Thresholds:${NC}"
     echo "   npm run test:thresholds"
     echo ""
@@ -662,9 +648,6 @@ show_coverage_guide() {
     echo ""
     echo -e "${CYAN}View Coverage Reports:${NC}"
     echo "   open coverage/html/index.html"
-    echo ""
-    echo -e "${CYAN}Coverage Dashboard:${NC}"
-    echo "   open coverage/html/coverage-dashboard.html"
     echo ""
     echo -e "${CYAN}Coverage Thresholds:${NC}"
     echo "   bin/manage-coverage-thresholds.sh check"
@@ -804,8 +787,6 @@ generate_documentation() {
         
         <h3>Reporting</h3>
         <ul>
-            <li><span class="command">bin/generate-html-coverage.sh</span> - Generate HTML coverage</li>
-            <li><span class="command">bin/generate-coverage-dashboard.sh</span> - Generate coverage dashboard</li>
             <li><span class="command">bin/generate-junit-report.sh</span> - Generate JUnit reports</li>
         </ul>
     </div>

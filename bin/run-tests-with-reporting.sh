@@ -15,7 +15,6 @@ FAIL_ON_THRESHOLD_BREACH="${FAIL_ON_THRESHOLD_BREACH:-true}"
 FAIL_ON_QUALITY_GATE_FAILURE="${FAIL_ON_QUALITY_GATE_FAILURE:-true}"
 GENERATE_REPORTS="${GENERATE_REPORTS:-true}"
 GENERATE_BADGES="${GENERATE_BADGES:-true}"
-GENERATE_DASHBOARD="${GENERATE_DASHBOARD:-true}"
 
 # Test execution options
 TEST_SUITE="${TEST_SUITE:-all}"
@@ -33,6 +32,39 @@ BLUE='\033[0;34m'
 PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
+
+# Abort rather than report zeros derived from a missing tool: without
+# xmlstarlet every extraction below silently yields an empty string and a
+# healthy suite reports 0% coverage. CI installs it explicitly.
+require_xmlstarlet() {
+    if ! command -v xmlstarlet >/dev/null 2>&1; then
+        echo -e "${RED}❌ xmlstarlet is required to read coverage data but was not found.${NC}" >&2
+        echo -e "${YELLOW}   Install it with: brew install xmlstarlet  (macOS)${NC}" >&2
+        echo -e "${YELLOW}                    sudo apt-get install -y xmlstarlet  (Debian/Ubuntu)${NC}" >&2
+        exit 1
+    fi
+}
+
+# Compute overall line-coverage percentage from a Clover XML file.
+# PHPUnit's Clover format stores totals on //project/metrics and has NO
+# @percentage attribute on the root <coverage> element, so we derive it.
+#
+# Third copy of this helper (see bin/ci-coverage-integration.sh and
+# bin/run-tests-ci.sh). Candidate 05 of the deepening review proposes a shared
+# bin/lib/common.sh; this trio is exactly what it would collapse.
+clover_percentage() {
+    local file="$1"
+    local statements covered
+    statements=$(xmlstarlet sel -t -v "//project/metrics/@statements" "$file" 2>/dev/null || echo "0")
+    covered=$(xmlstarlet sel -t -v "//project/metrics/@coveredstatements" "$file" 2>/dev/null || echo "0")
+    statements=${statements:-0}
+    covered=${covered:-0}
+    if [ "$statements" -gt 0 ] 2>/dev/null; then
+        printf '%.2f' "$(echo "scale=4; $covered * 100 / $statements" | bc -l)"
+    else
+        echo "0"
+    fi
+}
 
 # Display usage information
 show_usage() {
@@ -56,7 +88,6 @@ show_usage() {
     echo "  --fail-on-quality-gate-failure Fail on quality gate failure (default: true)"
     echo "  --generate-reports       Generate comprehensive reports (default: true)"
     echo "  --generate-badges        Generate coverage badges (default: true)"
-    echo "  --generate-dashboard     Generate coverage dashboard (default: true)"
     echo "  --verbose                Enable verbose output"
     echo "  --help                   Show this help message"
     echo ""
@@ -69,7 +100,6 @@ show_usage() {
     echo "  FAIL_ON_QUALITY_GATE_FAILURE Fail on quality gate failure"
     echo "  GENERATE_REPORTS         Generate comprehensive reports"
     echo "  GENERATE_BADGES          Generate coverage badges"
-    echo "  GENERATE_DASHBOARD       Generate coverage dashboard"
     echo "  TEST_SUITE               Test suite to run"
     echo "  TEST_GROUP               Test group to run"
     echo "  TEST_FILTER              Test filter pattern"
@@ -143,10 +173,6 @@ while [[ $# -gt 0 ]]; do
             ;;
         --generate-badges)
             GENERATE_BADGES="true"
-            shift
-            ;;
-        --generate-dashboard)
-            GENERATE_DASHBOARD="true"
             shift
             ;;
         --verbose)
@@ -286,8 +312,14 @@ execute_tests() {
     
     log_verbose "Command: $phpunit_cmd"
     
-    # Execute tests and capture output
-    if $phpunit_cmd 2>&1 | tee "$TEST_REPORTS_DIR/test-output.log"; then
+    # Execute tests and capture output.
+    #
+    # `cmd | tee` reports tee's exit status, not the test runner's, so this
+    # branch used to be taken even when the runner never started — the script
+    # then printed "Tests executed successfully" and a summary of zeros. Check
+    # the runner's own status via PIPESTATUS instead.
+    $phpunit_cmd 2>&1 | tee "$TEST_REPORTS_DIR/test-output.log"
+    if [ "${PIPESTATUS[0]}" -eq 0 ]; then
         local end_time=$(date +%s)
         local duration=$((end_time - start_time))
         log_success "Tests executed successfully in ${duration}s"
@@ -315,18 +347,9 @@ generate_comprehensive_reports() {
         bin/generate-junit-report.sh --output-dir "$TEST_REPORTS_DIR" --verbose
     fi
     
-    # Generate HTML coverage report
-    if [ -f "$COVERAGE_DIR/clover.xml" ]; then
-        log_info "Generating HTML coverage report..."
-        bin/generate-html-coverage.sh --coverage-dir "$COVERAGE_DIR" --html-dir "$COVERAGE_DIR/html" --verbose
-    fi
-    
-    # Generate coverage dashboard
-    if [ "$GENERATE_DASHBOARD" = true ] && [ -f "$COVERAGE_DIR/clover.xml" ]; then
-        log_info "Generating coverage dashboard..."
-        bin/generate-coverage-dashboard.sh --coverage-dir "$COVERAGE_DIR" --html-dir "$COVERAGE_DIR/html" --verbose
-    fi
-    
+    # PHPUnit writes the real HTML coverage report to $COVERAGE_DIR/html
+    # itself (see phpunit.xml), so there is nothing to generate here.
+
     log_success "Comprehensive reports generated"
 }
 
@@ -400,7 +423,10 @@ generate_coverage_badges() {
     
     log_step "Generating coverage badges..."
     
-    bin/generate-html-coverage.sh --coverage-dir "$COVERAGE_DIR" --html-dir "$COVERAGE_DIR/html" --verbose
+    # This used to invoke bin/generate-html-coverage.sh, which generated a
+    # dashboard of hardcoded numbers and no badges at all. The real badge
+    # generator is ci-coverage-integration.sh, which reads clover.xml.
+    bin/ci-coverage-integration.sh badge --coverage-dir "$COVERAGE_DIR" --clover-file "$COVERAGE_DIR/clover.xml" --verbose
     
     log_success "Coverage badges generated"
 }
@@ -414,22 +440,32 @@ generate_test_summary() {
     
     # Extract test results from output log
     local total_tests=0
-    local passed_tests=0
+    local assertions=0
     local failed_tests=0
     local skipped_tests=0
     
     if [ -f "$TEST_REPORTS_DIR/test-output.log" ]; then
         # Parse PHPUnit output for test counts
-        total_tests=$(grep -o "Tests: [0-9]*" "$TEST_REPORTS_DIR/test-output.log" | grep -o "[0-9]*" | tail -1 || echo "0")
-        passed_tests=$(grep -o "Assertions: [0-9]*" "$TEST_REPORTS_DIR/test-output.log" | grep -o "[0-9]*" | tail -1 || echo "0")
-        failed_tests=$(grep -o "Failures: [0-9]*" "$TEST_REPORTS_DIR/test-output.log" | grep -o "[0-9]*" | tail -1 || echo "0")
-        skipped_tests=$(grep -o "Skipped: [0-9]*" "$TEST_REPORTS_DIR/test-output.log" | grep -o "[0-9]*" | tail -1 || echo "0")
+        # A trailing `|| echo "0"` on these pipelines never fires: tail exits 0
+        # even on empty input, so an absent count yielded an empty string that
+        # was then interpolated bare into the JSON below, producing
+        # `"total_tests": ,` — invalid, and unreadable by every downstream jq.
+        # PHPUnit also omits "Failures:"/"Skipped:" entirely when there are
+        # none, so absent genuinely means zero.
+        total_tests=$(grep -o "Tests: [0-9]*" "$TEST_REPORTS_DIR/test-output.log" | grep -o "[0-9]*" | tail -1)
+        assertions=$(grep -o "Assertions: [0-9]*" "$TEST_REPORTS_DIR/test-output.log" | grep -o "[0-9]*" | tail -1)
+        failed_tests=$(grep -o "Failures: [0-9]*" "$TEST_REPORTS_DIR/test-output.log" | grep -o "[0-9]*" | tail -1)
+        skipped_tests=$(grep -o "Skipped: [0-9]*" "$TEST_REPORTS_DIR/test-output.log" | grep -o "[0-9]*" | tail -1)
+        total_tests=${total_tests:-0}
+        assertions=${assertions:-0}
+        failed_tests=${failed_tests:-0}
+        skipped_tests=${skipped_tests:-0}
     fi
     
     # Extract coverage data
     local overall_coverage=0
     if [ -f "$COVERAGE_DIR/clover.xml" ]; then
-        overall_coverage=$(xmlstarlet sel -t -v "//coverage/@percentage" "$COVERAGE_DIR/clover.xml" 2>/dev/null || echo "0")
+        overall_coverage=$(clover_percentage "$COVERAGE_DIR/clover.xml")
     fi
     
     # Generate summary
@@ -447,10 +483,10 @@ generate_test_summary() {
     },
     "test_results": {
         "total_tests": $total_tests,
-        "passed_tests": $passed_tests,
+        "assertions": $assertions,
         "failed_tests": $failed_tests,
         "skipped_tests": $skipped_tests,
-        "success_rate": $([ "$total_tests" -gt 0 ] && echo "scale=2; $passed_tests * 100 / $total_tests" | bc || echo "0")
+        "success_rate": $([ "$total_tests" -gt 0 ] && echo "scale=2; ($total_tests - $failed_tests) * 100 / $total_tests" | bc || echo "0")
     },
     "coverage": {
         "overall_coverage": $overall_coverage,
@@ -466,8 +502,7 @@ generate_test_summary() {
         "coverage_dir": "$COVERAGE_DIR",
         "test_reports_dir": "$TEST_REPORTS_DIR",
         "generate_reports": $GENERATE_REPORTS,
-        "generate_badges": $GENERATE_BADGES,
-        "generate_dashboard": $GENERATE_DASHBOARD
+        "generate_badges": $GENERATE_BADGES
     }
 }
 EOF
@@ -484,13 +519,13 @@ display_final_results() {
     # Display test results
     if [ -f "$TEST_REPORTS_DIR/test-summary.json" ]; then
         local total_tests=$(jq -r '.test_results.total_tests' "$TEST_REPORTS_DIR/test-summary.json")
-        local passed_tests=$(jq -r '.test_results.passed_tests' "$TEST_REPORTS_DIR/test-summary.json")
+        local assertions=$(jq -r '.test_results.assertions' "$TEST_REPORTS_DIR/test-summary.json")
         local failed_tests=$(jq -r '.test_results.failed_tests' "$TEST_REPORTS_DIR/test-summary.json")
         local skipped_tests=$(jq -r '.test_results.skipped_tests' "$TEST_REPORTS_DIR/test-summary.json")
         local success_rate=$(jq -r '.test_results.success_rate' "$TEST_REPORTS_DIR/test-summary.json")
         
         echo -e "Total Tests: ${GREEN}$total_tests${NC}"
-        echo -e "Passed: ${GREEN}$passed_tests${NC}"
+        echo -e "Assertions: ${GREEN}$assertions${NC}"
         echo -e "Failed: ${RED}$failed_tests${NC}"
         echo -e "Skipped: ${YELLOW}$skipped_tests${NC}"
         echo -e "Success Rate: ${GREEN}${success_rate}%${NC}"
@@ -498,8 +533,7 @@ display_final_results() {
     
     # Display coverage results
     if [ "$COVERAGE_ENABLED" = true ] && [ -f "$COVERAGE_DIR/clover.xml" ]; then
-        local overall_coverage=$(xmlstarlet sel -t -v "//coverage/@percentage" "$COVERAGE_DIR/clover.xml" 2>/dev/null || echo "0")
-        echo -e "Overall Coverage: ${GREEN}${overall_coverage}%${NC}"
+        echo -e "Overall Coverage: ${GREEN}$(clover_percentage "$COVERAGE_DIR/clover.xml")%${NC}"
     fi
     
     echo ""
@@ -508,16 +542,9 @@ display_final_results() {
     echo -e "  Reports: ${GREEN}$TEST_REPORTS_DIR/${NC}"
     echo -e "  Summary: ${GREEN}$TEST_REPORTS_DIR/test-summary.json${NC}"
     
-    if [ "$GENERATE_DASHBOARD" = true ]; then
-        echo -e "  Dashboard: ${GREEN}$COVERAGE_DIR/html/coverage-dashboard.html${NC}"
-    fi
-    
     echo ""
     echo -e "${BLUE}💡 Next Steps:${NC}"
     echo -e "  View coverage: ${GREEN}open $COVERAGE_DIR/html/index.html${NC}"
-    if [ "$GENERATE_DASHBOARD" = true ]; then
-        echo -e "  View dashboard: ${GREEN}open $COVERAGE_DIR/html/coverage-dashboard.html${NC}"
-    fi
     echo -e "  Serve locally: ${GREEN}python -m http.server 8000 -d $COVERAGE_DIR/html${NC}"
 }
 
@@ -525,7 +552,9 @@ display_final_results() {
 main() {
     echo -e "${BLUE}🧪 Comprehensive Test Execution with Reporting${NC}"
     echo ""
-    
+
+    [ "$COVERAGE_ENABLED" = true ] && require_xmlstarlet
+
     local start_time=$(date +%s)
     local exit_code=0
     

@@ -55,7 +55,6 @@ show_usage() {
     echo "  --fail-on-quality-gate-failure Fail on quality gate failure"
     echo "  --generate-reports       Generate comprehensive reports"
     echo "  --generate-badges        Generate coverage badges"
-    echo "  --generate-dashboard     Generate coverage dashboard"
     echo "  --verbose                Enable verbose output"
     echo "  --help                   Show this help message"
     echo ""
@@ -67,7 +66,6 @@ show_usage() {
     echo "  $0 quick                                    # Quick test execution"
     echo "  $0 full --test-filter ThemeSetup           # Full execution with filter"
     echo "  $0 ci --coverage-enabled --verbose         # CI execution with coverage"
-    echo "  $0 coverage --generate-dashboard          # Coverage analysis with dashboard"
     echo "  $0 thresholds                              # Check thresholds only"
     echo "  $0 quality-gates                           # Validate quality gates only"
     echo "  $0 reports                                  # Generate reports only"
@@ -91,7 +89,7 @@ MODE="${1:-quick}"
 COMMON_OPTIONS=""
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --test-filter|--test-group|--test-suite|--coverage-enabled|--parallel-execution|--memory-limit|--coverage-dir|--test-reports-dir|--thresholds-file|--quality-gates-file|--fail-on-threshold-breach|--fail-on-quality-gate-failure|--generate-reports|--generate-badges|--generate-dashboard|--verbose)
+        --test-filter|--test-group|--test-suite|--coverage-enabled|--parallel-execution|--memory-limit|--coverage-dir|--test-reports-dir|--thresholds-file|--quality-gates-file|--fail-on-threshold-breach|--fail-on-quality-gate-failure|--generate-reports|--generate-badges|--verbose)
             COMMON_OPTIONS="$COMMON_OPTIONS $1"
             if [[ $2 != --* ]]; then
                 COMMON_OPTIONS="$COMMON_OPTIONS $2"
@@ -153,7 +151,7 @@ execute_ci_tests() {
 # Execute coverage tests
 execute_coverage_tests() {
     log_step "Executing tests with coverage analysis..."
-    bin/run-tests-with-reporting.sh --coverage-enabled --generate-reports --generate-dashboard $COMMON_OPTIONS
+    bin/run-tests-with-reporting.sh --coverage-enabled --generate-reports $COMMON_OPTIONS
 }
 
 # Check thresholds only
@@ -172,8 +170,6 @@ validate_quality_gates_only() {
 generate_reports_only() {
     log_step "Generating comprehensive reports..."
     bin/generate-junit-report.sh $COMMON_OPTIONS
-    bin/generate-html-coverage.sh $COMMON_OPTIONS
-    bin/generate-coverage-dashboard.sh $COMMON_OPTIONS
 }
 
 # Display mode information
