@@ -78,6 +78,33 @@ class test_FieldRenderer extends WP_UnitTestCase {
         $this->assertStringContainsString( 'Banana', $html );
     }
 
+    public function test_select_option_labels_are_escaped() {
+        $html = $this->render(
+            [
+                'id'      => 'greeting',
+                'type'    => 'select',
+                'options' => [ 'a' => '<script>alert(1)</script>' ],
+            ]
+        );
+
+        $this->assertStringNotContainsString( '<script>', $html );
+    }
+
+    public function test_color_control_renders_before_description() {
+        $html = $this->render(
+            [
+                'id'          => 'greeting',
+                'type'        => 'color',
+                'description' => 'Pick a color',
+            ]
+        );
+
+        $this->assertLessThan(
+            strpos( $html, 'description' ),
+            strpos( $html, 'color-picker' )
+        );
+    }
+
     public function test_multi_value_field_survives_an_unsaved_option() {
         $html = $this->render(
             [

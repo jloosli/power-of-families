@@ -161,7 +161,7 @@ class FieldRenderer
             . ' id="' . esc_attr($field->id) . '"' . ($multiple ? ' multiple="multiple"' : '') . '>';
 
         foreach ($field->options as $key => $label) {
-            $selected = $multiple ? in_array($key, (array) $value, false) : $key === $value;
+            $selected = $multiple ? in_array($key, (array) $value, false) : (string) $key === (string) $value;
             $html .= '<option ' . selected($selected, true, false)
                 . ' value="' . esc_attr($key) . '">' . esc_html($label) . '</option>';
         }
