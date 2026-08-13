@@ -72,6 +72,38 @@ clover_percentage() {
     fi
 }
 
+# Read a PHPUnit result count ("Tests" or "Assertions") out of a captured run
+# log. PHPUnit prints its summary in two shapes:
+#
+#   Tests: 80, Assertions: 225, Skipped: 1.   <- any run that is not clean
+#   OK (112 tests, 285 assertions)            <- a fully clean run
+#
+# Only the first was matched, so a clean run reported "Total Tests: 0" while
+# the log directly above it read "OK (112 tests, 285 assertions)" (#76). Local
+# runs looked fine because a skipped ThemeBootstrap test produced the first
+# form; CI, with nothing skipped, produced the second.
+#
+# One of two copies (run-tests-with-reporting.sh carries the other).
+# Candidate 05 of the deepening review proposes a shared bin/lib/common.sh;
+# this pair is part of what it would collapse.
+phpunit_count() {
+    local label="$1" file="$2"
+    local count ok_line word
+
+    count=$(grep -o "$label: [0-9]*" "$file" | grep -o "[0-9]*" | tail -1)
+
+    if [ -z "$count" ]; then
+        # A single-test run says "OK (1 test, 1 assertion)", hence the
+        # optional trailing s on both nouns.
+        word=$(printf '%s' "$label" | tr '[:upper:]' '[:lower:]')
+        word="${word%s}"
+        ok_line=$(grep -oE "OK \([0-9]+ tests?, [0-9]+ assertions?\)" "$file" | tail -1)
+        count=$(printf '%s' "$ok_line" | grep -oE "[0-9]+ $word" | grep -oE "[0-9]+")
+    fi
+
+    echo "${count:-0}"
+}
+
 # Display usage information
 show_usage() {
     echo -e "${BLUE}CI/CD Test Execution Script${NC}"
@@ -402,21 +434,22 @@ display_ci_results() {
     
     # Display test results
     if [ -f "$TEST_REPORTS_DIR/test-output.log" ]; then
-        # PHPUnit's summary reads "Tests: N, Assertions: M" and adds
-        # "Failures: F" only when something failed, so an absent Failures count
-        # means zero. Assertions is not a pass count — labelling it "Passed"
-        # reported 86 passes for a 37-test run.
+        # Test and assertion counts come from phpunit_count, which reads both
+        # summary shapes PHPUnit emits. Failures only ever appear in the
+        # "Failures: F" form — PHPUnit omits the field entirely when nothing
+        # failed, so an absent count genuinely means zero. Assertions is not a
+        # pass count: labelling it "Passed" reported 86 passes for 37 tests.
         #
-        # The trailing `|| echo "0"` these greps used to carry never fired:
-        # tail exits 0 even on empty input, so a missing count rendered as an
-        # empty string. The ${var:-0} defaults below are what actually applies.
-        local total_tests=$(grep -o "Tests: [0-9]*" "$TEST_REPORTS_DIR/test-output.log" | grep -o "[0-9]*" | tail -1)
-        local assertions=$(grep -o "Assertions: [0-9]*" "$TEST_REPORTS_DIR/test-output.log" | grep -o "[0-9]*" | tail -1)
+        # The trailing `|| echo "0"` this grep used to carry never fired: tail
+        # exits 0 even on empty input, so a missing count rendered as an empty
+        # string. The ${var:-0} default below is what actually applies.
+        local total_tests=$(phpunit_count Tests "$TEST_REPORTS_DIR/test-output.log")
+        local assertions=$(phpunit_count Assertions "$TEST_REPORTS_DIR/test-output.log")
         local failed_tests=$(grep -o "Failures: [0-9]*" "$TEST_REPORTS_DIR/test-output.log" | grep -o "[0-9]*" | tail -1)
 
         echo ""
-        echo -e "Total Tests: ${GREEN}${total_tests:-0}${NC}"
-        echo -e "Assertions: ${GREEN}${assertions:-0}${NC}"
+        echo -e "Total Tests: ${GREEN}${total_tests}${NC}"
+        echo -e "Assertions: ${GREEN}${assertions}${NC}"
         echo -e "Failed: ${RED}${failed_tests:-0}${NC}"
     fi
 
