@@ -27,7 +27,10 @@ final class GroupsMembership implements ProgramMembership
             return [];
         }
 
-        if (!$userId) {
+        // Only null means "the current user". A literal 0 is WordPress for
+        // "nobody", and answering it with the current user's programs would be
+        // a surprising thing for this interface to do.
+        if (null === $userId) {
             $userId = get_current_user_id();
         }
 
@@ -47,7 +50,7 @@ final class GroupsMembership implements ProgramMembership
      */
     private function groupsFor(int $userId): array
     {
-        if ($this->treatsAdministratorsAsMembers()) {
+        if ($this->treatsAdministratorsAsMembers($userId)) {
             return $this->rows(\Groups_Group::get_groups());
         }
 
@@ -78,15 +81,20 @@ final class GroupsMembership implements ProgramMembership
     }
 
     /**
-     * Whether the current request should see every program.
+     * Whether this user should see every program.
      *
      * `GROUPS_ADMINISTRATOR_OVERRIDE` is a Groups-wide switch, defined by
      * {@see MyPrograms::register()}.
+     *
+     * The check is `user_can($userId, …)` rather than `current_user_can()` so
+     * the answer is a function of the user asked about. The two agree for the
+     * only production call site, which asks about the current user -- but an
+     * interface that takes a user id should not answer for a different one.
      */
-    private function treatsAdministratorsAsMembers(): bool
+    private function treatsAdministratorsAsMembers(int $userId): bool
     {
         return defined('GROUPS_ADMINISTRATOR_OVERRIDE')
             && (GROUPS_ADMINISTRATOR_OVERRIDE === true)
-            && current_user_can('administrator');
+            && user_can($userId, 'administrator');
     }
 }

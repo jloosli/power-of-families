@@ -136,6 +136,8 @@ class test_MyPrograms extends WP_UnitTestCase {
         $this->assertStringContainsString( "href='https://example.com/goalsetting'", $output );
         $this->assertStringContainsString( "src='https://example.com/i.png'", $output );
         $this->assertStringContainsString( "class='alignleft'", $output );
+        // Decorative: the link already carries the program name as text.
+        $this->assertStringContainsString( "alt=''", $output );
     }
 
     public function test_program_without_a_home_link_renders_an_empty_href() {

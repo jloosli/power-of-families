@@ -1,6 +1,6 @@
 # Extract the Program-Description Parser — Design
 
-**Status:** Implemented on `worktree-extract-program-description`; suite green at 110 tests / 278 assertions (from 80 / 225)
+**Status:** Implemented on `worktree-extract-program-description`; suite green at 112 tests / 282 assertions (from 80 / 225)
 **Date:** 2026-08-13
 **Author:** Jared Loosli (with Claude)
 **Implements:** Candidate 07 of [`docs/architecture/2026-08-12-deepening-review.md`](../../architecture/2026-08-12-deepening-review.md), and closes [issue #41](https://github.com/jloosli/power-of-families/issues/41)
@@ -44,10 +44,16 @@ change to `Settings`, so candidate 08's reflection-based registry is untouched.
   Groups-plugin global that changes access checks plugin-wide, not just here, so
   relocating it into the membership adapter would shift behavior outside this class.
   The adapter reads it with the same `defined()` guard it has today.
-- **Reworking the markup.** `show_programs()` emits the same HTML, escape for escape —
-  including the unbalanced extra `</div>` it appends after the program list. That is a
-  real defect, seen and deliberately left: fixing markup inside a refactor makes the
-  diff hard to read, and the tests written here will catch a later change to it.
+- **Reworking the markup.** `show_programs()` emits the same HTML, escape for escape,
+  with one exception: the program image gained `alt=''` (Copilot review), which changes
+  nothing about layout.
+
+    Deliberately _not_ fixed: the unbalanced extra `</div>` after the program list, filed
+    as [issue #73](https://github.com/jloosli/power-of-families/issues/73). A stray closing
+    tag is not inert — the parser applies it to the nearest open ancestor, so removing it
+    changes the DOM nesting of a page that has shipped this way for years, and production
+    CSS may be sitting on the current structure. That wants a rendered before/after on
+    `/my-account/`, not a line-deletion inside a refactor.
 
 ## Design
 
@@ -147,6 +153,16 @@ failure. Filtering at the adapter keeps both a non-event.
 `MyPrograms::__construct(?string $token = null, ?ProgramMembership $membership = null)`
 defaults to `new GroupsMembership()`, so nothing at the call sites changes.
 
+**The answer is a function of the argument** (tightened during review). Copilot pointed
+out that `if (!$userId)` treats a literal `0` — WordPress for "nobody" — the same as the
+`null` the interface documents as "use the current user". Pulling that thread found the
+same confusion one level down: the override branch asked `current_user_can()`, so an
+administrator asking about someone else's enrolment got told about every group. Both now
+key off the user passed in: `null === $userId` for the sentinel, `user_can($userId, …)`
+for the override. Production is unaffected — its one call site asks about the current
+user, where the two agree — but this is an interface that takes a user id, and it should
+not answer for a different one.
+
 ```mermaid
 flowchart LR
   SC["[pof_programs]<br/>show_programs()"] -->|"programsFor(id)"| PM["ProgramMembership<br/>(interface)"]
@@ -194,8 +210,8 @@ New test files must be listed in the theme's `phpunit.xml`; the suite enumerates
 
 ## Wins
 
-- The interface is the test surface. `show_programs()` goes from untested to 14 cases;
-  the suite goes from 80 tests / 225 assertions to 110 / 278. Reflection is gone.
+- The interface is the test surface. `show_programs()` goes from untested to 15 cases;
+  the suite goes from 80 tests / 225 assertions to 112 / 282. Reflection is gone.
 - Parsing is a pure function of a string, testable without Groups and without WordPress.
 - Groups' two-shape asymmetry is stated once, in the adapter, instead of implied by an
   `array_map` in the middle of a private method — and looking straight at it is what

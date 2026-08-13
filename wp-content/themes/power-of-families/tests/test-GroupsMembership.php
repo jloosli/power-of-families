@@ -106,6 +106,37 @@ class test_GroupsMembership extends WP_UnitTestCase {
         $this->assertSame( 'Assessments', $programs[0]->name );
     }
 
+    /**
+     * The override answers for the user asked about, not for whoever is logged
+     * in -- otherwise an administrator viewing the site would see every group
+     * reported as any user's enrolment.
+     */
+    public function test_administrator_asking_about_someone_else_gets_their_groups_only() {
+        $administrator = self::factory()->user->create( array( 'role' => 'administrator' ) );
+        $subscriber    = self::factory()->user->create( array( 'role' => 'subscriber' ) );
+        wp_set_current_user( $administrator );
+        Groups_Group::seed( 7, 'Goalsetting', null );
+        Groups_Group::seed( 8, 'Assessments', null );
+        Groups_User::enroll( $subscriber, array( 8 ) );
+
+        $programs = $this->membership->programsFor( $subscriber );
+
+        $this->assertCount( 1, $programs );
+        $this->assertSame( 'Assessments', $programs[0]->name );
+    }
+
+    /**
+     * 0 is WordPress for "nobody", not "the current user".
+     */
+    public function test_user_zero_is_not_the_current_user() {
+        $subscriber = self::factory()->user->create( array( 'role' => 'subscriber' ) );
+        wp_set_current_user( $subscriber );
+        Groups_Group::seed( 7, 'Goalsetting', null );
+        Groups_User::enroll( $subscriber, array( 7 ) );
+
+        $this->assertSame( array(), $this->membership->programsFor( 0 ) );
+    }
+
     public function test_omitted_user_id_falls_back_to_the_current_user() {
         $subscriber = self::factory()->user->create( array( 'role' => 'subscriber' ) );
         wp_set_current_user( $subscriber );

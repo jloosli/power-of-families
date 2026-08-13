@@ -74,6 +74,10 @@ class MyPrograms implements HookRegistrar
 
     /**
      * One program's tile: its image, if it declares one, linked to its home page.
+     *
+     * The image gets `alt=""` rather than the program name: the same link already
+     * carries that name as text, so announcing it twice is noise to a screen
+     * reader. Decorative is the accurate description here.
      */
     private function render_program( EnrolledProgram $program ) : string
     {
@@ -85,7 +89,7 @@ class MyPrograms implements HookRegistrar
             esc_url( $home ?? '' ),
             null === $image
                 ? ''
-                : sprintf("<img class='alignleft' src='%s' width='88' height='88' />", esc_url($image)),
+                : sprintf("<img class='alignleft' src='%s' width='88' height='88' alt='' />", esc_url($image)),
             esc_html( stripslashes($program->name) )
         );
     }
