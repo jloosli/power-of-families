@@ -55,3 +55,4 @@ test-results/
 tests/smoke/test-results/
 playwright-report/
 tests/smoke/playwright-report/
+.claude/.ship-and-watch-state.json
