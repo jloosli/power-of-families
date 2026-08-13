@@ -125,6 +125,46 @@ class test_SettingsFieldTyping extends WP_UnitTestCase {
             $settings->settings['standard']['fields'][0],
             'A malformed section must not stop the well-formed ones being typed.'
         );
+
+        $this->assertArrayNotHasKey(
+            'bogus',
+            $settings->settings,
+            'A non-array section must be dropped, not merely skipped -- downstream readers index it unguarded.'
+        );
+    }
+
+    /**
+     * The admin path must survive a malformed section too.
+     *
+     * Dropping the section at the conversion boundary is only worth anything if
+     * the readers that index it unguarded never see it. register_settings()
+     * reads $data['title'] directly, so an object left in place would fatal here.
+     */
+    public function test_the_admin_registration_path_survives_a_malformed_section() {
+        $this->setExpectedIncorrectUsage( 'PowerOfFamilies\Settings::settings_fields' );
+
+        require_once ABSPATH . 'wp-admin/includes/template.php';
+
+        add_filter(
+            'Power_of_Families_Programs_settings_fields',
+            function ( $settings ) {
+                $settings['bogus'] = new \stdClass();
+
+                return $settings;
+            }
+        );
+
+        $settings = new \PowerOfFamilies\Settings( 'Power_of_Families_Programs', new \PowerOfFamilies\FieldRenderer() );
+        $settings->init_settings();
+        $settings->register_settings();
+
+        global $wp_settings_fields;
+
+        $this->assertArrayHasKey(
+            'Power_of_Families_Programs_settings',
+            $wp_settings_fields,
+            'The well-formed section should still have registered its fields.'
+        );
     }
 
     public function test_the_standard_section_still_types_when_a_filter_field_is_malformed() {

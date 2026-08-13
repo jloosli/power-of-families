@@ -182,9 +182,16 @@ class Settings implements HookRegistrar
             if (!is_array($data)) {
                 _doing_it_wrong(
                     __METHOD__,
-                    sprintf('Settings section "%s" is not an array.', esc_html((string) $section)),
+                    sprintf('Settings section "%s" is not an array and has been dropped.', esc_html((string) $section)),
                     '3.0.0'
                 );
+
+                // Dropped, not merely skipped. Leaving it in place would push the
+                // fatal downstream instead of preventing it: register_settings()
+                // and settings_page() both read $data['title'] unguarded, so an
+                // object section would still take down every admin request.
+                // Nothing downstream can render a section that is not an array.
+                unset($settings[$section]);
                 continue;
             }
 
