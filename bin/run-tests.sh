@@ -1,7 +1,13 @@
 #!/bin/bash
 
 # Unified Test Execution Wrapper
-# Provides a unified interface for all test execution scenarios
+# Provides a unified interface for all test execution scenarios.
+#
+# This is the HOST-side dispatcher: every mode below delegates to a sibling
+# bin/ script, and it is not shipped inside the test image. The container's
+# own runner is docker/ci-test.sh. Keep the two separate -- this file used to
+# double as the image ENTRYPOINT, where it swallowed `docker compose run --rm
+# test phpunit ...` arguments and rejected them as unknown mode names.
 
 set -e
 
@@ -67,9 +73,19 @@ show_usage() {
     echo "  $0 reports                                  # Generate reports only"
 }
 
-# Parse command line arguments
+# Parse command line arguments.
+# --help is checked before the mode is consumed; the -h case in the option loop
+# below is only reachable as `run-tests.sh <mode> --help`.
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    show_usage
+    exit 0
+fi
+
+# Guard the shift: under `set -e`, shifting with no positional args is a
+# non-zero return and would abort the script before it ran anything -- which is
+# exactly what bare `npm run test` did.
 MODE="${1:-quick}"
-shift
+[ $# -gt 0 ] && shift
 
 # Extract common options
 COMMON_OPTIONS=""
@@ -131,43 +147,7 @@ execute_full_tests() {
 # Execute CI tests
 execute_ci_tests() {
     log_step "Executing CI/CD optimized tests..."
-    
-    # Set up WordPress test environment
-    echo "Setting up WordPress test environment..."
-    bash /usr/local/bin/install-wp-tests.sh \
-        "${TEST_DB_NAME:-wordpress_tests}" \
-        "${TEST_DB_USER:-root}" \
-        "${TEST_DB_PASSWORD:-password}" \
-        "${TEST_DB_HOST:-db}" \
-        "${WP_VERSION:-latest}" \
-        false
-    
-    # Change to theme directory
-    cd /var/www/html/wp-content/themes/power-of-families
-    
-    # Install dependencies
-    echo "Installing Composer dependencies..."
-    composer install --no-dev --optimize-autoloader
-    
-    # Run PHPUnit with coverage and reporting for CI/CD
-    local phpunit_cmd="phpunit --configuration phpunit.xml"
-    
-    # Write coverage and reports to /var/www/html/{coverage,test-reports},
-    # which are bind-mounted to ./coverage and ./test-reports on the host.
-    # Using absolute paths here because CWD is the theme directory, so
-    # `coverage/clover.xml` would otherwise resolve under the theme tree.
-    if [[ "$COMMON_OPTIONS" == *"--coverage-enabled"* ]]; then
-        phpunit_cmd="$phpunit_cmd --coverage-clover=/var/www/html/coverage/clover.xml"
-        phpunit_cmd="$phpunit_cmd --coverage-html=/var/www/html/coverage/html"
-        phpunit_cmd="$phpunit_cmd --coverage-text"
-    fi
-
-    if [[ "$COMMON_OPTIONS" == *"--generate-reports"* ]]; then
-        phpunit_cmd="$phpunit_cmd --log-junit=/var/www/html/test-reports/junit.xml"
-    fi
-    
-    # Execute the command
-    eval $phpunit_cmd
+    bin/run-tests-ci.sh $COMMON_OPTIONS
 }
 
 # Execute coverage tests

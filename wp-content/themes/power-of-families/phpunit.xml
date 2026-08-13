@@ -19,8 +19,15 @@
 
     <php>
         <const name="PHPUNIT_RUNNING" value="true"/>
-        <const name="WP_TESTS_DIR" value="/tmp/wordpress-tests-lib"/>
-        <const name="WP_CORE_DIR" value="/tmp/wordpress"/>
+        <!-- WP_TESTS_DIR / WP_CORE_DIR are deliberately NOT declared here.
+             docker-compose.yml sets them on the test service, and that is the
+             only place that can be authoritative: docker/ci-test.sh runs
+             install-wp-tests.sh as a separate process before PHPUnit starts,
+             so the container environment (not this file) decides where the
+             suite is installed. tests/bootstrap.php then reads the same env
+             vars via getenv(). Declaring them here again, as a const or an
+             env entry, would only add a second copy to keep in sync. -->
+
         <const name="WP_TESTS_DOMAIN" value="example.org"/>
         <const name="WP_TESTS_EMAIL" value="admin@example.org"/>
         <const name="WP_TESTS_TITLE" value="Test Blog"/>
@@ -73,35 +80,35 @@
         </exclude>
         <report>
             <!-- HTML Coverage Report -->
-            <html outputDirectory="../coverage/html" lowUpperBound="50" highLowerBound="80"/>
+            <html outputDirectory="/var/www/html/coverage/html" lowUpperBound="50" highLowerBound="80"/>
             
             <!-- Clover XML Report for CI/CD -->
-            <clover outputFile="../coverage/clover.xml"/>
+            <clover outputFile="/var/www/html/coverage/clover.xml"/>
             
             <!-- Cobertura XML Report -->
-            <cobertura outputFile="../coverage/cobertura.xml"/>
+            <cobertura outputFile="/var/www/html/coverage/cobertura.xml"/>
             
             <!-- Text Coverage Report -->
-            <text outputFile="../coverage/coverage.txt" showUncoveredFiles="true" showOnlySummary="false"/>
+            <text outputFile="/var/www/html/coverage/coverage.txt" showUncoveredFiles="true" showOnlySummary="false"/>
             
             <!-- PHP Coverage Report -->
-            <php outputFile="../coverage/coverage.php"/>
+            <php outputFile="/var/www/html/coverage/coverage.php"/>
         </report>
     </coverage>
 
     <!-- Logging Configuration -->
     <logging>
         <!-- JUnit XML for CI/CD -->
-        <junit outputFile="../test-reports/junit.xml"/>
+        <junit outputFile="/var/www/html/test-reports/junit.xml"/>
         
         <!-- TestDox Text Output -->
-        <testdoxText outputFile="../test-reports/testdox.txt"/>
+        <testdoxText outputFile="/var/www/html/test-reports/testdox.txt"/>
         
         <!-- TestDox HTML Output -->
-        <testdoxHtml outputFile="../test-reports/testdox.html"/>
+        <testdoxHtml outputFile="/var/www/html/test-reports/testdox.html"/>
         
         <!-- TeamCity Output -->
-        <teamcity outputFile="../test-reports/teamcity.txt"/>
+        <teamcity outputFile="/var/www/html/test-reports/teamcity.txt"/>
     </logging>
 
 

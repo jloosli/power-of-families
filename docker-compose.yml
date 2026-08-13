@@ -103,6 +103,13 @@ services:
             TEST_DB_PASSWORD: password
             TEST_DB_HOST: db
             WP_VERSION: latest
+            # Install the WordPress test suite into a named volume rather than
+            # the container's /tmp. Every caller uses `docker compose run --rm`,
+            # so a /tmp install is discarded the moment the command exits --
+            # which made `npm run test:php-setup` a no-op and left `npm run test`
+            # unable to find the test library.
+            WP_TESTS_DIR: /wp-test-suite/wordpress-tests-lib
+            WP_CORE_DIR: /wp-test-suite/wordpress
             XDEBUG_MODE: develop,coverage,debug,profile
             XDEBUG_CONFIG: client_host=host.docker.internal client_port=${XDEBUG_PORT:-9003} idekey=docker
             SKIP_DB_CREATE: false
@@ -118,6 +125,7 @@ services:
             - ./bin:/var/www/html/bin
             - ./coverage:/var/www/html/coverage
             - ./test-reports:/var/www/html/test-reports
+            - wp-test-suite:/wp-test-suite
         ports:
             - '${XDEBUG_PORT:-9003}:9003' # xDebug port
         profiles:
@@ -126,3 +134,5 @@ services:
 volumes:
     wordpress:
     db_data:
+    # Holds the downloaded WordPress core + test library for the `test` service.
+    wp-test-suite:

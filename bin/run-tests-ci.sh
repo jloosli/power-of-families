@@ -218,7 +218,7 @@ execute_ci_tests() {
     log_info "Executing tests for CI/CD..."
     
     # Use the container's built-in test execution with coverage enabled
-    local phpunit_cmd="docker compose run --rm test ci"
+    local phpunit_cmd="docker compose run --rm test ci-test.sh"
     phpunit_cmd="$phpunit_cmd --coverage-enabled"
     phpunit_cmd="$phpunit_cmd --generate-reports"
     phpunit_cmd="$phpunit_cmd --coverage-dir $COVERAGE_DIR"
