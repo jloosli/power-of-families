@@ -9,10 +9,21 @@ class test_Settings extends WP_UnitTestCase {
 
     private ?\PowerOfFamilies\Settings $settings;
 
+    /**
+     * These tests drive the tab nav by rewriting REQUEST_URI, so the originals
+     * are restored rather than unset — WordPress reads $_SERVER['REQUEST_URI']
+     * on shutdown (wp-includes/cron.php), and leaving it missing emits a
+     * deprecation notice for the rest of the run.
+     */
+    private array $server_backup;
+    private array $get_backup;
+
     protected function setUp(): void {
         parent::setUp();
         require_once ABSPATH . 'wp-admin/includes/template.php';
-        $this->settings = new \PowerOfFamilies\Settings( 'pof' );
+        $this->server_backup = $_SERVER;
+        $this->get_backup    = $_GET;
+        $this->settings      = new \PowerOfFamilies\Settings( 'pof' );
 
         // Two sections, so settings_page() renders the tab nav at all.
         $this->settings->settings = [
@@ -22,7 +33,8 @@ class test_Settings extends WP_UnitTestCase {
     }
 
     protected function tearDown(): void {
-        unset( $_SERVER['REQUEST_URI'], $_GET['tab'] );
+        $_SERVER        = $this->server_backup;
+        $_GET           = $this->get_backup;
         $this->settings = null;
         parent::tearDown();
     }
