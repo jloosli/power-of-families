@@ -159,14 +159,21 @@ this install today; external code (an mu-plugin, another site) hooking
 
 ## Escaping
 
-Three unescaped interpolations sit in the switch being rewritten, and are fixed as part
+Five unescaped interpolations sit in the switch being rewritten, and are fixed as part
 of the rewrite:
 
-| Location                                                         | Fix                        |
-| ---------------------------------------------------------------- | -------------------------- |
-| `$data` into `<textarea>` (`:97`)                                | `esc_textarea()`           |
-| `$data` into the image field's attributes (`:157-160`)           | `esc_attr()` / `esc_url()` |
-| `description` into `<span class="description">` (`:175`, `:181`) | `wp_kses_post()`           |
+| Location                                                                                                                       | Fix                           |
+| ------------------------------------------------------------------------------------------------------------------------------ | ----------------------------- |
+| `$data` into `<textarea>` (`:97`)                                                                                              | `esc_textarea()`              |
+| `$data` into the image field's attributes (`:157-160`)                                                                         | `esc_attr()` / `esc_url()`    |
+| `description` into `<span class="description">` (`:175`, `:181`)                                                               | `wp_kses_post()`              |
+| Option labels (`FieldRenderer.php:137`, `:152`, `:166`)                                                                        | `esc_html($label)`            |
+| The image field's `$option_name` interpolations (`id=`/`name=`, `FieldRenderer.php:176-187`) and its static translated strings | `esc_attr()` / `esc_attr__()` |
+
+The last two rows are strict hardening of previously-raw output, not behavior fixes:
+option labels were interpolated raw, and the image field's own `id=`/`name=`
+interpolations and static translated strings (`__()` → `esc_attr__()`) were too. Neither
+changes rendered output for a well-formed value.
 
 `wp_kses_post` rather than `esc_html` for descriptions: labels in this codebase
 deliberately carry HTML (`AffiliateLinkerSettings.php:57` is an `<a class="button">`), so
@@ -214,7 +221,7 @@ rule was chosen correctly.
 (merged as `ba01519`) changed the test image, so a stale image will not reflect the new
 harness.
 
-Baseline to establish before writing any code, not assumed: 34 tests / 80 assertions was
+Baseline to establish before writing any code, not assumed: 34 tests / 83 assertions was
 the count through the pre-06 container path. Post-06, `npm run test` is expected to report
 the same 34 with one skip caused by a missing theme build artifact; `npm run build:theme`
 clears it. Record the real numbers from a clean run first — every later claim about "no

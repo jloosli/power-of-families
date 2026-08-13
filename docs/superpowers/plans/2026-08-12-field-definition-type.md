@@ -531,6 +531,14 @@ This is the largest task. It deletes the unreachable metabox path and rewrites `
 - Consumes: `FieldDefinition` and `FieldType` from Tasks 1–2.
 - Produces: `FieldRenderer::display_field(array $args): void`. `$args` is WordPress's `add_settings_field` payload: `['field' => FieldDefinition|array, 'prefix' => string]`. The class no longer implements `HookRegistrar` and has no `register()` — Task 4 depends on that.
 
+> **Amendment to the spec:** the `select()` method's comparison was written strictly
+> (`$key === $value`) in the original plan text. Task review caught that `$key` is an
+> array key (`int|string`) while `$value` is always a string once it comes back from the
+> options table, so the strict comparison silently rendered a saved choice as unselected.
+> It was loosened to `(string) $key === (string) $value` in `d68225b`, matching the
+> string-based comparisons already used by the adjacent `radio()` and `checkboxMulti()`
+> paths.
+
 - [ ] **Step 1: Write the failing test**
 
 Create `wp-content/themes/power-of-families/tests/test-FieldRenderer.php`:
@@ -848,7 +856,7 @@ class FieldRenderer
             . ' id="' . esc_attr($field->id) . '"' . ($multiple ? ' multiple="multiple"' : '') . '>';
 
         foreach ($field->options as $key => $label) {
-            $selected = $multiple ? in_array($key, (array) $value, false) : $key === $value;
+            $selected = $multiple ? in_array($key, (array) $value, false) : (string) $key === (string) $value;
             $html .= '<option ' . selected($selected, true, false)
                 . ' value="' . esc_attr($key) . '">' . esc_html($label) . '</option>';
         }
