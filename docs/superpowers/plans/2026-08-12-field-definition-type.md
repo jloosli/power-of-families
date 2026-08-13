@@ -43,13 +43,51 @@ One test skips without `dist/*.asset.php`.
 npm run build:theme
 ```
 
+- [ ] **Step 2a: Install the theme's Composer dependencies**
+
+A fresh worktree has no `vendor/`, and the theme's `functions.php` requires
+`vendor/autoload.php`. Without it PHPUnit dies in the bootstrap with
+`Failed opening required 'vendor/autoload.php'` — which reads like a test failure but is a
+missing checkout step.
+
+```bash
+docker compose run --rm composer install --no-dev
+```
+
+- [ ] **Step 2b: Install the WordPress test suite into the named volume**
+
+Candidate 06 moved the WP test library into a named volume (`wp-test-suite`) mounted at
+`/wp-test-suite`. A fresh worktree's volume is empty, and PHPUnit reports
+`Could not find /wp-test-suite/wordpress-tests-lib/includes/functions.php`. Run once per
+worktree:
+
+```bash
+npm run test:php-setup
+```
+
+- [ ] **Step 2c: Claim unused host ports**
+
+Every running stack on this machine needs unique ports, and several worktrees run
+concurrently. Check what is taken before starting containers:
+
+```bash
+docker ps --format "{{.Names}}\t{{.Ports}}"
+```
+
+Then set `WP_PORT`, `XDEBUG_PORT` and `DB_PORT` in a gitignored `.env` to values nothing
+else holds. A collision surfaces as Podman's opaque
+`Error response from daemon: something went wrong with the request: "proxy already running"`,
+which names neither the port nor the conflicting stack.
+
 - [ ] **Step 3: Run the suite and record the numbers**
 
 ```bash
 npm run test
 ```
 
-Expected: passing, roughly 34 tests / 80 assertions. **Write the actual counts down** — the exact figures are the baseline, and Task 5 compares against them.
+Expected: passing. **Measured on 2026-08-12 at `ba01519`: `OK (34 tests, 83 assertions)`, no skips.** That is the baseline Task 5 compares against.
+
+Read the real result line, not the wrapper's summary — issue #68 records that the CI wrapper prints fabricated counts and exits 0 regardless. `npm run test` (quick mode) prints PHPUnit's own `OK (N tests, M assertions)`, which is the line to trust.
 
 - [ ] **Step 4: Confirm the warnings this work removes**
 
@@ -880,7 +918,7 @@ git commit -m "Rewrite FieldRenderer onto FieldDefinition and drop the dead meta
 
 - Modify: `wp-content/themes/power-of-families/inc/PowerOfFamilies/Settings.php:137-171` and `:199-241`
 - Modify: `wp-content/themes/power-of-families/inc/PowerOfFamilies/Programs.php:60-65`
-- Test: `wp-content/themes/power-of-families/tests/test-Settings.php` (new)
+- Test: `wp-content/themes/power-of-families/tests/test-SettingsFieldTyping.php` (new)
 - Modify: `wp-content/themes/power-of-families/phpunit.xml`
 
 **Interfaces:**
@@ -890,7 +928,7 @@ git commit -m "Rewrite FieldRenderer onto FieldDefinition and drop the dead meta
 
 - [ ] **Step 1: Write the failing test**
 
-Create `wp-content/themes/power-of-families/tests/test-Settings.php`:
+Create `wp-content/themes/power-of-families/tests/test-SettingsFieldTyping.php`:
 
 ```php
 <?php
@@ -900,7 +938,7 @@ Create `wp-content/themes/power-of-families/tests/test-Settings.php`:
  *
  * @package Power_Of_Families
  */
-class test_Settings extends WP_UnitTestCase {
+class test_SettingsFieldTyping extends WP_UnitTestCase {
 
     protected function tearDown(): void {
         delete_option( 'pof_active_programs' );
@@ -961,7 +999,7 @@ class test_Settings extends WP_UnitTestCase {
 In `wp-content/themes/power-of-families/phpunit.xml`, after the `test-FieldRenderer.php` line:
 
 ```xml
-            <file>./tests/test-Settings.php</file>
+            <file>./tests/test-SettingsFieldTyping.php</file>
 ```
 
 - [ ] **Step 3: Run the test to verify it fails**
@@ -1050,7 +1088,7 @@ Expected: PASS, 3 more tests than after Task 3.
 ```bash
 git add wp-content/themes/power-of-families/inc/PowerOfFamilies/Settings.php \
         wp-content/themes/power-of-families/inc/PowerOfFamilies/Programs.php \
-        wp-content/themes/power-of-families/tests/test-Settings.php \
+        wp-content/themes/power-of-families/tests/test-SettingsFieldTyping.php \
         wp-content/themes/power-of-families/phpunit.xml
 git commit -m "Type settings fields at the Settings boundary"
 ```
