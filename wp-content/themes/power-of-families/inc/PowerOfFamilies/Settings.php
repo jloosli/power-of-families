@@ -169,17 +169,35 @@ class Settings implements HookRegistrar
 
         // Single conversion boundary: everything downstream -- ours and any
         // field contributed through the filter above -- is typed from here on.
+        //
+        // This method runs on `init`, so it is reached on every request rather
+        // than only on the settings screen. A malformed field from a third-party
+        // filter must therefore degrade itself, not the site: each conversion is
+        // contained, and a bad field is dropped with a developer notice while the
+        // rest of the section still renders.
         foreach ($settings as $section => $data) {
             if (!isset($data['fields']) || !is_array($data['fields'])) {
                 continue;
             }
 
-            $settings[$section]['fields'] = array_map(
-                static fn($field) => $field instanceof FieldDefinition
-                    ? $field
-                    : FieldDefinition::fromArray($field),
-                $data['fields']
-            );
+            $definitions = [];
+
+            foreach ($data['fields'] as $field) {
+                if ($field instanceof FieldDefinition) {
+                    $definitions[] = $field;
+                    continue;
+                }
+
+                try {
+                    $definitions[] = FieldDefinition::fromArray($field);
+                } catch (\InvalidArgumentException | \TypeError $e) {
+                    // InvalidArgumentException: absent id, or an unrecognised type.
+                    // TypeError: the element is not an array at all.
+                    _doing_it_wrong(__METHOD__, esc_html($e->getMessage()), '3.0.0');
+                }
+            }
+
+            $settings[$section]['fields'] = $definitions;
         }
 
         return $settings;
