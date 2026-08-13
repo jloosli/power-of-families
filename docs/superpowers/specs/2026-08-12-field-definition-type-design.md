@@ -1,6 +1,6 @@
 # Give the Field Definition a Type — Design
 
-**Status:** Approved, not yet implemented
+**Status:** Implemented on `worktree-field-definition-type`; suite green at 63 tests / 174 assertions
 **Date:** 2026-08-12
 **Author:** Jared Loosli (with Claude)
 **Implements:** Candidate 02 of [`docs/architecture/2026-08-12-deepening-review.md`](../../architecture/2026-08-12-deepening-review.md)
