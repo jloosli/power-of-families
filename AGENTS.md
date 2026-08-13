@@ -58,7 +58,7 @@ schema regardless of which DB pattern you pick.
 - Linting: `prettier.config.js` and `.phpcs.xml.dist`. Use spaces, not tabs.
 - Deploy: push to `main` triggers rsync of the theme directory to production via `.github/workflows/deploy.yml`.
 - Coverage reporting needs `xmlstarlet` on the **host** (`brew install xmlstarlet`); it is not in the containers. `bin/run-tests-ci.sh` and `bin/ci-coverage-integration.sh` abort without it rather than reporting a false 0%.
-- `npm run test:php-ci` exits 0 even when PHPUnit fails. Read `test-reports/test-output.log` for the real `OK (N tests, M assertions)` line rather than trusting the summary.
+- `npm run test:php-ci` now exits non-zero when PHPUnit fails (#75 — it used to read `tee`'s status and always exit 0). Its `Total Tests` / `Assertions` still print 0 on a fully clean run, though: the parser only matches PHPUnit's `Tests: N` form, which a clean run doesn't emit (#76). `test-reports/test-output.log` remains the source of truth for `OK (N tests, M assertions)`.
 
 ## Before merging
 
@@ -130,19 +130,19 @@ it and an issue disagree, the issue is right. Start with `gh issue list`.
 
 Status of that review's nine candidates, so nobody re-derives it from `git log`:
 
-| Candidate                              | Outcome                                    |
-| -------------------------------------- | ------------------------------------------ |
-| 01 collapse the duplicated Settings Screen | done — #69, by retiring the plugin     |
-| 02 type the field-definition array     | done — #70                                 |
-| 03 delete `tests/reporting/`           | done — #66                                 |
-| 04 seeding harness off the bootstrap   | **open — #79**                             |
-| 05 shared `bin/lib/common.sh`          | **open — #78**                             |
-| 06 split `run-tests.sh`'s two roles    | done — #67                                 |
-| 07 extract the program-description parser | done — #72, closing #41                 |
-| 08 declare the program contract        | **open — #80** (`needs-triage`)            |
-| 09 break up `POM_Bloom_Program`        | void — the plugin was retired by 01        |
+| Candidate                                  | Outcome                             |
+| ------------------------------------------ | ----------------------------------- |
+| 01 collapse the duplicated Settings Screen | done — #69, by retiring the plugin  |
+| 02 type the field-definition array         | done — #70                          |
+| 03 delete `tests/reporting/`               | done — #66                          |
+| 04 seeding harness off the bootstrap       | **open — #79**                      |
+| 05 shared `bin/lib/common.sh`              | **open — #78**                      |
+| 06 split `run-tests.sh`'s two roles        | done — #67                          |
+| 07 extract the program-description parser  | done — #72, closing #41             |
+| 08 declare the program contract            | **open — #80** (`needs-triage`)     |
+| 09 break up `POM_Bloom_Program`            | void — the plugin was retired by 01 |
 
-Work found by *running* the tooling rather than reading it was never part of that review and
+Work found by _running_ the tooling rather than reading it was never part of that review and
 lives only in the tracker — currently #74 and #76. Both matter when reading a green build:
 `bin/run-tests-with-reporting.sh` runs no tests at all, and two of the nightly's four test
 jobs select zero tests and pass.
