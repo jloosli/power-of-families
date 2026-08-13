@@ -54,7 +54,7 @@ final readonly class FieldDefinition
             label: self::text($field, 'label', $id),
             description: self::text($field, 'description', $id),
             placeholder: self::text($field, 'placeholder', $id),
-            options: isset($field['options']) && is_array($field['options']) ? $field['options'] : [],
+            options: self::options($field, $id),
             default: $field['default'] ?? null,
             min: self::textOrNull($field, 'min', $id),
             max: self::textOrNull($field, 'max', $id),
@@ -105,6 +105,31 @@ final readonly class FieldDefinition
         }
 
         return (string) $field[$key];
+    }
+
+    /**
+     * Read the options map, rejecting labels that cannot be rendered.
+     *
+     * Option labels reach `esc_html()` at render time, which raises a TypeError
+     * on a non-scalar. Validating here keeps the promise this boundary makes:
+     * a malformed third-party field is dropped where it enters, not where it
+     * is finally drawn.
+     */
+    private static function options(array $field, string $id): array
+    {
+        if (!isset($field['options']) || !is_array($field['options'])) {
+            return [];
+        }
+
+        foreach ($field['options'] as $key => $label) {
+            if (!is_scalar($label)) {
+                throw new \InvalidArgumentException(
+                    sprintf('Field "%s" declares a non-scalar label for option "%s".', $id, (string) $key)
+                );
+            }
+        }
+
+        return $field['options'];
     }
 
     /**

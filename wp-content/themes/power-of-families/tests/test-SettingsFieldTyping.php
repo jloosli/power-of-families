@@ -100,6 +100,15 @@ class test_SettingsFieldTyping extends WP_UnitTestCase {
             'object label'   => [ [ 'id' => 'obj_label', 'type' => 'text', 'label' => new \stdClass() ] ],
             'array type'     => [ [ 'id' => 'arr_type', 'type' => [ 'nested' ] ] ],
             'array label'    => [ [ 'id' => 'arr_label', 'type' => 'text', 'label' => [ 'nested' ] ] ],
+            // Option labels reach esc_html() at render time, which raises a
+            // TypeError on a non-scalar -- far from the boundary that is
+            // supposed to have dropped the field already.
+            'object option label' => [
+                [ 'id' => 'obj_opt', 'type' => 'select', 'options' => [ 'a' => new \stdClass() ] ],
+            ],
+            'array option label'  => [
+                [ 'id' => 'arr_opt', 'type' => 'select', 'options' => [ 'a' => [ 'nested' ] ] ],
+            ],
         ];
     }
 
@@ -189,6 +198,34 @@ class test_SettingsFieldTyping extends WP_UnitTestCase {
             \PowerOfFamilies\FieldDefinition::class,
             $settings->settings['standard']['fields'][0],
             "One section's bad field must not stop another section being typed."
+        );
+    }
+
+    /**
+     * A section with no fields is a shape settings_fields() tolerates, so the
+     * admin path has to tolerate it too. Under convertWarningsToExceptions an
+     * unguarded read here fails the test rather than merely printing.
+     */
+    public function test_a_section_without_fields_registers_without_warnings() {
+        require_once ABSPATH . 'wp-admin/includes/template.php';
+
+        add_filter(
+            'Power_of_Families_Programs_settings_fields',
+            function ( $settings ) {
+                $settings['fieldless'] = [ 'title' => 'Fieldless', 'description' => 'No fields at all' ];
+
+                return $settings;
+            }
+        );
+
+        $settings = new \PowerOfFamilies\Settings( 'Power_of_Families_Programs', new \PowerOfFamilies\FieldRenderer() );
+        $settings->init_settings();
+        $settings->register_settings();
+
+        $this->assertArrayHasKey(
+            'fieldless',
+            $settings->settings,
+            'A section without fields is a supported shape and must survive.'
         );
     }
 

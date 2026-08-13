@@ -260,10 +260,14 @@ class Settings implements HookRegistrar
                     continue;
                 }
 
-                // Add section to page
-                add_settings_section($section, $data['title'], [$this, 'settings_section'], $this->token . '_settings');
+                // Add section to page. A section may legitimately carry no
+                // fields -- settings_fields() tolerates that shape -- so both
+                // reads are guarded rather than assuming the richer shape.
+                add_settings_section($section, $data['title'] ?? '', [$this, 'settings_section'], $this->token . '_settings');
 
-                foreach ($data['fields'] as $field) {
+                $fields = isset($data['fields']) && is_array($data['fields']) ? $data['fields'] : [];
+
+                foreach ($fields as $field) {
 
                     // Register field
                     $option_name = $this->base . $field->id;
