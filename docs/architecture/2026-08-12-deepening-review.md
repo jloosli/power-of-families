@@ -182,6 +182,11 @@ only real callers are three `bin/` scripts: `seed-test-db.sh`, `test-dev-helper.
 **Wins.** Bootstrap shrinks to stubs + WP. Two seeders collapse into one. Locality: seeding
 truth in one module.
 
+> **Tracked as #79 (2026-08-13).** Premise re-verified against `main`: all six files still
+> present at exactly 2,799 lines, still required by the bootstrap, still referenced by no
+> `test-*.php`. One correction — the bootstrap requires are at `tests/bootstrap.php:76-81`,
+> not `:75-80`.
+
 ---
 
 ## 05 — A shell library for `bin/`
@@ -205,6 +210,13 @@ most copies, most drift.
 **Also.** `bin/verify-db-isolation.sh` (174) and `bin/verify-test-isolation.sh` (317) are
 the same isolation check, the second a strict superset — delete the first. Roughly 15 of
 the 28 scripts appear in neither `README.md` nor `AGENTS.md`.
+
+> **Tracked as #78 (2026-08-13), and it has grown.** The table above is now wrong in five of
+> six rows: 25 scripts / 8,772 lines (#66 and #71 deleted three), colour codes in 20,
+> loggers in 16. Two duplicated blocks the review never counted now dominate the case —
+> `clover_percentage()` in **5** scripts and `require_xmlstarlet()` in **3**. Both were
+> duplicated knowingly while fixing #68, with comments pointing here, to keep those PRs
+> scoped. Fixing a reporting bug made this candidate larger, which is the argument for it.
 
 ---
 
@@ -316,6 +328,13 @@ constants — `pof_active_programs`, `pof_affiliates_run` (three files, includin
 string), `pof_save_meta`/`pof_meta_nonce` (twice in one file), `POF_Affiliate_Linker_CRON`
 (three sites plus six in tests).
 
+> **Tracked as #80 (2026-08-13), labelled `needs-triage` rather than `ready-for-agent`.**
+> Structure re-verified; only line numbers moved, since #70 edited `Settings.php` — the
+> registry is now at `:102-103`, the reflection sniff at `:123`, `getSettingsInstance()` at
+> `:162-163`, and `AffiliateLinker`'s static singleton at `:9`/`:26`. This is the only
+> remaining candidate touching production theme code, and the `has-settings => true` fatal
+> is latent rather than live, so it wants a human decision on scope before an agent starts.
+
 ---
 
 ## 09 — Break up `POM_Bloom_Program`
@@ -364,6 +383,14 @@ hypothetical. Then 03 is a free deletion clearing 1,514 dead lines out of the bo
 > the end, because it was closed by deleting the second copy rather than merging the two —
 > the ordering argument above only held while an extraction was the plan. What remains is
 > **02 → 07 → 04/05 → 08**.
+>
+> **This document is no longer the backlog (2026-08-13).** 02 (#70) and 07 (#72) have since
+> landed, so every candidate is either done, void, or filed: **04 → #79, 05 → #78,
+> 08 → #80**. Those issues carry the live state and re-verify each premise against `main`;
+> this file stays a dated snapshot of the original analysis. Where the two disagree, the
+> issue is right — candidate 05 in particular has grown since this was written. Work found
+> by running the pipeline rather than reading it is tracked only in the issue tracker
+> (#73, #74, #76), and was never part of this review.
 
 > **Updated 2026-08-13.** 02 and 07 have landed too. What remains is **04/05 → 08**, and
 > 04/05 should follow issue #68's reporting work — both touch `bin/` and the PHPUnit
