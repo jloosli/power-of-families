@@ -61,6 +61,7 @@
             <file>./tests/test-FieldType.php</file>
             <file>./tests/test-FieldDefinition.php</file>
             <file>./tests/test-FieldRenderer.php</file>
+            <file>./tests/test-SettingsFieldTyping.php</file>
         </testsuite>
     </testsuites>
 

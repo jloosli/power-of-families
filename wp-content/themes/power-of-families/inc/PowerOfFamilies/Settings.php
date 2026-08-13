@@ -167,6 +167,21 @@ class Settings implements HookRegistrar
 
         $settings = apply_filters($this->token . '_settings_fields', $settings);
 
+        // Single conversion boundary: everything downstream -- ours and any
+        // field contributed through the filter above -- is typed from here on.
+        foreach ($settings as $section => $data) {
+            if (!isset($data['fields']) || !is_array($data['fields'])) {
+                continue;
+            }
+
+            $settings[$section]['fields'] = array_map(
+                static fn($field) => $field instanceof FieldDefinition
+                    ? $field
+                    : FieldDefinition::fromArray($field),
+                $data['fields']
+            );
+        }
+
         return $settings;
     }
 
@@ -213,18 +228,12 @@ class Settings implements HookRegistrar
 
                 foreach ($data['fields'] as $field) {
 
-                    // Validation callback for field
-                    $validation = '';
-                    if (isset($field['callback'])) {
-                        $validation = $field['callback'];
-                    }
-
                     // Register field
-                    $option_name = $this->base . $field['id'];
-                    register_setting($this->token . '_settings', $option_name, $validation);
+                    $option_name = $this->base . $field->id;
+                    register_setting($this->token . '_settings', $option_name, $field->callback ?? '');
 
                     // Add field to page
-                    add_settings_field($field['id'], $field['label'], array(
+                    add_settings_field($field->id, $field->label, array(
                         $this->renderer,
                         'display_field'
                     ), $this->token . '_settings', $section, array(
