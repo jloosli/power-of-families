@@ -59,6 +59,7 @@
             <file>./tests/test-MyPrograms.php</file>
             <file>./tests/test-AffiliateLinker.php</file>
             <file>./tests/test-FieldType.php</file>
+            <file>./tests/test-FieldDefinition.php</file>
         </testsuite>
     </testsuites>
 
