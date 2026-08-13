@@ -336,6 +336,15 @@ string), `pof_save_meta`/`pof_meta_nonce` (twice in one file), `POF_Affiliate_Li
 > `:162-163`, and `AffiliateLinker`'s static singleton at `:9`/`:26`. This is the only
 > remaining candidate touching production theme code, and the `has-settings => true` fatal
 > is latent rather than live, so it wants a human decision on scope before an agent starts.
+>
+> **Split and the interface half done (2026-08-13).** The contract landed as `ProgramModule`
+> in #85 — named that, not `Program`, because `EnrolledProgram` in the same namespace means
+> a program a customer bought. The "related, smaller" paragraph above became #86, minus
+> `pof_save_meta`/`pof_meta_nonce`, which no longer exist: they went with the Bloom
+> retirement (#69). Two things this candidate did not predict, both from checking production
+> rather than call sites: the live snapshot has only `My_Programs` active, so the changed
+> path was unreachable there — and the affiliate-linker ajax button has never worked, since
+> it demands a nonce no caller sends (#87).
 
 ---
 
@@ -391,19 +400,19 @@ hypothetical. Then 03 is a free deletion clearing 1,514 dead lines out of the bo
 > `main`; this file stays a dated snapshot of the original analysis. Where the two disagree,
 > the issue is right — candidate 05 in particular has grown since this was written.
 >
-> | Candidate                                  | Outcome                            |
-> | ------------------------------------------ | ---------------------------------- |
-> | 01 collapse the duplicated Settings Screen | done — #69, by retiring the plugin |
-> | 02 type the field-definition array         | done — #70                         |
-> | 03 delete `tests/reporting/`               | done — #66                         |
-> | 04 seeding harness off the bootstrap       | **open — #79**                     |
-> | 05 shared `bin/lib/common.sh`              | **open — #78**                     |
-> | 06 split `run-tests.sh`'s two roles        | done — #67                         |
-> | 07 extract the program-description parser  | done — #72, closing #41            |
-> | 08 declare the program contract            | **open — #80** (`needs-triage`)    |
-> | 09 break up `POM_Bloom_Program`            | void — plugin retired by 01        |
+> | Candidate                                  | Outcome                                   |
+> | ------------------------------------------ | ----------------------------------------- |
+> | 01 collapse the duplicated Settings Screen | done — #69, by retiring the plugin        |
+> | 02 type the field-definition array         | done — #70                                |
+> | 03 delete `tests/reporting/`               | done — #66                                |
+> | 04 seeding harness off the bootstrap       | **open — #79**                            |
+> | 05 shared `bin/lib/common.sh`              | **open — #78**                            |
+> | 06 split `run-tests.sh`'s two roles        | done — #67                                |
+> | 07 extract the program-description parser  | done — #72, closing #41                   |
+> | 08 declare the program contract            | interface done — #85; keys **open — #86** |
+> | 09 break up `POM_Bloom_Program`            | void — plugin retired by 01               |
 >
-> This table is temporary: once 04, 05 and 08 close, `gh issue list` is the only thing worth
+> This table is temporary: once 04, 05 and 86 close, `gh issue list` is the only thing worth
 > reading. Work found by _running_ the tooling rather than reading it — #73, #74, #76 — was
 > never part of this review and lives only in the tracker.
 
