@@ -18,6 +18,30 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# Compute overall line-coverage percentage from a Clover XML file.
+# PHPUnit's Clover format stores totals on //project/metrics and has NO
+# @percentage attribute on the root <coverage> element, so we derive it.
+# Querying //coverage/@percentage here wrote an empty coverage.percentage
+# property into every junit.xml.
+#
+# One of five copies (see bin/ci-coverage-integration.sh, bin/run-tests-ci.sh,
+# bin/run-tests-with-reporting.sh and bin/manage-coverage-thresholds.sh).
+# Candidate 05 of the deepening review proposes a shared bin/lib/common.sh;
+# this set is exactly what it would collapse.
+clover_percentage() {
+    local file="$1"
+    local statements covered
+    statements=$(xmlstarlet sel -t -v "//project/metrics/@statements" "$file" 2>/dev/null || echo "0")
+    covered=$(xmlstarlet sel -t -v "//project/metrics/@coveredstatements" "$file" 2>/dev/null || echo "0")
+    statements=${statements:-0}
+    covered=${covered:-0}
+    if [ "$statements" -gt 0 ] 2>/dev/null; then
+        printf '%.2f' "$(echo "scale=4; $covered * 100 / $statements" | bc -l)"
+    else
+        echo "0"
+    fi
+}
+
 # Display usage information
 show_usage() {
     echo -e "${BLUE}JUnit Test Report Generator${NC}"
@@ -145,7 +169,7 @@ EOF
         
         # Extract coverage metrics from Clover XML
         if command -v xmlstarlet >/dev/null 2>&1; then
-            local coverage_percent=$(xmlstarlet sel -t -v "//coverage/@percentage" "$COVERAGE_DIR/clover.xml" 2>/dev/null || echo "0")
+            local coverage_percent=$(clover_percentage "$COVERAGE_DIR/clover.xml")
             echo "            <property name=\"coverage.percentage\" value=\"$coverage_percent\"/>" >> "$junit_file"
         fi
         

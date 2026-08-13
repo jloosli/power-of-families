@@ -200,6 +200,23 @@ npm run build:theme
 `npm run build` and `npm run start` are aliases for the two commands above —
 the theme is the only thing this repo builds.
 
+### Coverage reporting prerequisites
+
+The host-side coverage scripts (`bin/run-tests-ci.sh`,
+`bin/ci-coverage-integration.sh`) read PHPUnit's `coverage/clover.xml` with
+[xmlstarlet](https://xmlstar.sourceforge.net/), which is **not** bundled with
+the containers and must be installed on the host:
+
+```shell
+brew install xmlstarlet                  # macOS
+sudo apt-get install -y xmlstarlet       # Debian/Ubuntu
+```
+
+CI installs it explicitly in
+[.github/workflows/comprehensive-tests.yml](.github/workflows/comprehensive-tests.yml).
+Both scripts now abort with an install hint when it is missing — previously
+they swallowed the failure and reported 0% coverage for a healthy suite.
+
 ### Smoke Testing After Updates
 
 `bin/smoke` exercises the public site, members login + gated content, and

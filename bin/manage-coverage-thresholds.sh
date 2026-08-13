@@ -509,7 +509,10 @@ validate_quality_gates() {
     fi
     
     # Check low coverage files gate
-    local low_coverage_files=$(xmlstarlet sel -t -c "//file[metrics/@coveredstatements < metrics/@statements * 0.5]" "$CLOVER_FILE" 2>/dev/null | grep -c "<file" || echo "0")
+    # grep -c already prints 0 when it matches nothing; it also exits 1, so a
+    # `|| echo "0"` here would append a second 0 and make the variable the
+    # two-line string "0\n0", breaking the numeric comparison that follows.
+    local low_coverage_files=$(xmlstarlet sel -t -c "//file[metrics/@coveredstatements < metrics/@statements * 0.5]" "$CLOVER_FILE" 2>/dev/null | grep -c "<file")
     local max_low_coverage=$(jq -r '.quality_gates.max_low_coverage_files' "$THRESHOLDS_FILE")
     
     if [ "$low_coverage_files" -le "$max_low_coverage" ]; then

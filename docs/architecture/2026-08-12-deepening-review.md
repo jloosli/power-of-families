@@ -149,6 +149,17 @@ because the working implementation is the bash one.
 coverage numbers referencing `Avanti/ThemeSetup.php`, a file that no longer exists after
 the recent class renames.
 
+> **Resolved 2026-08-12 by deletion (issue #68).** The fabrication was not confined to that
+> one script: `bin/generate-coverage-dashboard.sh` carried an identical `loadCoverageData()`
+> with its own hardcoded 76.5%, and neither file referenced `clover.xml` at all. Both were
+> deleted — 1,609 lines — along with their callers. PHPUnit already writes a real HTML
+> coverage report to `coverage/html` (`phpunit.xml`), so no capability was lost.
+>
+> The same investigation found the root cause of the 0% coverage reported alongside it:
+> `xmlstarlet` is absent from the host and every extraction was written as
+> `xmlstarlet … 2>/dev/null || echo "0"`, silently turning a missing binary into a zero.
+> Actual coverage at the time was 27.92% (203/727 statements).
+
 ---
 
 ## 04 — Move the seeding harness off the PHPUnit bootstrap

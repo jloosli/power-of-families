@@ -129,7 +129,7 @@ jobs:
             - name: Run coverage analysis
               run: |
                   chmod +x bin/run-tests-ci.sh
-                  bin/run-tests-ci.sh --coverage-enabled --generate-reports --generate-dashboard --ci-environment github-actions --ci-build-number ${{ github.run_number }} --ci-commit-sha ${{ github.sha }} --ci-branch ${{ github.ref_name }}
+                  bin/run-tests-ci.sh --coverage-enabled --generate-reports --ci-environment github-actions --ci-build-number ${{ github.run_number }} --ci-commit-sha ${{ github.sha }} --ci-branch ${{ github.ref_name }}
 
             - name: Check coverage thresholds
               run: |
@@ -140,11 +140,6 @@ jobs:
               run: |
                   chmod +x bin/manage-coverage-thresholds.sh
                   bin/manage-coverage-thresholds.sh validate --coverage-dir coverage --quality-gates-file quality-gates.json
-
-            - name: Generate coverage report
-              run: |
-                  chmod +x bin/generate-coverage-dashboard.sh
-                  bin/generate-coverage-dashboard.sh --coverage-dir coverage --html-dir coverage/html --verbose
 
             - name: Upload coverage reports
               uses: actions/upload-artifact@v7

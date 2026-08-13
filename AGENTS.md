@@ -57,6 +57,8 @@ schema regardless of which DB pattern you pick.
 - CSS is plain PostCSS (postcss-nested, autoprefixer). Config: `postcss.config.js`.
 - Linting: `prettier.config.js` and `.phpcs.xml.dist`. Use spaces, not tabs.
 - Deploy: push to `main` triggers rsync of the theme directory to production via `.github/workflows/deploy.yml`.
+- Coverage reporting needs `xmlstarlet` on the **host** (`brew install xmlstarlet`); it is not in the containers. `bin/run-tests-ci.sh` and `bin/ci-coverage-integration.sh` abort without it rather than reporting a false 0%.
+- `npm run test:php-ci` exits 0 even when PHPUnit fails. Read `test-reports/test-output.log` for the real `OK (N tests, M assertions)` line rather than trusting the summary.
 
 ## Before merging
 
