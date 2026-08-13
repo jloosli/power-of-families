@@ -66,11 +66,15 @@ Fifteen types drawn from the existing switch, plus `None`:
 
 Behavior currently encoded as scattered conditionals becomes methods on the enum:
 
-| Method                    | Cases                                               | Replaces                                 |
-| ------------------------- | --------------------------------------------------- | ---------------------------------------- |
-| `usesOptions()`           | `checkbox_multi`, `radio`, `select`, `select_multi` | four unguarded `$field['options']` loops |
-| `isMultiValue()`          | `checkbox_multi`, `select_multi`                    | the `in_array($k, $data)` calls          |
-| `describesBelowControl()` | `checkbox_multi`, `radio`, `select_multi`           | the `in_array` at `FieldRenderer:174`    |
+| Method                    | Cases                                     | Replaces                              |
+| ------------------------- | ----------------------------------------- | ------------------------------------- |
+| `isMultiValue()`          | `checkbox_multi`, `select_multi`          | the `in_array($k, $data)` calls       |
+| `describesBelowControl()` | `checkbox_multi`, `radio`, `select_multi` | the `in_array` at `FieldRenderer:174` |
+
+An earlier draft of this design also carried a `usesOptions()` predicate, to replace the
+four unguarded `$field['options']` loops. It was dropped while planning: once `options`
+defaults to `[]`, iterating it needs no guard, so nothing would ever call the predicate.
+The type removes the need rather than relocating it.
 
 ### `FieldDefinition` — final readonly class
 
@@ -86,6 +90,7 @@ final readonly class FieldDefinition {
         public mixed $default = null,
         public ?string $min = null,
         public ?string $max = null,
+        public mixed $callback = null,
     ) {}
 
     public static function fromArray(array $field): self { /* ... */ }
@@ -94,6 +99,11 @@ final readonly class FieldDefinition {
 
 `min` and `max` have no current user but are read on a live path for `number` fields.
 They are kept because dropping them is a silent capability loss, not a YAGNI win.
+
+`callback` is kept for the same reason, and was missed in the first draft of this design:
+`Settings.php:218` reads `$field['callback']` and hands it to `register_setting()` as the
+validation callback. No field declares one today, but dropping the property would quietly
+remove the ability for any filter-supplied field to validate itself.
 
 ### Where arrays become typed
 
