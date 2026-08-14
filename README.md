@@ -181,6 +181,59 @@ each `.github/workflows/*.yml`. [bin/check-php-version](bin/check-php-version)
 prints every pin with its version and fails the build if any disagree,
 so a bump can't land in only some files.
 
+### The WordPress version under test
+
+`WP_VERSION` in [docker-compose.yml](docker-compose.yml) is pinned to the
+version poweroffamilies.com runs. The PHPUnit suite installs that exact core
+and test-suite tag, so a green run means green against the WordPress production
+actually serves.
+
+That `${WP_VERSION:-...}` default is the **only** place the version is written
+down. `docker/ci-test.sh` has no fallback — it fails with a clear message if
+`WP_VERSION` is unset rather than silently reverting to `latest` — and
+[bin/check-wp-version](bin/check-wp-version) reads the pin out of
+`docker-compose.yml` rather than carrying a second copy. To change the version
+under test, change that one literal.
+
+It used to be `latest`, which cost two things. It resolved through
+`api.wordpress.org` on every run, so an unreachable endpoint failed CI for
+reasons unrelated to the code. And `latest` is currently **7.0.4** — two major
+versions ahead of production — so the suite was reporting on a WordPress the
+theme does not run on. Pinning caught that immediately: one test asserted
+`href="/store"`, which is only true because `wp_kses_post()` rewrites attribute
+quoting in 7.0 and leaves it alone in 6.8.
+
+A pin goes stale on its own, because production auto-updates and the repo does
+not. `npm run check:wp-version` reads production's live version and compares it
+to the pin:
+
+```shell
+npm run check:wp-version
+# WordPress pin matches production (<version>)   — exit 0
+# WordPress pin has drifted from production      — exit 1, prints both versions
+```
+
+It asks production one of two ways. Locally it scrapes the version off a core
+asset's `ver=` cache-buster over HTTP. In CI it reads
+`wp-includes/version.php` over SSH instead, using the same credentials
+[deploy.yml](.github/workflows/deploy.yml) rsyncs with — the host 403s GitHub
+Actions runners by IP, so the HTTP route cannot work from there. Setting
+`SSH_HOST` selects the SSH source; `POF_VERSION_SOURCE=http|ssh` forces one.
+
+It runs nightly in [comprehensive-tests.yml](.github/workflows/comprehensive-tests.yml)
+and fails that job when the two disagree. It is deliberately **not** in PR CI:
+putting a lookup against a live third party back on the path that gates every
+PR is the failure pinning exists to prevent. When the check cannot run at all —
+host unreachable, credentials missing — it warns instead of failing, since that
+says nothing about our code.
+
+To bump: change `WP_VERSION` in `docker-compose.yml` to the version the check
+reports, then run the suite. Bumping is a reviewable commit, so a suite that
+breaks right after one is unambiguous.
+
+Note that the pin governs the **test** environment. The dev site's core is the
+checked-out `wordpress/` directory, which is on 6.8.3 and tracks separately.
+
 ## Ongoing Development
 
 ### Theme

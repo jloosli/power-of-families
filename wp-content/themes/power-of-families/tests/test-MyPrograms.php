@@ -92,8 +92,11 @@ class test_MyPrograms extends WP_UnitTestCase {
         $output = $this->my_programs->show_programs( array() );
 
         $this->assertStringContainsString( "You haven't subscribed to any Programs.", $output );
-        // wp_kses_post() rewrites the default message's attribute quoting.
-        $this->assertStringContainsString( 'href="/store"', $output );
+        // Quote-agnostic on purpose: the source writes href='/store', and whether
+        // wp_kses_post() rewrites that to double quotes is a WordPress version
+        // detail -- 7.0 does, 6.8 leaves it alone. Both render the same link, so
+        // asserting one spelling only tested which WordPress happened to install.
+        $this->assertMatchesRegularExpression( '#href=["\']/store["\']#', $output );
     }
 
     public function test_membership_is_asked_about_the_current_user() {

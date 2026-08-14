@@ -11,6 +11,7 @@
 		"setup:sync-plugins": "rsync -avzh --exclude=pof-programs --exclude=pom-bloom --exclude=pof-bloom pof:~/backups-tigertech/current/www/wp-content/plugins ./wordpress/wp-content/",
 		"setup:composer-install": "docker-compose run --rm composer install --no-dev",
 		"check:php-version": "bin/check-php-version",
+		"check:wp-version": "bin/check-wp-version",
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
 		"setup": "npm run setup:db-download && npm run setup:db-import && npm run setup:sync-themes && npm run setup:sync-plugins && npm run setup:composer-install",

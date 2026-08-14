@@ -154,6 +154,50 @@ jobs:
               if: always()
               run: docker compose down
 
+    # Does the version we test against still match the one production serves?
+    # Nightly rather than per-PR on purpose: this makes a live call to
+    # poweroffamilies.com, and a third-party lookup on the path that gates every
+    # PR is the failure that motivated pinning in the first place (#88).
+    wp-pin-drift:
+        name: WordPress Pin vs Production
+        runs-on: ubuntu-24.04
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v6
+
+            - name: Compare the pin against production
+              env:
+                  SSH_HOST: ${{ secrets.SSH_HOST }}
+                  SSH_USER: ${{ secrets.SSH_USER }}
+                  SSH_KEY: ${{ secrets.SSH_KEY }}
+                  DEST_PATH: ${{ secrets.DEST_PATH }}
+              run: |
+                  # Read the version over ssh rather than off the front end: the host
+                  # 403s GitHub Actions runners by IP, so the http path cannot work
+                  # from here. These are the same credentials deploy.yml uses to rsync
+                  # to this host on every push to main, and the command is one `cat` of
+                  # wp-includes/version.php. Setting SSH_HOST is what selects the ssh
+                  # source; with no secrets (a fork) it falls back to http and warns.
+                  mkdir -p ~/.ssh
+                  echo "$SSH_KEY" > ~/.ssh/id_rsa
+                  chmod 600 ~/.ssh/id_rsa
+                  export SSH_KEY_FILE=~/.ssh/id_rsa
+
+                  set +e
+                  bin/check-wp-version
+                  status=$?
+                  set -e
+                  # 1 means the versions genuinely disagree -- the suite is testing
+                  # a WordPress production does not run, which is worth a red job.
+                  # Anything else means the check could not run (site unreachable,
+                  # markup changed). That is not a fact about our code, so it warns
+                  # rather than failing and teaching everyone to ignore this job.
+                  if [[ $status -eq 1 ]]; then
+                      exit 1
+                  elif [[ $status -ne 0 ]]; then
+                      echo "::warning::check-wp-version could not run (exit $status); the pin itself is unaffected"
+                  fi
+
     # Test Summary and Reporting
     test-summary:
         name: Test Summary

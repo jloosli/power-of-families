@@ -105,13 +105,20 @@ done
 COVERAGE_DIR="$(resolve_path "$COVERAGE_DIR")"
 TEST_REPORTS_DIR="$(resolve_path "$TEST_REPORTS_DIR")"
 
-echo "Setting up WordPress test environment..."
+# No default: WP_VERSION is pinned in docker-compose.yml, and every caller
+# reaches this script through `docker compose run --rm test`. Defaulting to
+# `latest` here would let an unset variable silently unpin the version and
+# reintroduce the api.wordpress.org lookup, which is the failure this pin exists
+# to prevent -- better to say so than to run the wrong WordPress.
+: "${WP_VERSION:?must be set -- it is pinned in docker-compose.yml; run this via 'docker compose run --rm test ci-test.sh'}"
+
+echo "Setting up WordPress test environment (WordPress $WP_VERSION)..."
 bash /usr/local/bin/install-wp-tests.sh \
     "${TEST_DB_NAME:-wordpress_tests}" \
     "${TEST_DB_USER:-root}" \
     "${TEST_DB_PASSWORD:-password}" \
     "${TEST_DB_HOST:-db}" \
-    "${WP_VERSION:-latest}" \
+    "$WP_VERSION" \
     false
 
 cd "$WP_ROOT/wp-content/themes/power-of-families"

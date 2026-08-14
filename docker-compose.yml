@@ -99,7 +99,18 @@ services:
             TEST_DB_USER: root
             TEST_DB_PASSWORD: password
             TEST_DB_HOST: db
-            WP_VERSION: latest
+            # Pinned to the version poweroffamilies.com runs, so the suite tests
+            # the WordPress the theme actually ships against. `latest` resolved
+            # through api.wordpress.org on every run, which made CI fail for
+            # reasons unrelated to the code and silently changed the version
+            # under test whenever upstream shipped a release.
+            #
+            # To bump: read the production version from any core asset's `ver=`
+            # query string (`curl -s https://poweroffamilies.com/ | grep -o
+            # 'wp-emoji-release.min.js?ver=[0-9.]*'`) and change it here. This is
+            # the single source of truth -- docker/ci-test.sh requires it to be set
+            # rather than carrying a second copy of the number.
+            WP_VERSION: ${WP_VERSION:-6.8.8}
             # Install the WordPress test suite into a named volume rather than
             # the container's /tmp. Every caller uses `docker compose run --rm`,
             # so a /tmp install is discarded the moment the command exits --
