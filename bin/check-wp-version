@@ -40,15 +40,16 @@ fi
 #    cache-buster. wp-emoji-release.min.js is core, is enqueued on every front-end
 #    page, and is not something a plugin re-versions. The generator meta tag would
 #    be the obvious source, but this site does not emit one.
-#    The browser user agent is not cosmetic: the host 403s agents it does not
-#    recognise. This is our own site being asked for its own version, so a
-#    stock agent string is the honest way to ask, not an evasion.
+#    The agent string is descriptive on purpose. The host 403s GitHub Actions
+#    runners by IP -- tested with both a descriptive agent and a stock Chrome
+#    one, same 403 -- so pretending to be a browser buys nothing. From a laptop
+#    either works.
 curl_err=$(mktemp)
 trap 'rm -f "$curl_err"' EXIT
 curl_status=0
 html=$(curl -fsSL --retry 3 --retry-delay 5 --retry-all-errors \
     --connect-timeout 10 --max-time 60 \
-    -A 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36' \
+    -A 'pof-check-wp-version' \
     "$SITE_URL" 2>"$curl_err") || curl_status=$?
 if [[ $curl_status -ne 0 ]]; then
     echo "error: could not reach $SITE_URL (curl exit $curl_status)" >&2
