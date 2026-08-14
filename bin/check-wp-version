@@ -11,14 +11,29 @@
 # So there is nothing in-repo to compare it to. The fact it can drift from is
 # external: production auto-updates WordPress, and the pin does not. This script
 # reads the pin out of docker-compose.yml — never restating it — and compares it
-# to the version production serves.
+# to the version production is running.
 #
-# Deliberately NOT wired into PR CI. It makes a live call to poweroffamilies.com,
-# and putting a third-party lookup back on the path that gates every PR is the
-# failure that motivated pinning in the first place (#88). It runs nightly, where
-# a network blip costs a re-run rather than a red PR, and locally:
+# Two ways to ask production, because the obvious one does not work everywhere:
+#
+#   http  Scrape the version off a core asset's `ver=` cache-buster. Needs
+#         nothing but a network route. The default, and what you get locally.
+#   ssh   Read wp-includes/version.php on the server. Definitive rather than
+#         inferred, but needs deploy credentials. What CI uses, because the host
+#         403s GitHub Actions runners by IP (tested with both a descriptive and
+#         a stock Chrome user agent — same 403, so it is the address, not the
+#         agent). deploy.yml already reaches the box this way.
+#
+# Picked automatically: ssh when SSH_HOST is set, http otherwise. Force one with
+# POF_VERSION_SOURCE=http|ssh.
+#
+# Deliberately NOT wired into PR CI — a lookup against a third party on the path
+# that gates every PR is the failure that motivated pinning (#88). It runs
+# nightly, where a blip costs a re-run rather than a red PR, and locally:
 #
 #   npm run check:wp-version
+#
+# Exit codes are load-bearing: 1 means the versions genuinely disagree, 2 means
+# the check could not run. The nightly job fails on 1 and warns on 2.
 
 set -euo pipefail
 
@@ -36,45 +51,109 @@ if [[ -z "$pinned" ]]; then
     exit 2
 fi
 
-# 2. Production — WordPress stamps its own version onto core assets as a `ver=`
-#    cache-buster. wp-emoji-release.min.js is core, is enqueued on every front-end
-#    page, and is not something a plugin re-versions. The generator meta tag would
-#    be the obvious source, but this site does not emit one.
-#    The agent string is descriptive on purpose. The host 403s GitHub Actions
-#    runners by IP -- tested with both a descriptive agent and a stock Chrome
-#    one, same 403 -- so pretending to be a browser buys nothing. From a laptop
-#    either works.
-curl_err=$(mktemp)
-trap 'rm -f "$curl_err"' EXIT
-curl_status=0
-html=$(curl -fsSL --retry 3 --retry-delay 5 --retry-all-errors \
-    --connect-timeout 10 --max-time 60 \
-    -A 'pof-check-wp-version' \
-    "$SITE_URL" 2>"$curl_err") || curl_status=$?
-if [[ $curl_status -ne 0 ]]; then
-    echo "error: could not reach $SITE_URL (curl exit $curl_status)" >&2
-    sort -u "$curl_err" | sed 's/^/  /' >&2
-    echo "  This check needs the live site. If the site is up, it is a network or" >&2
-    echo "  hosting problem, not a version problem -- the pin itself is unaffected." >&2
-    exit 2
+# 2. Production
+source=${POF_VERSION_SOURCE:-auto}
+if [[ "$source" == auto ]]; then
+    if [[ -n "${SSH_HOST:-}" ]]; then source=ssh; else source=http; fi
 fi
 
-production=$(printf '%s' "$html" \
-    | grep -oE 'wp-emoji-release\.min\.js\?ver=[0-9]+\.[0-9]+(\.[0-9]+)?' \
-    | head -1 | sed 's/.*ver=//') || true
-if [[ -z "$production" ]]; then
-    echo "error: could not read a WordPress version from $SITE_URL" >&2
-    echo "  Looked for wp-emoji-release.min.js?ver=... — core may no longer enqueue it," >&2
-    echo "  or the site may now strip version query strings. Check by hand and update" >&2
-    echo "  this script's extraction." >&2
-    exit 2
-fi
+err_file=$(mktemp)
+trap 'rm -f "$err_file"' EXIT
+
+read_over_http() {
+    # WordPress stamps its own version onto core assets as a `ver=` cache-buster.
+    # wp-emoji-release.min.js is core, is enqueued on every front-end page, and is
+    # not something a plugin re-versions. The generator meta tag would be the
+    # obvious source, but this site does not emit one.
+    local status=0 html
+    html=$(curl -fsSL --retry 3 --retry-delay 5 --retry-all-errors \
+        --connect-timeout 10 --max-time 60 -A 'pof-check-wp-version' \
+        "$SITE_URL" 2>"$err_file") || status=$?
+    if [[ $status -ne 0 ]]; then
+        echo "error: could not reach $SITE_URL (curl exit $status)" >&2
+        sort -u "$err_file" | sed 's/^/  /' >&2
+        echo "  This check needs the live site. If the site is up it is a network or" >&2
+        echo "  hosting problem, not a version problem -- the pin itself is unaffected." >&2
+        echo "  A 403 from CI is expected: set SSH_HOST and friends to read it over ssh." >&2
+        return 2
+    fi
+
+    production=$(printf '%s' "$html" \
+        | grep -oE 'wp-emoji-release\.min\.js\?ver=[0-9]+\.[0-9]+(\.[0-9]+)?' \
+        | head -1 | sed 's/.*ver=//') || true
+    if [[ -z "$production" ]]; then
+        echo "error: could not read a WordPress version from $SITE_URL" >&2
+        echo "  Looked for wp-emoji-release.min.js?ver=... -- core may no longer enqueue" >&2
+        echo "  it, or the site may now strip version query strings. Check by hand and" >&2
+        echo "  update this script's extraction." >&2
+        return 2
+    fi
+    production_label="$SITE_URL"
+}
+
+read_over_ssh() {
+    local status=0 raw
+    # Checked by hand rather than with ${VAR:?}, which exits 1 -- the code that
+    # means "drifted". A missing variable means the check could not run: that is 2.
+    local missing=()
+    [[ -z "${SSH_USER:-}" ]] && missing+=(SSH_USER)
+    [[ -z "${DEST_PATH:-}" ]] && missing+=(DEST_PATH)
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        echo "error: ssh source needs ${missing[*]}" >&2
+        return 2
+    fi
+
+    # DEST_PATH is the rsync target -- the theme directory. WordPress root is three
+    # levels up: <root>/wp-content/themes/power-of-families. Strip the components
+    # rather than appending ../../.., so paths in output and errors stay readable.
+    local wp_root="${DEST_PATH%/}"
+    wp_root="${wp_root%/*}" # power-of-families
+    wp_root="${wp_root%/*}" # themes
+    wp_root="${wp_root%/*}" # wp-content
+    local version_file="$wp_root/wp-includes/version.php"
+
+    # StrictHostKeyChecking=no mirrors deploy.yml, which rsyncs to this same host
+    # on every push to main.
+    local ssh_opts=(-o StrictHostKeyChecking=no -o ConnectTimeout=15 -o BatchMode=yes)
+    [[ -n "${SSH_KEY_FILE:-}" ]] && ssh_opts+=(-i "$SSH_KEY_FILE")
+    raw=$(ssh "${ssh_opts[@]}" \
+        "$SSH_USER@$SSH_HOST" "cat '$version_file'" 2>"$err_file") || status=$?
+    if [[ $status -ne 0 ]]; then
+        echo "error: could not read $version_file over ssh (exit $status)" >&2
+        sort -u "$err_file" | sed 's/^/  /' >&2
+        echo "  Check SSH_HOST / SSH_USER / SSH_KEY_FILE / DEST_PATH. This is an access" >&2
+        echo "  problem, not a version problem -- the pin itself is unaffected." >&2
+        return 2
+    fi
+
+    # Match the assignment, not the `@global string $wp_version` docblock above it.
+    production=$(printf '%s' "$raw" \
+        | sed -n "s/^\$wp_version = '\([^']*\)';.*/\1/p" | head -1) || true
+    if [[ -z "$production" ]]; then
+        echo "error: no \$wp_version assignment in $version_file" >&2
+        echo "  The file was readable but did not look like WordPress's version.php." >&2
+        echo "  Check that DEST_PATH still points at the theme directory." >&2
+        return 2
+    fi
+    production_label="$SSH_USER@$SSH_HOST:$version_file"
+}
+
+production=''
+production_label=''
+case "$source" in
+    http) read_over_http ;;
+    ssh) read_over_ssh ;;
+    *)
+        echo "error: POF_VERSION_SOURCE must be http, ssh or auto (got '$source')" >&2
+        exit 2
+        ;;
+esac
 
 if [[ "$pinned" != "$production" ]]; then
     echo "WordPress pin has drifted from production" >&2
     echo >&2
     printf '      %-8s  %s\n' "$pinned" "docker-compose.yml (\${WP_VERSION:-...})" >&2
-    printf '  !!  %-8s  %s\n' "$production" "$SITE_URL" >&2
+    printf '  !!  %-8s  %s\n' "$production" "$production_label" >&2
     echo >&2
     echo "The suite is testing a WordPress production does not run." >&2
     echo "Bump WP_VERSION in docker-compose.yml to $production -- it is the only" >&2
@@ -85,4 +164,4 @@ fi
 
 echo "WordPress pin matches production ($pinned)"
 echo "  - docker-compose.yml (\${WP_VERSION:-...})"
-echo "  - $SITE_URL"
+echo "  - $production_label"

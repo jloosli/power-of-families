@@ -166,7 +166,23 @@ jobs:
               uses: actions/checkout@v6
 
             - name: Compare the pin against production
+              env:
+                  SSH_HOST: ${{ secrets.SSH_HOST }}
+                  SSH_USER: ${{ secrets.SSH_USER }}
+                  SSH_KEY: ${{ secrets.SSH_KEY }}
+                  DEST_PATH: ${{ secrets.DEST_PATH }}
               run: |
+                  # Read the version over ssh rather than off the front end: the host
+                  # 403s GitHub Actions runners by IP, so the http path cannot work
+                  # from here. These are the same credentials deploy.yml uses to rsync
+                  # to this host on every push to main, and the command is one `cat` of
+                  # wp-includes/version.php. Setting SSH_HOST is what selects the ssh
+                  # source; with no secrets (a fork) it falls back to http and warns.
+                  mkdir -p ~/.ssh
+                  echo "$SSH_KEY" > ~/.ssh/id_rsa
+                  chmod 600 ~/.ssh/id_rsa
+                  export SSH_KEY_FILE=~/.ssh/id_rsa
+
                   set +e
                   bin/check-wp-version
                   status=$?

@@ -213,12 +213,19 @@ npm run check:wp-version
 # WordPress pin has drifted from production      — exit 1, prints both versions
 ```
 
+It asks production one of two ways. Locally it scrapes the version off a core
+asset's `ver=` cache-buster over HTTP. In CI it reads
+`wp-includes/version.php` over SSH instead, using the same credentials
+[deploy.yml](.github/workflows/deploy.yml) rsyncs with — the host 403s GitHub
+Actions runners by IP, so the HTTP route cannot work from there. Setting
+`SSH_HOST` selects the SSH source; `POF_VERSION_SOURCE=http|ssh` forces one.
+
 It runs nightly in [comprehensive-tests.yml](.github/workflows/comprehensive-tests.yml)
 and fails that job when the two disagree. It is deliberately **not** in PR CI:
-it calls poweroffamilies.com, and putting a third-party lookup back on the path
-that gates every PR is the failure pinning exists to prevent. When the check
-cannot run at all — site unreachable, markup changed — it warns instead of
-failing, since that says nothing about our code.
+putting a lookup against a live third party back on the path that gates every
+PR is the failure pinning exists to prevent. When the check cannot run at all —
+host unreachable, credentials missing — it warns instead of failing, since that
+says nothing about our code.
 
 To bump: change `WP_VERSION` in `docker-compose.yml` to the version the check
 reports, then run the suite. Bumping is a reviewable commit, so a suite that
