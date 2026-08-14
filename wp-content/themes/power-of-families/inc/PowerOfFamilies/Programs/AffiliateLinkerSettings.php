@@ -4,7 +4,7 @@ namespace PowerOfFamilies\Programs;
 
 use PowerOfFamilies\HookRegistrar;
 
-class AffiliateLinkerSettings implements HookRegistrar {
+class AffiliateLinkerSettings implements HookRegistrar, ProgramSettings {
 
     public function register(): void {
 //        add_action( 'pof_programs_settings_admin_end', array( $this, 'add_script' ) );
@@ -38,7 +38,7 @@ JS;
      * Build settings fields
      * @return array Fields to be displayed on settings page
      */
-    public function getSettings() {
+    public function getSettings(): array {
 
 
         $settings = array(
