@@ -154,6 +154,34 @@ jobs:
               if: always()
               run: docker compose down
 
+    # Does the version we test against still match the one production serves?
+    # Nightly rather than per-PR on purpose: this makes a live call to
+    # poweroffamilies.com, and a third-party lookup on the path that gates every
+    # PR is the failure that motivated pinning in the first place (#88).
+    wp-pin-drift:
+        name: WordPress Pin vs Production
+        runs-on: ubuntu-24.04
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v6
+
+            - name: Compare the pin against production
+              run: |
+                  set +e
+                  bin/check-wp-version
+                  status=$?
+                  set -e
+                  # 1 means the versions genuinely disagree -- the suite is testing
+                  # a WordPress production does not run, which is worth a red job.
+                  # Anything else means the check could not run (site unreachable,
+                  # markup changed). That is not a fact about our code, so it warns
+                  # rather than failing and teaching everyone to ignore this job.
+                  if [[ $status -eq 1 ]]; then
+                      exit 1
+                  elif [[ $status -ne 0 ]]; then
+                      echo "::warning::check-wp-version could not run (exit $status); the pin itself is unaffected"
+                  fi
+
     # Test Summary and Reporting
     test-summary:
         name: Test Summary

@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+#
+# check-wp-version — fail if the pinned WordPress version has drifted from what
+# poweroffamilies.com actually runs.
+#
+# Unlike check-php-version, which reconciles several in-repo pins against each
+# other, WP_VERSION is pinned in exactly one place:
+#
+#   - docker-compose.yml   (WP_VERSION: ${WP_VERSION:-X} — the only literal)
+#
+# So there is nothing in-repo to compare it to. The fact it can drift from is
+# external: production auto-updates WordPress, and the pin does not. This script
+# reads the pin out of docker-compose.yml — never restating it — and compares it
+# to the version production serves.
+#
+# Deliberately NOT wired into PR CI. It makes a live call to poweroffamilies.com,
+# and putting a third-party lookup back on the path that gates every PR is the
+# failure that motivated pinning in the first place (#88). It runs nightly, where
+# a network blip costs a re-run rather than a red PR, and locally:
+#
+#   npm run check:wp-version
+
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+SITE_URL="${POF_SITE_URL:-https://poweroffamilies.com/}"
+
+# 1. The pin — docker-compose.yml, `WP_VERSION: ${WP_VERSION:-X}`
+# `|| true` because pipefail turns a no-match grep into a fatal error, which
+# would kill the script before the diagnostic below could explain what is wrong.
+pinned=$(grep -oE 'WP_VERSION:-[0-9]+\.[0-9]+(\.[0-9]+)?' docker-compose.yml \
+    | head -1 | sed 's/WP_VERSION:-//') || true
+if [[ -z "$pinned" ]]; then
+    echo "error: could not find \${WP_VERSION:-X} default in docker-compose.yml" >&2
+    exit 2
+fi
+
+# 2. Production — WordPress stamps its own version onto core assets as a `ver=`
+#    cache-buster. wp-emoji-release.min.js is core, is enqueued on every front-end
+#    page, and is not something a plugin re-versions. The generator meta tag would
+#    be the obvious source, but this site does not emit one.
+html=$(curl -fsSL --retry 3 --retry-delay 5 --retry-all-errors \
+    --connect-timeout 10 --max-time 60 -A 'pof-check-wp-version' "$SITE_URL" 2>/dev/null) || {
+    echo "error: could not reach $SITE_URL" >&2
+    echo "  This check needs the live site. If the site is up, it is a network problem," >&2
+    echo "  not a version problem -- the pin itself is unaffected." >&2
+    exit 2
+}
+
+production=$(printf '%s' "$html" \
+    | grep -oE 'wp-emoji-release\.min\.js\?ver=[0-9]+\.[0-9]+(\.[0-9]+)?' \
+    | head -1 | sed 's/.*ver=//') || true
+if [[ -z "$production" ]]; then
+    echo "error: could not read a WordPress version from $SITE_URL" >&2
+    echo "  Looked for wp-emoji-release.min.js?ver=... — core may no longer enqueue it," >&2
+    echo "  or the site may now strip version query strings. Check by hand and update" >&2
+    echo "  this script's extraction." >&2
+    exit 2
+fi
+
+if [[ "$pinned" != "$production" ]]; then
+    echo "WordPress pin has drifted from production" >&2
+    echo >&2
+    printf '      %-8s  %s\n' "$pinned" "docker-compose.yml (\${WP_VERSION:-...})" >&2
+    printf '  !!  %-8s  %s\n' "$production" "$SITE_URL" >&2
+    echo >&2
+    echo "The suite is testing a WordPress production does not run." >&2
+    echo "Bump WP_VERSION in docker-compose.yml to $production -- it is the only" >&2
+    echo "place the version is pinned -- then run the suite to see what the new" >&2
+    echo "version changes." >&2
+    exit 1
+fi
+
+echo "WordPress pin matches production ($pinned)"
+echo "  - docker-compose.yml (\${WP_VERSION:-...})"
+echo "  - $SITE_URL"
