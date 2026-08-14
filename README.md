@@ -181,6 +181,35 @@ each `.github/workflows/*.yml`. [bin/check-php-version](bin/check-php-version)
 prints every pin with its version and fails the build if any disagree,
 so a bump can't land in only some files.
 
+### The WordPress version under test
+
+`WP_VERSION` in [docker-compose.yml](docker-compose.yml) is pinned to the
+version poweroffamilies.com runs — **6.8.8** as of 2026-08-14. The PHPUnit
+suite installs that exact core and test-suite tag, so a green run means green
+against the WordPress production actually serves.
+
+It used to be `latest`, which cost two things. It resolved through
+`api.wordpress.org` on every run, so an unreachable endpoint failed CI for
+reasons unrelated to the code. And `latest` is currently **7.0.4** — two major
+versions ahead of production — so the suite was reporting on a WordPress the
+theme does not run on. Pinning caught that immediately: one test asserted
+`href="/store"`, which is only true because `wp_kses_post()` rewrites attribute
+quoting in 7.0 and leaves it alone in 6.8.
+
+To bump the pin, read the version off any core asset on production and change
+the single literal in `docker-compose.yml`:
+
+```shell
+curl -s https://poweroffamilies.com/ | grep -o 'wp-emoji-release.min.js?ver=[0-9.]*'
+```
+
+`docker/ci-test.sh` deliberately has no fallback — it fails with a clear message
+if `WP_VERSION` is unset, rather than silently reverting to `latest`. Bumping is
+a reviewable commit, so a suite that breaks right after one is unambiguous.
+
+Note that the pin governs the **test** environment. The dev site's core is the
+checked-out `wordpress/` directory, which is on 6.8.3 and tracks separately.
+
 ## Ongoing Development
 
 ### Theme

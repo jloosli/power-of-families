@@ -81,6 +81,18 @@ install_wp() {
 	else
 		if [ $WP_VERSION == 'latest' ]; then
 			local ARCHIVE_NAME='latest'
+		elif [[ $WP_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+			# An exact patch version names its own archive, so resolve it without
+			# asking api.wordpress.org which release is current. The offer lookup
+			# below only exists to find the newest patch of an x.y series; for a
+			# pinned x.y.z it can only ever answer x.y.z back, while still being
+			# able to fail the run when the endpoint is unreachable.
+			if [[ $WP_VERSION =~ \.0$ ]]; then
+				# x.x.0 is the first release of a major version, published as x.x
+				local ARCHIVE_NAME="wordpress-${WP_VERSION%??}"
+			else
+				local ARCHIVE_NAME="wordpress-$WP_VERSION"
+			fi
 		elif [[ $WP_VERSION =~ [0-9]+\.[0-9]+ ]]; then
 			# https serves multiple offers, whereas http serves single.
 			download https://api.wordpress.org/core/version-check/1.7/ $TMPDIR/wp-latest.json
