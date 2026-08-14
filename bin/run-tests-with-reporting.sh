@@ -67,6 +67,36 @@ clover_percentage() {
     fi
 }
 
+# Read a PHPUnit result count ("Tests" or "Assertions") out of a captured run
+# log. PHPUnit prints its summary in two shapes:
+#
+#   Tests: 80, Assertions: 225, Skipped: 1.   <- any run that is not clean
+#   OK (112 tests, 285 assertions)            <- a fully clean run
+#
+# Only the first was matched, so a clean run reported zero tests while the log
+# directly above it read "OK (112 tests, 285 assertions)" (#76).
+#
+# One of two copies (run-tests-ci.sh carries the other, with the fuller note).
+# Candidate 05 of the deepening review proposes a shared bin/lib/common.sh;
+# this pair is part of what it would collapse.
+phpunit_count() {
+    local label="$1" file="$2"
+    local count ok_line word
+
+    count=$(grep -o "$label: [0-9]*" "$file" | grep -o "[0-9]*" | tail -1)
+
+    if [ -z "$count" ]; then
+        # A single-test run says "OK (1 test, 1 assertion)", hence the
+        # optional trailing s on both nouns.
+        word=$(printf '%s' "$label" | tr '[:upper:]' '[:lower:]')
+        word="${word%s}"
+        ok_line=$(grep -oE "OK \([0-9]+ tests?, [0-9]+ assertions?\)" "$file" | tail -1)
+        count=$(printf '%s' "$ok_line" | grep -oE "[0-9]+ $word" | grep -oE "[0-9]+")
+    fi
+
+    echo "${count:-0}"
+}
+
 # Display usage information
 show_usage() {
     echo -e "${BLUE}Comprehensive Test Execution Script with Reporting${NC}"
@@ -446,15 +476,19 @@ generate_test_summary() {
     local skipped_tests=0
     
     if [ -f "$TEST_REPORTS_DIR/test-output.log" ]; then
-        # Parse PHPUnit output for test counts
+        # Parse PHPUnit output for test counts. Test and assertion counts go
+        # through phpunit_count, which reads both summary shapes PHPUnit emits
+        # — the "Tests: N, Assertions: M" form and the "OK (N tests, M
+        # assertions)" one a fully clean run produces instead (#76).
+        #
         # A trailing `|| echo "0"` on these pipelines never fires: tail exits 0
         # even on empty input, so an absent count yielded an empty string that
         # was then interpolated bare into the JSON below, producing
         # `"total_tests": ,` — invalid, and unreadable by every downstream jq.
-        # PHPUnit also omits "Failures:"/"Skipped:" entirely when there are
-        # none, so absent genuinely means zero.
-        total_tests=$(grep -o "Tests: [0-9]*" "$TEST_REPORTS_DIR/test-output.log" | grep -o "[0-9]*" | tail -1)
-        assertions=$(grep -o "Assertions: [0-9]*" "$TEST_REPORTS_DIR/test-output.log" | grep -o "[0-9]*" | tail -1)
+        # PHPUnit omits "Failures:"/"Skipped:" entirely when there are none, so
+        # absent genuinely means zero for those two.
+        total_tests=$(phpunit_count Tests "$TEST_REPORTS_DIR/test-output.log")
+        assertions=$(phpunit_count Assertions "$TEST_REPORTS_DIR/test-output.log")
         failed_tests=$(grep -o "Failures: [0-9]*" "$TEST_REPORTS_DIR/test-output.log" | grep -o "[0-9]*" | tail -1)
         skipped_tests=$(grep -o "Skipped: [0-9]*" "$TEST_REPORTS_DIR/test-output.log" | grep -o "[0-9]*" | tail -1)
         total_tests=${total_tests:-0}

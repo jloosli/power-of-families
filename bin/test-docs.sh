@@ -458,9 +458,10 @@ show_configuration() {
     
     echo -e "${YELLOW}Configuration Files:${NC}"
     echo ""
-    echo -e "${CYAN}phpunit.xml.dist${NC}"
-    echo "  Main PHPUnit configuration file"
+    echo -e "${CYAN}wp-content/themes/power-of-families/phpunit.xml${NC}"
+    echo "  The PHPUnit configuration -- the only one, and the only one that runs"
     echo "  Contains test suite definitions, coverage settings, and reporting options"
+    echo "  Test files are listed individually; a new file not listed there never runs"
     echo ""
     echo -e "${CYAN}coverage-thresholds.json${NC}"
     echo "  Coverage threshold definitions"

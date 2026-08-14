@@ -11,11 +11,17 @@
     stopOnError="false"
     stopOnIncomplete="false"
     stopOnSkipped="false"
+    failOnEmptyTestSuite="true"
     timeoutForSmallTests="1"
     timeoutForMediumTests="10"
     timeoutForLargeTests="60"
     verbose="true"
     >
+
+    <!-- failOnEmptyTestSuite: PHPUnit exits 0 on an empty selection by
+         default, so a filter or group that matches nothing reports a passing
+         run of zero tests. That is how two CI jobs selecting @group
+         annotations this suite has never carried stayed green (#76). -->
 
     <php>
         <const name="PHPUNIT_RUNNING" value="true"/>

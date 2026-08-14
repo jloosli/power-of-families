@@ -60,9 +60,15 @@ schema regardless of which DB pattern you pick.
 - Coverage reporting needs `xmlstarlet` on the **host** (`brew install xmlstarlet`); it is
   not in the containers. `bin/run-tests-ci.sh` and `bin/ci-coverage-integration.sh` abort
   without it rather than reporting a false 0%.
-- `npm run test:php-ci` exits non-zero on failure since #75. Its `Total Tests` /
-  `Assertions` still print 0 on a fully clean run (#76), so `test-reports/test-output.log`
-  remains the source of truth for `OK (N tests, M assertions)`.
+- `npm run test:php-ci` exits non-zero on failure since #75, and prints real `Total Tests` /
+  `Assertions` on a fully clean run since #76. PHPUnit summarises a clean run as
+  `OK (N tests, M assertions)` and everything else as `Tests: N, Assertions: M`; only the
+  second form used to be parsed, so the cleaner the run, the more it under-reported.
+- The theme's `phpunit.xml` sets `failOnEmptyTestSuite="true"`. A `--filter` or `--group`
+  selecting nothing therefore fails instead of reporting a green run of zero tests, which
+  is how two nightly jobs filtering on `@group` annotations the suite never had stayed
+  green (#76). The suite carries no `@group` annotations at all — every test extends
+  `WP_UnitTestCase` — so don't add a group filter without adding the annotations first.
 
 ## Before merging
 

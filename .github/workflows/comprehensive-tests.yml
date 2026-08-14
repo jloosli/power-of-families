@@ -11,16 +11,6 @@ on:
                 required: false
                 default: true
                 type: boolean
-            run_integration:
-                description: 'Run integration tests'
-                required: false
-                default: true
-                type: boolean
-            run_security:
-                description: 'Run security tests'
-                required: false
-                default: true
-                type: boolean
 
 env:
     PHP_VERSION: '8.4'
@@ -164,127 +154,11 @@ jobs:
               if: always()
               run: docker compose down
 
-    # Integration Tests
-    integration-tests:
-        name: Integration Tests
-        runs-on: ubuntu-24.04
-        needs: unit-tests
-        if: ${{ github.event.inputs.run_integration != 'false' }}
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v6
-
-            - name: Install system dependencies
-              run: sudo apt-get update && sudo apt-get install -y xmlstarlet
-
-            - name: Set up Node.js
-              uses: actions/setup-node@v6
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-                  cache: 'npm'
-
-            - name: Install dependencies
-              run: npm install
-
-            - name: Build project
-              run: npm run build
-
-            - name: Start Docker services
-              run: |
-                  docker compose up -d db wordpress
-
-            - name: Wait for services to be ready
-              run: |
-                  timeout 60 bash -c 'until docker compose exec -T db mysqladmin ping -h"localhost" -u"root" -p"password" --silent; do sleep 2; done'
-                  timeout 60 bash -c 'until curl -f http://localhost:8080 >/dev/null 2>&1; do sleep 2; done'
-
-            - name: Setup test environment
-              run: |
-                  chmod +x bin/test-env-manager.sh
-                  bin/test-env-manager.sh setup --force
-
-            - name: Run integration tests
-              run: |
-                  chmod +x bin/run-tests-ci.sh
-                  bin/run-tests-ci.sh --test-group integration --ci-environment github-actions --ci-build-number ${{ github.run_number }} --ci-commit-sha ${{ github.sha }} --ci-branch ${{ github.ref_name }}
-
-            - name: Upload integration test results
-              uses: actions/upload-artifact@v7
-              if: always()
-              with:
-                  name: integration-test-results-${{ github.run_number }}
-                  path: |
-                      test-reports/
-                      coverage/
-                  retention-days: 30
-
-            - name: Stop services
-              if: always()
-              run: docker compose down
-
-    # Security Tests
-    security-tests:
-        name: Security Tests
-        runs-on: ubuntu-24.04
-        needs: unit-tests
-        if: ${{ github.event.inputs.run_security != 'false' }}
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v6
-
-            - name: Install system dependencies
-              run: sudo apt-get update && sudo apt-get install -y xmlstarlet
-
-            - name: Set up Node.js
-              uses: actions/setup-node@v6
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-                  cache: 'npm'
-
-            - name: Install dependencies
-              run: npm install
-
-            - name: Build project
-              run: npm run build
-
-            - name: Start Docker services
-              run: |
-                  docker compose up -d db wordpress
-
-            - name: Wait for services to be ready
-              run: |
-                  timeout 60 bash -c 'until docker compose exec -T db mysqladmin ping -h"localhost" -u"root" -p"password" --silent; do sleep 2; done'
-                  timeout 60 bash -c 'until curl -f http://localhost:8080 >/dev/null 2>&1; do sleep 2; done'
-
-            - name: Setup test environment
-              run: |
-                  chmod +x bin/test-env-manager.sh
-                  bin/test-env-manager.sh setup --force
-
-            - name: Run security tests
-              run: |
-                  chmod +x bin/run-tests-ci.sh
-                  bin/run-tests-ci.sh --test-group security --ci-environment github-actions --ci-build-number ${{ github.run_number }} --ci-commit-sha ${{ github.sha }} --ci-branch ${{ github.ref_name }}
-
-            - name: Upload security test results
-              uses: actions/upload-artifact@v7
-              if: always()
-              with:
-                  name: security-test-results-${{ github.run_number }}
-                  path: |
-                      test-reports/
-                  retention-days: 30
-
-            - name: Stop services
-              if: always()
-              run: docker compose down
-
     # Test Summary and Reporting
     test-summary:
         name: Test Summary
         runs-on: ubuntu-24.04
-        needs:
-            [unit-tests, coverage-analysis, integration-tests, security-tests]
+        needs: [unit-tests, coverage-analysis]
         if: always()
         steps:
             - name: Checkout code
@@ -322,20 +196,6 @@ jobs:
                     echo "⚠️ **Coverage Analysis:** Skipped or Failed" >> test-summary.md
                   fi
 
-                  # Check integration
-                  if [ -d "artifacts/integration-test-results-${{ github.run_number }}" ]; then
-                    echo "✅ **Integration Tests:** Passed" >> test-summary.md
-                  else
-                    echo "⚠️ **Integration Tests:** Skipped or Failed" >> test-summary.md
-                  fi
-
-                  # Check security
-                  if [ -d "artifacts/security-test-results-${{ github.run_number }}" ]; then
-                    echo "✅ **Security Tests:** Passed" >> test-summary.md
-                  else
-                    echo "⚠️ **Security Tests:** Skipped or Failed" >> test-summary.md
-                  fi
-
                   echo "" >> test-summary.md
                   echo "## Artifacts" >> test-summary.md
                   echo "" >> test-summary.md
@@ -345,7 +205,6 @@ jobs:
                   echo "" >> test-summary.md
                   echo "- Review any failed tests and fix issues" >> test-summary.md
                   echo "- Check coverage reports for areas needing more tests" >> test-summary.md
-                  echo "- Address any security concerns identified" >> test-summary.md
 
             - name: Upload test summary
               uses: actions/upload-artifact@v7
